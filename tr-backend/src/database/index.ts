@@ -4,10 +4,10 @@ const dbConfig: TypeOrmModuleOptions = {
     type: 'postgres',
     host: 'localhost',
     port: 5432,
-    username: 'test',
-    password: 'test',
+    username: 'trvx',
+    password: 'trvx-123',
     database: 'trvx',
     entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    synchronize: false,
+    synchronize: true,
 }
 export default TypeOrmModule.forRoot(dbConfig)
