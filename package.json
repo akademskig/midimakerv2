@@ -1,6 +1,6 @@
 {
   "name": "tr-user-admin",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "TravelRay users administration service.",
   "main": "index.js",
   "dependencies": {},
