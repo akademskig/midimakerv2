@@ -1,5 +1,5 @@
 const yargs = require("yargs")
-const cp = require("child_process")
+const { spawnSync } = require("child_process")
 
 const args = yargs
     .option('bump', {
@@ -7,38 +7,50 @@ const args = yargs
         describe: "bump version",
         choices: ['major', 'minor', 'patch'],
     })
-    .option('version', {
+    .option('version-tag', {
         alias: "v",
         describe: "tag defined version",
+        string: true
     })
     .help('help')
     .argv
 
 const init = (version) => {
     const promiseMain = new Promise((resolve, reject) => {
-        return cp.exec(`cd ${process.cwd()} && npm version ${version} `,(err) => reject(err) 
-            ,() =>
-            resolve() )
+        const options = {
+            cwd: process.cwd()
+        }
+        commandsExec(options, version)
+        resolve()
     })
     const promiseBackend = new Promise((resolve, reject) => {
-        return cp.exec(`cd ${process.cwd()}/trua-backend && npm version ${version} `, () =>
-            resolve()
-            , (err) => reject())
+        const options = {
+            cwd: `${process.cwd()}/trua-backend`
+        }
+        commandsExec(options, version)
+        resolve()
     })
     const promiseFrontend = new Promise((resolve, reject) => {
-        return cp.exec(`cd ${process.cwd()}/trua-frontend && npm version ${version} `, () =>
-            resolve()
-            , (err) => reject())
+        const options = {
+            cwd: `${process.cwd()}/trua-frontend`
+        }
+        commandsExec(options, version)
+        resolve()
     })
-    return Promise.all([promiseMain, promiseFrontend, promiseBackend]);
+    return Promise.all([promiseMain, promiseBackend, promiseFrontend]);
+}
+
+const commandsExec = (options, version) => {
+    spawnSync("git", ["stash"], options)
+    spawnSync("npm", ["version", version], options)
+    spawnSync("git", ["stash", "apply"], options)
 
 }
 
-if (args.bump || args.version) {
-    const version = args.bump || args.version
-    init(version).then(()=>console.log("Release done")).catch(err => 
-        { 
-            console.error(err)
-            process.exit(1) 
-        })
+if (args.bump || args["version-tag"]) {
+    const version = args.bump || args.versionTag
+    init(version).then(() => console.log(`Released version ${version}`)).catch(err => {
+        console.error(err)
+        process.exit(1)
+    })
 }
