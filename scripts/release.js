@@ -2,17 +2,19 @@ const yargs = require("yargs")
 const cp = require("child_process")
 
 const args = yargs
-    .option('release', {
-        alias: "r",
-        describe: "version",
+    .option('bump', {
+        alias: "b",
+        describe: "bump version",
         choices: ['major', 'minor', 'patch'],
-        require: true
+    })
+    .option('version', {
+        alias: "v",
+        describe: "tag defined version",
     })
     .help('help')
     .argv
 
 const init = (version) => {
-    console.log(version)
     const promiseMain = new Promise((resolve, reject) => {
         return cp.exec(`cd ${process.cwd()} && npm version ${version} `,(err) => reject(err) 
             ,() =>
@@ -32,9 +34,9 @@ const init = (version) => {
 
 }
 
-if (args.release) {
-    console.log(init(args.release))
-    init(args.release).then(()=>console.log("Release done")).catch(err => 
+if (args.bump || args.version) {
+    const version = args.bump || args.version
+    init(version).then(()=>console.log("Release done")).catch(err => 
         { 
             console.error(err)
             process.exit(1) 
