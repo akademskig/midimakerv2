@@ -1,4 +1,4 @@
-import { Controller, Request, Post, Get, UseGuards, Param, Query, Body } from '@nestjs/common';
+import { Controller, Request, Post, Get, UseGuards, Param, Query, Body, Logger } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserRegister } from './auth.utils';
@@ -14,6 +14,10 @@ export class AuthController {
 
     @Post('/register')
     async register(@Body() user: UserRegister) {
-        return this.authService.register(user);
+        try {
+            return this.authService.register(user);
+        } catch (error) {
+            Logger.error('Error', JSON.stringify(error), 'AuthController');
+        }
     }
 }

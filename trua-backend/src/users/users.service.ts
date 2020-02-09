@@ -14,14 +14,18 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) { }
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ username });
+  async findOne(query): Promise<User | undefined> {
+    return this.userRepository.findOne(query);
   }
 
   async createNew({ username, password, email }: UserRegister): Promise<User> {
-    const existingUser = await this.findOne(username);
+    const existingUser = await this.findOne({username});
     if (existingUser) {
       throw new BadRequestException(`Username ${existingUser.username} already exists!`);
+    }
+    const existingEmail = await this.findOne({email});
+    if (existingEmail) {
+      throw new BadRequestException(`Email ${existingEmail.email} already exists!`);
     }
     const hashedPassword = await hashPassword(password);
     const user = new User({ username, password: hashedPassword, email });

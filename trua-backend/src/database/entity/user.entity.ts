@@ -14,15 +14,23 @@ export default class User {
     password: string;
 
     @IsEmail()
-    @Column('text')
+    @Column({type: 'text', unique: true})
     email: string;
 
     @IsNotEmpty()
-    @Column({ enum: [Privileges.ADMIN, Privileges.COMPANY, Privileges.REGULAR] })
+    @Column({
+        type: 'enum',
+        enum: Privileges,
+        default: Privileges.ADMIN,
+    })
     privilege: Privileges;
 
     @IsNotEmpty()
-    @Column({ enum: [Privileges.ADMIN, Privileges.COMPANY, Privileges.REGULAR] })
+    @Column({
+        type: 'enum',
+        enum: Privileges,
+        default: Privileges.ADMIN,
+    })
     type: Privileges;
 
     @Column({type: 'text', nullable: true})
