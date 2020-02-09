@@ -7,7 +7,6 @@ import { AuthController } from './auth.controller';
 import JwtModule from './jwt.config';
 import { JwtStrategy } from './jwt.strategy';
 
-
 @Module({
   imports: [UsersModule, PassportModule, JwtModule],
   providers: [AuthService, LocalStrategy, JwtStrategy],
