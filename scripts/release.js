@@ -20,29 +20,30 @@ const init = (version) => {
         const options = {
             cwd: process.cwd()
         }
-        commandsExec(options, version)
+        commandsExec(options, version, "main package")
         resolve()
     })
     const promiseBackend = new Promise((resolve, reject) => {
         const options = {
             cwd: `${process.cwd()}/trua-backend`
         }
-        commandsExec(options, version)
+        commandsExec(options, version, "frontend-ts")
         resolve()
     })
     const promiseFrontend = new Promise((resolve, reject) => {
         const options = {
             cwd: `${process.cwd()}/trua-frontend`
         }
-        commandsExec(options, version)
+        commandsExec(options, version, "trua-backend")
         resolve()
     })
     return Promise.all([promiseMain, promiseBackend, promiseFrontend]);
 }
 
-const commandsExec = (options, version) => {
+const commandsExec = (options, version, package) => {
     spawnSync("git", ["stash"], options)
-    spawnSync("npm", ["version", version], options)
+    let res = spawnSync("npm", ["version", version], options)
+    console.log(`${package} updated to ${res.stdout.toString()}`)
     spawnSync("git", ["stash", "apply"], options)
 
 }
