@@ -1,9 +1,9 @@
-enum Privileges {
+enum UserGroup {
     ADMIN = 'admin',
     COMPANY = 'company',
     REGULAR = 'regular',
 }
 
 export {
-    Privileges,
+    UserGroup,
 };
