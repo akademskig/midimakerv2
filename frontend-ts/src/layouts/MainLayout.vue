@@ -32,7 +32,7 @@
           :key="link.title"
           v-bind="link"
         />
-      </q-list>
+        </q-list>
     </q-drawer>
 
     <q-page-container>
@@ -42,20 +42,15 @@
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink'
 
-export default {
+export default Vue.extend({
   name: 'MainLayout',
-
-  components: {
-    EssentialLink
-  },
 
   data () {
     return {
-      leftDrawerOpen: false,
+       leftDrawerOpen:  false,
       essentialLinks: [
-        {
+          {
           title: 'Docs',
           caption: 'quasar.dev',
           icon: 'school',
@@ -94,5 +89,5 @@ export default {
       ]
     }
   }
-}
+})
 </script>
