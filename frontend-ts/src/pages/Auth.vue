@@ -1,15 +1,54 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <login-form/>
-  </q-page>
+    <q-card class="q-pa-md card-auth">
+      <q-tabs
+        v-model="tab"
+        dense
+        class="text-grey"
+        active-color="primary"
+        indicator-color="primary"
+        align="justify"
+        narrow-indicator
+      >
+        <q-tab name="signIn" label="Sign In" :to="'login'"/>
+        <q-tab name="register" label="Register"></q-tab>
+      </q-tabs>
 
+      <q-separator />
+
+      <q-tab-panels v-model="tab" animated class="q-pt-lg">
+        <q-tab-panel name="signIn" class="no-padding">
+          <register-form />
+        </q-tab-panel>
+
+        <q-tab-panel name="register" class="no-padding">
+          <register-form />
+        </q-tab-panel>
+      </q-tab-panels>
+    </q-card>
+  </q-page>
 </template>
 
 <script lang="ts">
-import LoginForm from '../components/LoginFormComponent.vue'
+import RegisterForm from '../components/RegisterForm.vue'
 
 export default {
-  name: 'PageLogin',
-  components: { 'login-form': LoginForm }
+  name: 'PageAuth',
+  data () {
+    return {
+      tab: 'signIn'
+    }
+  },
+  components: { 'register-form': RegisterForm }
 }
 </script>
+
+<style lang="scss">
+.q-card.card-auth {
+  width: 90%;
+  background-color: transparent;
+  max-width: 370px;
+  padding-left: 28px;
+  padding-right: 28px;
+}
+</style>
