@@ -1,19 +1,15 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+    <login-form/>
   </q-page>
+
 </template>
 
 <script lang="ts">
-import ExampleComponent from 'components/ClassComponent.vue'
+import LoginForm from '../components/LoginFormComponent.vue'
 
 export default {
-  name: 'PageIndex',
-  components: { ExampleComponent },
+  name: 'PageLogin',
+  components: { 'login-form': LoginForm }
 }
 </script>

@@ -10,7 +10,7 @@ const routes: RouteConfig[] = [
     component: () => import('layouts/AuthLayout.vue'),
     redirect: '/auth/login',
     children: [{
-      path: 'login', component: () => import('pages/Index.vue')
+      path: 'login', component: () => import('pages/Auth.vue')
     }]
   }
 ]
