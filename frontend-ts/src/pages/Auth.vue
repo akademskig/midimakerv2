@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page class="vertical-top justify-evenly">
     <q-card class="q-pa-md card-auth">
       <q-tabs
         v-model="tab"
@@ -10,17 +10,14 @@
         align="justify"
         narrow-indicator
       >
-        <q-tab name="signIn" label="Sign In" :to="'login'"/>
+        <q-tab name="signIn" label="Sign In" :to="'login'" />
         <q-tab name="register" label="Register"></q-tab>
       </q-tabs>
-
       <q-separator />
-
       <q-tab-panels v-model="tab" animated class="q-pt-lg">
         <q-tab-panel name="signIn" class="no-padding">
-          <register-form />
+          <signin-form />
         </q-tab-panel>
-
         <q-tab-panel name="register" class="no-padding">
           <register-form />
         </q-tab-panel>
@@ -31,7 +28,7 @@
 
 <script lang="ts">
 import RegisterForm from '../components/RegisterForm.vue'
-
+import SignInForm from '../components/SignInForm.vue'
 export default {
   name: 'PageAuth',
   data () {
@@ -39,16 +36,17 @@ export default {
       tab: 'signIn'
     }
   },
-  components: { 'register-form': RegisterForm }
+  components: { 'register-form': RegisterForm, 'signin-form': SignInForm }
 }
 </script>
 
 <style lang="scss">
 .q-card.card-auth {
-  width: 90%;
-  background-color: transparent;
+  width: 96%;
   max-width: 370px;
   padding-left: 28px;
   padding-right: 28px;
+  margin: auto;
+  top: 18vh;
 }
 </style>
