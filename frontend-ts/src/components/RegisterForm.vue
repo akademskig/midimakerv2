@@ -81,9 +81,10 @@ export default class RegisterForm extends Vue {
   password = ''
   repeatPassword = ''
 
-  onSubmit () {
+  async onSubmit () {
     if (!this.$v.$invalid) {
-      console.log('submitted!')
+      await this.$store.dispatch('Auth/register',
+        { email: this.email, password: this.password, username: this.name })
     } else if (!this.accept) {
       this.$q.notify(
         { color: 'negative', message: 'Please accept terms and conditions', icon: 'warning', timeout: 2000, position: 'top' }

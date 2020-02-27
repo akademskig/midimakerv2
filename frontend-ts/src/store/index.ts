@@ -1,6 +1,7 @@
 import { HasSsrBootParams } from 'quasar'
 import { VueConstructor } from 'vue'
 import Vuex from 'vuex'
+import Auth from './auth'
 
 // import example from './module-example'
 // import exampleState from './module-example/state'
@@ -22,10 +23,9 @@ export interface StoreInterface {
 
 export default function ({ Vue }: StoreBootParams) {
   Vue.use(Vuex)
-
   const Store = new Vuex.Store({
     modules: {
-      // example
+      Auth
     },
 
     // enable strict mode (adds overhead!)
