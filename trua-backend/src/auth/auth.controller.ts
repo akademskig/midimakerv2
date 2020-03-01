@@ -6,10 +6,10 @@ import { UserRegister } from './auth.utils';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    @UseGuards(AuthGuard('local'))
-    @Post('/login')
+    @UseGuards(AuthGuard('custom'))
+    @Post('/signin')
     async login(@Request() req) {
-        return this.authService.login(req);
+        return this.authService.signIn(req.user);
     }
 
     @Post('/register')
