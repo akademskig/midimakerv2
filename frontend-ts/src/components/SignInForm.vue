@@ -34,7 +34,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import { required, email } from 'vuelidate/lib/validators'
-
+import e from '../helpers/errors'
 const validations = {
   email: {
     required,
@@ -49,19 +49,24 @@ const validations = {
   validations: validations
 })
 export default class SignInForm extends Vue {
-  name = ''
   email = ''
-  accept = false
   password = ''
-  repeatPassword = ''
 
   onSubmit () {
     if (!this.$v.$invalid) {
-      console.log('submitted!')
-    } else if (!this.accept) {
-      this.$q.notify(
-        { color: 'negative', message: 'Please accept terms and conditions', icon: 'warning', timeout: 2000, position: 'top' }
-      )
+      this.$store.dispatch('Auth/signIn',
+        { email: this.email, password: this.password })
+        .then(username => {
+          console.log(username)
+          this.$q.notify({ message: `Welcome ${username}!`, type: 'positive', timeout: 2000, position: 'top' })
+          this.$router.push('/')
+        }
+
+        )
+        .catch(err =>
+          this.$q.notify(
+            { caption: `\n${e.parseError(err).message}`, html: true, color: 'negative', message: 'Sign in error!', icon: 'warning', timeout: 2000, position: 'top' }
+          ))
     }
   }
 

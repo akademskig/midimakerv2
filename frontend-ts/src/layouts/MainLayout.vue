@@ -3,10 +3,21 @@
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>
-          Quasar App
+           <q-item>
+          <q-avatar>
+            <q-img src="../assets/robot.svg" width="50px" padding></q-img>
+          </q-avatar>
+        </q-item>
         </q-toolbar-title>
+        <q-avatar>
+            <q-img src="../assets/robot-head.svg" width="50px" padding></q-img>
+          </q-avatar>
+          <q-item class="items-center">{{currentUser && currentUser.username}}</q-item>
+          <q-item  class="items-center">
+            <q-btn icon-right="logout" label="Logout" flat @click="logout()">
+            </q-btn>
 
-        <div>Quasar v{{ $q.version }}</div>
+          </q-item>
       </q-toolbar>
     </q-header>
 
@@ -16,10 +27,27 @@
   </q-layout>
 </template>
 
-<script>
+<script lang='ts'>
 import Vue from 'vue'
-export default Vue.extend({
-  name: 'MainLayout'
-
+import Component from 'vue-class-component'
+import { mapGetters, mapActions } from 'vuex'
+@Component({
+  name: 'Mainlayout',
+  computed: {
+    ...mapGetters({
+      currentUser: 'Auth/getCurrentUser'
+    })
+  },
+  methods: {
+    ...mapActions({
+      removeUser: 'Auth/removeUser'
+    }),
+    logout () {
+      this.removeUser()
+      this.$router.push('/auth')
+    }
+  }
 })
+export default class MainLayout extends Vue {
+}
 </script>

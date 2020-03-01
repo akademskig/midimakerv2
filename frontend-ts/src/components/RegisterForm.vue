@@ -55,8 +55,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { required, email, sameAs } from 'vuelidate/lib/validators'
+import e from '../helpers/errors'
 
 const validations = {
   name: {
@@ -75,21 +76,37 @@ const validations = {
   validations: validations
 })
 export default class RegisterForm extends Vue {
+  @Prop() routeSignIn!: () => void
   name = ''
   email = ''
   accept = false
   password = ''
   repeatPassword = ''
+  currentUser = null
 
-  async onSubmit () {
+  onSubmit () {
     if (!this.$v.$invalid) {
-      await this.$store.dispatch('Auth/register',
+      this.$store.dispatch('Auth/register',
         { email: this.email, password: this.password, username: this.name })
+        .then(res => {
+          this.$q.notify({ message: 'Success!', type: 'info', timeout: 200000, position: 'top' })
+          this.routeSignIn()
+        }
+
+        )
+        .catch(err =>
+          this.$q.notify(
+            { caption: `\n${e.parseError(err).message}`, html: true, color: 'negative', message: 'Registration error!', icon: 'warning', timeout: 2000, position: 'top' }
+          ))
     } else if (!this.accept) {
       this.$q.notify(
         { color: 'negative', message: 'Please accept terms and conditions', icon: 'warning', timeout: 2000, position: 'top' }
       )
     }
+  }
+
+  computed () {
+    this.currentUser = this.$store.getters('Auth/currentUser')
   }
 
   onReset () {

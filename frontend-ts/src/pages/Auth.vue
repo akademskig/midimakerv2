@@ -19,7 +19,7 @@
           <signin-form />
         </q-tab-panel>
         <q-tab-panel name="register" class="no-padding">
-          <register-form />
+          <register-form :routeSignIn="routeSignIn"/>
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
@@ -34,6 +34,11 @@ export default {
   data () {
     return {
       tab: 'signIn'
+    }
+  },
+  methods: {
+    routeSignIn () {
+      this.tab = 'signIn'
     }
   },
   components: { 'register-form': RegisterForm, 'signin-form': SignInForm }

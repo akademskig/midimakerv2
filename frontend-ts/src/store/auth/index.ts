@@ -1,30 +1,47 @@
 import auth from '../../api/auth'
+import Vue from 'vue'
 
 const state = {
   currentUser: null
   // your code
 }
 
-function mutations (state) {
-  return {
-    'REGISTER': (user) => {
-      state.currentUser = user
-    }
-
+const mutations = {
+  REGISTER (state, user) {
+    state.currentUser = user
+  },
+  SIGN_IN (state, user) {
+    state.currentUser = user
+  },
+  LOG_OUT (state, user) {
+    Vue.set(state, 'currentUser', null)
   }
   // your code
 }
 const actions = {
-  async  register ({ commit }, payload) {
-    const { user } = await auth.register(payload)
-    if (user) {
-      commit('REGISTER', user)
-    }
+  register ({ commit }, payload) {
+    return auth.register(payload)
+      .then((user) => {
+        commit('REGISTER', user)
+      })
+  },
+  signIn ({ commit }, payload) {
+    return auth.signIn(payload)
+      .then((user) => {
+        commit('SIGN_IN', user)
+        return user.username
+      })
+  },
+  removeUser ({ commit }) {
+    commit('LOG_OUT')
   }
 }
 // your code
 
-function getters (/* state */) {
+const getters = {
+  getCurrentUser (state) {
+    return state.currentUser
+  }
   // your code
 }
 
