@@ -41,13 +41,14 @@ import { mapGetters, mapActions } from 'vuex'
   methods: {
     ...mapActions({
       removeUser: 'Auth/removeUser'
-    }),
-    logout () {
-      this.removeUser()
-      this.$router.push('/auth')
-    }
+    })
   }
 })
 export default class MainLayout extends Vue {
+  removeUser!: () => void
+  logout () {
+    this.removeUser()
+    this.$router.push('/auth')
+  }
 }
 </script>

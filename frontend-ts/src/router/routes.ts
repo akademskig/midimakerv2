@@ -1,7 +1,7 @@
 import { RouteConfig } from 'vue-router'
 import store from '../store/auth'
 
-const authGuard = (to, from, next: ({ path }?: {path: string}) => void) => {
+const authGuard = (from, to, next: ({ path }?: {path: string}) => void) => {
   if (store.getters.getCurrentUser(store.state) === null) next({ path: '/auth' })
   else next()
 }

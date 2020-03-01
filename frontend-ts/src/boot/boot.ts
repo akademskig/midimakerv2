@@ -1,10 +1,10 @@
-import axios from 'axios'
-import Vue from 'vue'
+import axios, { AxiosStatic } from 'axios'
+import Vue, { PluginFunction } from 'vue'
 import Vuelidate from 'vuelidate'
 
 declare module 'vue/types/vue' {
   interface Vue {
-    use: (module: any) => void;
+    use: (module: PluginFunction<any> | AxiosStatic) => void;
   }
 }
 

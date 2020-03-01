@@ -88,7 +88,7 @@ export default class RegisterForm extends Vue {
     if (!this.$v.$invalid) {
       this.$store.dispatch('Auth/register',
         { email: this.email, password: this.password, username: this.name })
-        .then(res => {
+        .then(() => {
           this.$q.notify({ message: 'Success!', type: 'info', timeout: 200000, position: 'top' })
           this.routeSignIn()
         }

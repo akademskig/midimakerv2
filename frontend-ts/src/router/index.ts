@@ -1,4 +1,4 @@
-import { HasSsrBootParams, HasStoreBootParams } from 'quasar'
+import { HasSsrBootParams, HasStoreBootParams } from 'quasar/dist/types'
 import { VueConstructor } from 'vue'
 import VueRouter from 'vue-router'
 import { StoreInterface } from '../store'

@@ -5,7 +5,7 @@ class Errors {
     let messages = ''
     if (Array.isArray(error.message)) {
       error.message.map((message: Message) => {
-        _.forEach(message.constraints, (val, key) => {
+        _.forEach(message.constraints, (val) => {
           messages = messages.concat(val, '</br>')
         })
       })
