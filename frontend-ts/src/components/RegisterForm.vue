@@ -49,7 +49,7 @@
     <q-toggle class="q-pb-md q-ml-none" v-model="accept" label="I accept the license and terms" />
     <div>
       <q-btn label="Submit" type="submit" color="primary" />
-      <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+      <q-btn label="Reset" @click="onReset" color="primary" flat class="q-ml-sm" />
     </div>
   </q-form>
 </template>
