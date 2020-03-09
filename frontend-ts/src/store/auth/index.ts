@@ -1,7 +1,6 @@
 import auth from '../../api/auth'
 import Vue from 'vue'
 import { Commit } from 'vuex/types'
-import { RegisterPayload, SignInPayload, AuthState, CurrentUser } from './auth.store'
 
 const state = {
   currentUser: null
@@ -40,6 +39,9 @@ const actions = {
 const getters = {
   getCurrentUser (state: AuthState) {
     return state.currentUser
+  },
+  getCurrentUserLanguageId (state: AuthState) {
+    return state.currentUser ? state.currentUser.languageId : null
   }
 }
 
