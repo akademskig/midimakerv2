@@ -11,8 +11,9 @@ class Auth {
           } })
         return res.data
       } catch (err) {
-        console.error(JSON.stringify(err.response.data))
-        throw err.response.data
+        const errRes = err.response ? err.response.data : 'An error occurred'
+        console.error(JSON.stringify(errRes))
+        throw errRes
       }
     }
 
@@ -24,8 +25,9 @@ class Auth {
           } })
         return res.data
       } catch (err) {
-        console.error(JSON.stringify(err.response.data))
-        throw err.response.data
+        const errRes = err.response ? err.response.data : 'An error occurred'
+        console.error(JSON.stringify(errRes))
+        throw errRes
       }
     }
 }
