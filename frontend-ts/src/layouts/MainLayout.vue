@@ -2,57 +2,15 @@
   <q-layout view="hHh LpR lFf">
     <q-header elevated>
       <q-toolbar>
-       <q-toolbar-title>
+        <q-toolbar-title>
           <q-item class="toolbar-left">
             <q-avatar>
               <q-img src="../assets/robot.svg" width="50px" padding></q-img>
             </q-avatar>
             <q-btn dense flat round icon="menu" @click="drawerOpened=!drawerOpened" />
-
           </q-item>
-
         </q-toolbar-title>
-        <q-btn-dropdown flat :label="currentUser.username">
-          <div class="no-wrap q-pa-none">
-            <div class="items-center">
-              <q-item class="justify-center" bordered>
-                <q-avatar size="72px">
-                  <q-img src="../assets/robot-head.svg" width="50px" padding></q-img>
-                </q-avatar>
-              </q-item>
-              <q-separator/>
-              <q-list >
-                <q-item v-ripple>
-                  <q-item-section class="q-px-none" avatar >
-                    <q-avatar icon="email" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    {{currentUser.email}}
-                  </q-item-section>
-                </q-item>
-               <q-item   clickable v-ripple>
-                  <q-item-section class="q-px-none" avatar >
-                    <q-avatar icon="settings" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    Settings
-                  </q-item-section>
-                </q-item>
-                   <q-item  clickable v-ripple  @click="logout" >
-                  <q-item-section class="q-px-none" avatar >
-                    <q-avatar icon="logout" />
-                  </q-item-section>
-
-                  <q-item-section>
-                    Logout
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </div>
-          </div>
-        </q-btn-dropdown>
+        <user-control />
       </q-toolbar>
     </q-header>
     <navigation-drawer v-model="drawerOpened"></navigation-drawer>
@@ -65,39 +23,25 @@
 <script lang='ts'>
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import { mapGetters, mapActions } from 'vuex'
+import UserControl from '../components/userControl/userControl.vue'
 @Component({
   name: 'Mainlayout',
   data () {
     return {
-      userSelected: null,
       options: ['Settings', 'Logout'],
       drawerOpened: true
     }
   },
-  computed: {
-    ...mapGetters({
-      currentUser: 'Auth/getCurrentUser'
-    })
-  },
-  methods: {
-    ...mapActions({
-      removeUser: 'Auth/removeUser'
-    })
-  },
+  components: { 'user-control': UserControl }
 })
 export default class MainLayout extends Vue {
-  removeUser!: () => void
-  logout () {
-    this.removeUser()
-    this.$router.push('/auth')
-  }
+
 }
 </script>
 <style lang="scss">
-.toolbar-left{
+.toolbar-left {
   justify-content: space-between;
   align-items: center;
-  width:30%;
+  width: 30%;
 }
 </style>
