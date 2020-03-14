@@ -1,8 +1,8 @@
-import { RouteConfig } from 'vue-router'
+import { RouteConfig, Route } from 'vue-router'
 import store from '../store/auth'
 
-const authGuard = (from, to, next: ({ path }?: {path: string}) => void) => {
-  if (store.getters.getCurrentUser(store.state) === null) next({ path: '/auth' })
+const authGuard = (_from: Route, _to: Route, next: ({ path }?: { path: string }) => void) => {
+  if (!store.getters.getCurrentUser(store.state)) next({ path: '/auth' })
   else next()
 }
 const routes: RouteConfig[] = [
