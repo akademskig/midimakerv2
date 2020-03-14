@@ -13,10 +13,10 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOne({email});
-    if (user && comparePasswords(password, user.password)) {
+    if (user && await comparePasswords(password, user.password)) {
       const { password: pwd, ...result } = user;
       return result;
-    } else if (user && !comparePasswords(password, user.password)) {
+    } else if (user && !await comparePasswords(password, user.password)) {
       throw new UnauthorizedException('Invalid password');
     } else if (!user) {
       throw new UnauthorizedException('User doesn\'t exist!');
