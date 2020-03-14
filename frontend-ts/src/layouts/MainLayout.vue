@@ -1,13 +1,16 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="hHh LpR lFf">
     <q-header elevated>
       <q-toolbar>
-        <q-toolbar-title>
-          <q-item>
+       <q-toolbar-title>
+          <q-item class="toolbar-left">
             <q-avatar>
               <q-img src="../assets/robot.svg" width="50px" padding></q-img>
             </q-avatar>
+            <q-btn dense flat round icon="menu" @click="drawerOpened=!drawerOpened" />
+
           </q-item>
+
         </q-toolbar-title>
         <q-btn-dropdown flat :label="currentUser.username">
           <div class="no-wrap q-pa-none">
@@ -52,6 +55,7 @@
         </q-btn-dropdown>
       </q-toolbar>
     </q-header>
+    <navigation-drawer v-model="drawerOpened"></navigation-drawer>
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -67,7 +71,8 @@ import { mapGetters, mapActions } from 'vuex'
   data () {
     return {
       userSelected: null,
-      options: ['Settings', 'Logout']
+      options: ['Settings', 'Logout'],
+      drawerOpened: true
     }
   },
   computed: {
@@ -89,3 +94,10 @@ export default class MainLayout extends Vue {
   }
 }
 </script>
+<style lang="scss">
+.toolbar-left{
+  justify-content: space-between;
+  align-items: center;
+  width:30%;
+}
+</style>
