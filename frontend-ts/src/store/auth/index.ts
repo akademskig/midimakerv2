@@ -1,11 +1,11 @@
 import auth from '../../api/auth'
 import Vue from 'vue'
 import { Commit } from 'vuex/types'
+import storageApi from 'src/helpers/storageApi'
 
 const state = {
-  currentUser: null
+  currentUser: storageApi.getCurrentUser()
 }
-
 const mutations = {
   REGISTER (state: AuthState, user: CurrentUser) {
     state.currentUser = user
@@ -27,11 +27,13 @@ const actions = {
   signIn ({ commit }: {commit: Commit}, payload: SignInPayload) {
     return auth.signIn(payload)
       .then((user) => {
+        storageApi.setCurrentUser(user)
         commit('SIGN_IN', user)
         return user.username
       })
   },
   removeUser ({ commit }: {commit: Commit}) {
+    storageApi.removeCurrentUser()
     commit('LOG_OUT')
   }
 }
