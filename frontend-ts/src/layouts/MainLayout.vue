@@ -29,7 +29,8 @@ import UserControl from '../components/userControl/userControl.vue'
   data () {
     return {
       options: ['Settings', 'Logout'],
-      drawerOpened: true
+      drawerOpened: true,
+      inception: false
     }
   },
   components: { 'user-control': UserControl }

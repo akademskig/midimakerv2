@@ -16,12 +16,12 @@
 
             <q-item-section>{{currentUser.email}}</q-item-section>
           </q-item>
-          <q-item clickable v-ripple>
-            <q-item-section class="q-px-none" avatar>
+          <q-item clickable v-ripple  @click="inception = true">
+            <q-item-section class="q-px-none" avatar >
               <q-avatar icon="settings" />
             </q-item-section>
 
-            <q-item-section>Settings</q-item-section>
+            <q-item-section >Settings</q-item-section>
           </q-item>
           <q-item clickable v-ripple @click="logout">
             <q-item-section class="q-px-none" avatar>
@@ -31,6 +31,8 @@
             <q-item-section>Logout</q-item-section>
           </q-item>
         </q-list>
+         <user-control-modal :inception="inception" @input="toggleDialog()"/>
+
       </div>
     </div>
   </q-btn-dropdown>
@@ -43,6 +45,11 @@ import Vue from 'vue'
 
 @Component({
   name: 'UserControl',
+  data () {
+    return {
+      inception: false
+    }
+  },
   computed: {
     ...mapGetters({
       currentUser: 'Auth/getCurrentUser'
@@ -51,7 +58,10 @@ import Vue from 'vue'
   methods: {
     ...mapActions({
       removeUser: 'Auth/removeUser'
-    })
+    }),
+    toggleDialog () {
+      this.inception = !this.inception
+    }
   }
 })
 export default class UserControl extends Vue {
