@@ -18,6 +18,31 @@ export class UsersService {
     return this.userRepository.findOne(query);
   }
 
+  async getAll(params): Promise<{data:User[], count: number}> {
+    const query = this.buildQuery(params);
+    const res = await this.userRepository.findAndCount(query);
+    const count= res[1]
+    const data = res[0]
+    return {data, count}
+
+  }
+
+  private buildQuery(params: any) {
+    const { _end, _start, _sort, _order } = params;
+    const order = {
+      [_sort]: _order,
+    };
+    const select = {
+      skip: _start,
+      take: _end,
+    };
+    const query = {
+      order,
+      ...select,
+    };
+    return query;
+  }
+
   async createNew({ username, password, email }: UserRegister): Promise<User> {
     const existingUser = await this.findOne({username});
     if (existingUser) {
