@@ -4,7 +4,7 @@ import { useLogin, useNotify, Notification } from 'react-admin';
 import { Button, Container, FormGroup, Paper, TextField, InputAdornment } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
-import { useForm,} from "react-hook-form";
+import { useForm, } from "react-hook-form";
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -50,10 +50,12 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   eyeButton: {
     minWidth: 'auto',
-    padding: theme.spacing()*0.5
+    padding: theme.spacing() * 0.5
+  },
+  notification:{
+    minWidth: 'auto'
   }
 }));
-
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
@@ -66,7 +68,7 @@ const AuthPage = () => {
   const onSubmit = (values: any) => {
     if (values.length) return
     login({ email, password })
-      .catch(() => notify('Invalid email or password'));
+      .catch((err: Error) => { notify(err, 'error') });
   };
   return (
     <Container maxWidth="xs" className={classes.container}>
@@ -121,14 +123,14 @@ const AuthPage = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                   <Button 
-                   onMouseDown={() => setPasswordType('text')} 
-                   onMouseUp={() => setPasswordType('password')}
-                   className={classes.eyeButton}
-                   >
-                   <EyeIcon  />
+                    <Button
+                      onMouseEnter={() => setPasswordType('text')}
+                      onMouseLeave={() => setPasswordType('password')}
+                      className={classes.eyeButton}
+                    >
+                      <EyeIcon />
 
-                   </Button>
+                    </Button>
                   </InputAdornment>
                 )
               }}
@@ -136,7 +138,7 @@ const AuthPage = () => {
           </FormGroup>
           <Button type="submit" color="primary" variant="contained" className={classes.submitButton}>LOGIN</Button>
         </form>
-        <Notification />
+        <Notification className={classes.notification}/>
       </Paper>
     </Container>
   );
