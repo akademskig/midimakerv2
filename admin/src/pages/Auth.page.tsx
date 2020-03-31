@@ -5,7 +5,8 @@ import { Button, Container, FormGroup, Paper, TextField, InputAdornment } from '
 import LockIcon from '@material-ui/icons/Lock';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
 import { useForm, } from "react-hook-form";
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme, ThemeProvider } from '@material-ui/core/styles';
+import { useTheme } from '@material-ui/styles';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
@@ -46,13 +47,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   submitButton: {
     width: '80%',
-    marginTop: theme.spacing() * 2
+    marginTop: theme.spacing() * 2,
   },
   eyeButton: {
     minWidth: 'auto',
     padding: theme.spacing() * 0.5
   },
-  notification:{
+  notification: {
     minWidth: 'auto'
   }
 }));
@@ -64,6 +65,7 @@ const AuthPage = () => {
   const login = useLogin();
   const notify = useNotify();
   const classes = useStyles()
+  const theme = useTheme()
   const [passwordType, setPasswordType] = useState('password')
   const onSubmit = (values: any) => {
     if (values.length) return
@@ -71,76 +73,81 @@ const AuthPage = () => {
       .catch((err: Error) => { notify(err, 'error') });
   };
   return (
-    <Container maxWidth="xs" className={classes.container}>
-      <Paper className={classes.paper}>
-        <Button color="primary" className={classes.box}>
-          <LockIcon color="primary" fontSize="large"></LockIcon>
-        </Button>
-        <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
-          <FormGroup className={classes.formGroup}>
-            <TextField
-              error={!!errors.email}
-              label="Email Address"
-              name="email"
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
-              helperText={errors.email && errors.email.message}
-              inputRef={
-                register({
-                  required: {
-                    value: true,
-                    message: 'Email is required'
-                  },
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                    message: "Invalid email"
-                  }
-                })
-              }
-            />
-          </FormGroup>
-          <FormGroup className={classes.formGroup}>
-            <TextField
-              error={!!errors.password}
-              name="password"
-              type={passwordType}
-              label="Password"
-              onChange={(e: any) => setPassword(e.target.value)}
-              value={password}
-              helperText={errors.password && errors.password.message}
-              inputRef={
-                register({
-                  required: {
-                    value: true,
-                    message: 'Password is required'
-                  },
-                  minLength: {
-                    value: 8,
-                    message: "Password should consist of at least 8 characters"
-                  }
-                })
-              }
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Button
-                      onMouseEnter={() => setPasswordType('text')}
-                      onMouseLeave={() => setPasswordType('password')}
-                      className={classes.eyeButton}
-                    >
-                      <EyeIcon />
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="xs" className={classes.container}>
+        <Paper className={classes.paper}>
+          <Button className={classes.box}>
+            <LockIcon color="primary" fontSize="large"></LockIcon>
+          </Button>
+          <form noValidate onSubmit={handleSubmit(onSubmit)} className={classes.form}>
+            <FormGroup className={classes.formGroup}>
+              <TextField
+                required
+                error={!!errors.email}
+                label="Email"
+                name="email"
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
+                helperText={errors.email && errors.email.message}
+                inputRef={
+                  register({
+                    required: {
+                      value: true,
+                      message: 'Email is required'
+                    },
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                      message: "Invalid email"
+                    }
+                  })
+                }
+              />
+            </FormGroup>
+            <FormGroup className={classes.formGroup}>
+              <TextField
+                required
+                error={!!errors.password}
+                name="password"
+                type={passwordType}
+                label="Password"
+                onChange={(e: any) => setPassword(e.target.value)}
+                value={password}
+                helperText={errors.password && errors.password.message}
+                inputRef={
+                  register({
+                    required: {
+                      value: true,
+                      message: 'Password is required'
+                    },
+                    minLength: {
+                      value: 8,
+                      message: "Password should consist of at least 8 characters"
+                    }
+                  })
+                }
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Button
+                        onMouseDown={() => setPasswordType('text')}
+                        onMouseUp={() => setPasswordType('password')}
+                        onMouseLeave={() => setPasswordType('password')}
+                        className={classes.eyeButton}
+                      >
+                        <EyeIcon />
 
-                    </Button>
-                  </InputAdornment>
-                )
-              }}
-            />
-          </FormGroup>
-          <Button type="submit" color="primary" variant="contained" className={classes.submitButton}>LOGIN</Button>
-        </form>
-        <Notification className={classes.notification}/>
-      </Paper>
-    </Container>
+                      </Button>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </FormGroup>
+            <Button type="submit" color="primary" variant="contained" className={classes.submitButton}>LOGIN</Button>
+          </form>
+          <Notification className={classes.notification} />
+        </Paper>
+      </Container>
+    </ThemeProvider>
   );
 };
 

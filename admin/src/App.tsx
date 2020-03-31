@@ -9,24 +9,33 @@ import UserIcon from '@material-ui/icons/Group';
 import DashboardPage from './pages/Dashboard.page';
 import authProvider from './providers/auth.provider';
 import AuthPage from './pages/Auth.page';
-import { createMuiTheme } from '@material-ui/core/styles';
-import purple from '@material-ui/core/colors/purple';
-import green from '@material-ui/core/colors/green';
+import deepOrange from '@material-ui/core/colors/deepOrange';
+import deepPurple from '@material-ui/core/colors/deepPurple';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import './App.scss'
 
 const dataProvider = jsonServerProvider('http://localhost:4000');
-
+// primary: {
+//   light: '#7fbeda',
+//   dark: '#146179',
+//   main: '#4d8ea8' 
+// },
+// secondary: {
+//   main: '#ea5168',
+//   light: '#ff8496',
+//   dark: '#b2143e'
+// },
 const theme = createMuiTheme({
   palette: {
-    primary: purple,
-    secondary: green,
+    primary: deepPurple,
+    secondary: deepOrange
   },
 });
-console.log(theme)
 const App = () =>
-    <Admin theme={theme}loginPage={AuthPage} dashboard={DashboardPage} dataProvider={dataProvider}  authProvider={authProvider} >
+  <ThemeProvider theme={theme}>
+    <Admin theme={theme} loginPage={AuthPage} dashboard={DashboardPage} dataProvider={dataProvider} authProvider={authProvider} >
       <Resource name="posts" list={PostList} edit={PostEdit} create={PostCreate} icon={PostIcon} />
       <Resource name="users" list={UserList} icon={UserIcon} />
     </Admin>
-
+  </ThemeProvider>
 export default App;
