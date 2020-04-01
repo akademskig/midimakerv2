@@ -1,10 +1,7 @@
 // in src/App.js
 import React from 'react';
 import { Admin, Resource } from 'react-admin';
-import jsonServerProvider from 'ra-data-json-server';
-import { UserList } from './resources/user.resource';
-import { PostEdit, PostCreate, PostList } from './resources/post.resource';
-import PostIcon from '@material-ui/icons/Book';
+import { UserList, UserEdit, UserCreate } from './resources/user.resource';
 import UserIcon from '@material-ui/icons/Group';
 import DashboardPage from './pages/Dashboard.page';
 import authProvider from './providers/auth.provider';
@@ -12,9 +9,10 @@ import AuthPage from './pages/Auth.page';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import dataProvider from './providers/api.provider';
+
 import './App.scss'
 
-const dataProvider = jsonServerProvider('http://localhost:4000');
 // primary: {
 //   light: '#7fbeda',
 //   dark: '#146179',
@@ -34,8 +32,7 @@ const theme = createMuiTheme({
 const App = () =>
   <ThemeProvider theme={theme}>
     <Admin theme={theme} loginPage={AuthPage} dashboard={DashboardPage} dataProvider={dataProvider} authProvider={authProvider} >
-      <Resource name="posts" list={PostList} edit={PostEdit} create={PostCreate} icon={PostIcon} />
-      <Resource name="users" list={UserList} icon={UserIcon} />
+      <Resource name="users" list={UserList} icon={UserIcon} edit={UserEdit} create={UserCreate} />
     </Admin>
   </ThemeProvider>
 export default App;
