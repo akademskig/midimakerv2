@@ -3,7 +3,7 @@ import { jwtConstants } from './constants';
 
 const options = {
     secret: jwtConstants.secret,
-    signOptions: { expiresIn: '60s' },
+    signOptions: { expiresIn: '30d' },
 };
 
 export default JwtModule.register(options);
