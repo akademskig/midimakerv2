@@ -4,6 +4,7 @@ import { getRepository, Repository } from 'typeorm';
 import User from 'src/database/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate, ValidationError } from 'class-validator';
+import { QueryBuilderService } from 'src/utils/queryBuilder.service';
 
 @Injectable()
 export class UsersService {
@@ -12,35 +13,19 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly qbs: QueryBuilderService,
   ) { }
 
   async findOne(query): Promise<User | undefined> {
     return this.userRepository.findOne(query);
   }
 
-  async getAll(params): Promise<{data:User[], count: number}> {
-    const query = this.buildQuery(params);
+  async getAll(params): Promise<{data: User[], count: number}> {
+    const query = this.qbs.buildQuery(params, 'User');
     const res = await this.userRepository.findAndCount(query);
-    const count= res[1]
-    const data = res[0]
-    return {data, count}
-
-  }
-
-  private buildQuery(params: any) {
-    const { _end, _start, _sort, _order } = params;
-    const order = {
-      [_sort]: _order,
-    };
-    const select = {
-      skip: _start,
-      take: _end,
-    };
-    const query = {
-      order,
-      ...select,
-    };
-    return query;
+    const data = res[0];
+    const count = res[1];
+    return {data, count};
   }
 
   async createNew({ username, password, email }: UserRegister): Promise<User> {
