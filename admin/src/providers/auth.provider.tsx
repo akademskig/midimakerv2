@@ -28,7 +28,7 @@ class AuthProvider {
   checkError = ({ status }: { status: number }) => {
     if (status === 401 || status === 403) {
       localStorage.removeItem('access_token');
-      return Promise.reject();
+      return Promise.reject('Your session has expired');
     }
     return Promise.resolve();
   }
