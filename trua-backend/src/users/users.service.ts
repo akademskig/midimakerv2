@@ -45,4 +45,8 @@ export class UsersService {
     }
     return this.userRepository.save(user);
   }
+  async updateOne(id: {id: string}, user: User) {
+    const {id: extractedId, ...userValues} = user;
+    return this.userRepository.update(id, userValues);
+  }
 }

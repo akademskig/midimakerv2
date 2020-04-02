@@ -1,4 +1,4 @@
-import { Controller, Request, UseGuards, Get, Query, Res, Param } from '@nestjs/common';
+import { Controller, Request, UseGuards, Get, Query, Res, Param, Post, Body, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -19,5 +19,13 @@ export class UsersController {
     @Get(':id')
     async getOne(@Param() id) {
       return this.usersService.findOne(id);
+    }
+    @Put(':id')
+    async updateOne(@Param() id, @Body() user) {
+      return this.usersService.updateOne(id, user);
+    }
+    @Post()
+    async createNew(@Body() user) {
+      return this.usersService.createNew(user);
     }
 }
