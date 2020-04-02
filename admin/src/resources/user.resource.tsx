@@ -1,6 +1,6 @@
 import React from 'react';
 import { EmailField } from 'react-admin';
-import { List, Datagrid, TextField, Create, SimpleForm, ReferenceInput, SelectInput, TextInput, Edit, Filter } from 'react-admin';
+import { List, Datagrid, TextField, Create, SimpleForm, ReferenceInput, SelectInput, TextInput, Edit, Filter, required } from 'react-admin';
 export const UserList =( props: any) => (
     <List filters={<UserFilter/>}{...props}>
         <Datagrid rowClick="edit">
@@ -13,10 +13,10 @@ export const UserList =( props: any) => (
 export const UserCreate  = (props: any) => (
     <Create {...props}>
         <SimpleForm>
-            <ReferenceInput source="userId" reference="users">
-                <SelectInput optionText="name" /></ReferenceInput>
-            <TextInput source="title" />
-            <TextInput multiline source="body" />
+            <TextInput source="username" validate={[required()]} />
+            <TextInput source="email" validate={[required()]} />
+            <TextInput source="password" validate={[required()]} />
+            <SelectInput source="userGroup"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
         </SimpleForm>
     </Create>
 );
@@ -27,10 +27,9 @@ const UserTitle = ({record}:{record?: any}) =>{
 export const UserEdit = (props: any) => (
     <Edit title={<UserTitle/>}{...props}>
         <SimpleForm>
-            <TextInput disabled source="id" />
-            <TextInput  source="username" />
-            <TextInput  source="email" />
-            <TextInput  source="password" />
+            <TextInput required source="username" validate={[required()]}  />
+            <TextInput  source="email" validate={[required()]}  />
+            <SelectInput source="userGroup"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
         </SimpleForm>
     </Edit>
 );
