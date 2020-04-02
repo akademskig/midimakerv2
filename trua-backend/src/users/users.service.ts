@@ -49,4 +49,8 @@ export class UsersService {
     const {id: extractedId, ...userValues} = user;
     return this.userRepository.update(id, userValues);
   }
+
+  async deleteById(id) {
+    return this.userRepository.remove(id);
+  }
 }
