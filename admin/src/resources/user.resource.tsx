@@ -1,9 +1,9 @@
 import React from 'react';
 import { EmailField } from 'react-admin';
-import { List, Datagrid, TextField, Create, SimpleForm, ReferenceInput, SelectInput, TextInput, Edit, Filter, required } from 'react-admin';
+import { List, Datagrid, TextField, Create, SimpleForm, ReferenceInput, SelectInput, TextInput, Edit, Filter, required, minLength, email, Show, SimpleShowLayout, DateField } from 'react-admin';
 export const UserList =( props: any) => (
     <List filters={<UserFilter/>}{...props}>
-        <Datagrid rowClick="edit">
+        <Datagrid rowClick="show">
             <TextField source="username" />
             <EmailField source="email" />
             <TextField source="role" />
@@ -42,4 +42,16 @@ const UserFilter = (props: any) => (
             <SelectInput optionText="username" />
         </ReferenceInput>
     </Filter>
+);
+
+export const UserShow = (props: any) => (
+    <Show {...props}>
+        <SimpleShowLayout>
+            <TextField source="username" />
+            <TextField source="email" />
+            <TextField source="role" />
+            <DateField locales="de-DE"source="createdAt"  showTime />
+            <DateField locales="de-DE"label="Last updated" source="updatedAt" showTime/>
+        </SimpleShowLayout>
+    </Show>
 );

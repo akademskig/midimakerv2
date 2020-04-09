@@ -1,7 +1,7 @@
 // in src/App.js
 import React from 'react';
 import { Admin, Resource } from 'react-admin';
-import { UserList, UserEdit, UserCreate } from './resources/user.resource';
+import { UserList, UserEdit, UserCreate, UserShow } from './resources/user.resource';
 import UserIcon from '@material-ui/icons/Group';
 import DashboardPage from './pages/Dashboard.page';
 import authProvider from './providers/auth.provider';
@@ -32,7 +32,7 @@ const theme = createMuiTheme({
 const App = () =>
   <ThemeProvider theme={theme}>
     <Admin theme={theme} loginPage={AuthPage} dashboard={DashboardPage} dataProvider={dataProvider} authProvider={authProvider} >
-      <Resource name="users" list={UserList} icon={UserIcon} edit={UserEdit} create={UserCreate} />
+      <Resource name="users" show={UserShow}list={UserList} icon={UserIcon} edit={UserEdit} create={UserCreate} />
     </Admin>
   </ThemeProvider>
 export default App;
