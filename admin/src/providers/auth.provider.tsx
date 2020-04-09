@@ -11,9 +11,12 @@ class AuthProvider {
     return fetch(request)
       .then(response => response.json())
       .then((response) => {
+      
         if (response.statusCode < 200 || response.statusCode >= 300) {
-          console.error(response)
           return Promise.reject(response.message)
+        }
+        if(response.role !== 'admin'){
+          return Promise.reject('Only admin users are allowed access!')
         }
         const { access_token } = response
         localStorage.setItem('access_token', access_token)
