@@ -1,10 +1,11 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { UserRegister, hashPassword } from 'src/auth/auth.utils';
-import { getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import User from 'src/database/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { validate, ValidationError } from 'class-validator';
+import { validate } from 'class-validator';
 import { QueryBuilderService } from 'src/utils/queryBuilder.service';
+import ValidationErrors from '../errors/ValidationErrors';
 
 @Injectable()
 export class UsersService {
@@ -41,7 +42,7 @@ export class UsersService {
     const user = new User({ username, password: hashedPassword, email });
     const errors = await validate(user);
     if (errors.length) {
-      throw errors;
+      throw new ValidationErrors(errors);
     }
     return this.userRepository.save(user);
   }
