@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { UserRoles } from './types';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, Length } from 'class-validator';
 
 @Entity()
 export default class User {
@@ -10,6 +10,7 @@ export default class User {
     @Column({ length: 500, unique: true })
     username: string;
 
+    @Length(8)
     @Column('text')
     password: string;
 
