@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { UserGroup } from './types';
+import { UserRoles } from './types';
 import { IsEmail, IsNotEmpty } from 'class-validator';
 
 @Entity()
@@ -19,10 +19,10 @@ export default class User {
 
     @Column({
         type: 'enum',
-        enum: UserGroup,
-        default: UserGroup.ADMIN,
+        enum: UserRoles,
+        default: UserRoles.ADMIN,
     })
-    userGroup: UserGroup;
+    role: UserRoles;
 
     @Column({ type: 'text', nullable: true })
     company: string;

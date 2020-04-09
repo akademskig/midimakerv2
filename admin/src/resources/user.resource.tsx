@@ -6,7 +6,7 @@ export const UserList =( props: any) => (
         <Datagrid rowClick="edit">
             <TextField source="username" />
             <EmailField source="email" />
-            <TextField source="userGroup" />
+            <TextField source="role" />
         </Datagrid>
     </List>
 );
@@ -16,7 +16,7 @@ export const UserCreate  = (props: any) => (
             <TextInput source="username" validate={[required()]} />
             <TextInput source="email" validate={[required()]} />
             <TextInput source="password" validate={[required()]} />
-            <SelectInput source="userGroup"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
+            <SelectInput source="role"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
         </SimpleForm>
     </Create>
 );
@@ -29,7 +29,7 @@ export const UserEdit = (props: any) => (
         <SimpleForm>
             <TextInput required source="username" validate={[required()]}  />
             <TextInput  source="email" validate={[required()]}  />
-            <SelectInput source="userGroup"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
+            <SelectInput source="role"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
         </SimpleForm>
     </Edit>
 );
