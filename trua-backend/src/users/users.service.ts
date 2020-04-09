@@ -39,8 +39,9 @@ export class UsersService {
       throw new BadRequestException(`Email ${existingEmail.email} already exists!`);
     }
     const hashedPassword = await hashPassword(password);
-    const user = new User({ username, password: hashedPassword, email });
+    const user = new User({ username, password, email });
     const errors = await validate(user);
+    user.password = hashedPassword;
     if (errors.length) {
       throw new ValidationErrors(errors);
     }
