@@ -86,8 +86,7 @@ const AuthPage = () => {
                 error={!!errors.email}
                 label="Email"
                 name="email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
+                onChange={(e) => { console.log(e.target);setEmail(e.target.value)}}
                 helperText={errors.email && errors.email.message}
                 inputRef={
                   register({
@@ -111,7 +110,6 @@ const AuthPage = () => {
                 type={passwordType}
                 label="Password"
                 onChange={(e: any) => setPassword(e.target.value)}
-                value={password}
                 helperText={errors.password && errors.password.message}
                 inputRef={
                   register({
