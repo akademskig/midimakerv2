@@ -14,8 +14,8 @@ export const UserCreate  = (props: any) => (
     <Create {...props}>
         <SimpleForm>
             <TextInput source="username" validate={[required()]} />
-            <TextInput source="email" validate={[required()]} />
-            <TextInput source="password" validate={[required()]} />
+            <TextInput source="email" validate={[required(), email()]} />
+            <TextInput source="password" validate={[required(), minLength(8) ]} />
             <SelectInput source="role"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
         </SimpleForm>
     </Create>
@@ -28,7 +28,7 @@ export const UserEdit = (props: any) => (
     <Edit title={<UserTitle/>}{...props}>
         <SimpleForm>
             <TextInput required source="username" validate={[required()]}  />
-            <TextInput  source="email" validate={[required()]}  />
+            <TextInput  source="email" validate={[required(), email()]}  />
             <SelectInput source="role"optionText="name" validate={[required()]} choices={[{id: 'admin', name: "Admin"}, {id:'regular', name: 'Regular'}]}/>
         </SimpleForm>
     </Edit>
