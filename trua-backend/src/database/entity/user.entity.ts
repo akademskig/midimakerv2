@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Timestamp } from 'typeorm';
 import { UserRoles } from './types';
 import { IsEmail, Length } from 'class-validator';
 
@@ -27,6 +27,12 @@ export default class User {
 
     @Column({ type: 'text', nullable: true })
     company: string;
+
+    @CreateDateColumn()
+    createdAt: Timestamp;
+
+    @UpdateDateColumn()
+    updatedAt: Timestamp;
 
     constructor(user) {
         if (!user) {
