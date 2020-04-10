@@ -37,7 +37,7 @@ export const UserEdit = (props: any) => (
 
 const UserFilter = (props: any) => (
     <Filter {...props}>
-        <TextInput label="Search" source="q" alwaysOn />
+        <TextInput label="Search" source="q" alwaysOn resettable/>
         <ReferenceInput label="User" source="id" reference="users" allowEmpty>
             <SelectInput optionText="username" />
         </ReferenceInput>
