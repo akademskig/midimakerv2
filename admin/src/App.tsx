@@ -12,26 +12,26 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import dataProvider from './providers/api.provider';
 
 import './App.scss'
+import MainLayout from './layouts/Main.layout';
 
-// primary: {
-//   light: '#7fbeda',
-//   dark: '#146179',
-//   main: '#4d8ea8' 
-// },
-// secondary: {
-//   main: '#ea5168',
-//   light: '#ff8496',
-//   dark: '#b2143e'
-// },
+
 const theme = createMuiTheme({
   palette: {
-    primary: deepPurple,
-    secondary: deepOrange
+    primary: {
+      light: '#7fbeda',
+      dark: '#146179',
+      main: '#4d8ea8' 
+    },
+    secondary: {
+      main: '#ea5168',
+      light: '#ff8496',
+      dark: '#b2143e'
+    },
   },
 });
 const App = () =>
   <ThemeProvider theme={theme}>
-    <Admin theme={theme} loginPage={AuthPage} dashboard={DashboardPage} dataProvider={dataProvider} authProvider={authProvider} >
+    <Admin layout={MainLayout} theme={theme} loginPage={AuthPage} dashboard={DashboardPage} dataProvider={dataProvider} authProvider={authProvider} >
       <Resource name="users" show={UserShow}list={UserList} icon={UserIcon} edit={UserEdit} create={UserCreate} />
     </Admin>
   </ThemeProvider>
