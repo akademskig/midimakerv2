@@ -48,7 +48,7 @@ const UserFilter = (props: any) => (
 );
 
 export const UserShow = (props: any) => (
-    <Show {...props}>
+    <Show  title={<UserTitle />}{...props}>
         <SimpleShowLayout>
             <TextField source="username" />
             <TextField source="email" />
