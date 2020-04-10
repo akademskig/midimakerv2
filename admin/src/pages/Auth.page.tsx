@@ -85,6 +85,7 @@ const AuthPage = () => {
                 required
                 error={!!errors.email}
                 label="Email"
+                id="email"
                 name="email"
                 onChange={(e) => { console.log(e.target);setEmail(e.target.value)}}
                 helperText={errors.email && errors.email.message}
@@ -109,6 +110,7 @@ const AuthPage = () => {
                 name="password"
                 type={passwordType}
                 label="Password"
+                id="password"
                 onChange={(e: any) => setPassword(e.target.value)}
                 helperText={errors.password && errors.password.message}
                 inputRef={
