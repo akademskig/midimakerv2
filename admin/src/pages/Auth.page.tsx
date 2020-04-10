@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   box: {
     padding: theme.spacing() * 2,
     textAlign: 'center',
-    border: `solid 1px ${theme.palette.primary.dark}`,
+    border: `solid 1px ${theme.palette.secondary.dark}`,
     borderRadius: '50%',
     width: '73px',
     boxSizing: 'border-box'
@@ -51,7 +51,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   },
   eyeButton: {
     minWidth: 'auto',
-    padding: theme.spacing() * 0.5
+    padding: theme.spacing() * 0.5,
+    color: theme.palette.secondary.dark
   },
   notification: {
     minWidth: 'auto'
@@ -77,7 +78,7 @@ const AuthPage = () => {
       <Container maxWidth="xs" className={classes.container}>
         <Paper className={classes.paper}>
           <Button className={classes.box}>
-            <LockIcon color="primary" fontSize="large"></LockIcon>
+            <LockIcon color="secondary" fontSize="large"></LockIcon>
           </Button>
           <form noValidate onSubmit={handleSubmit(onSubmit)} className={classes.form}>
             <FormGroup className={classes.formGroup}>
@@ -86,6 +87,7 @@ const AuthPage = () => {
                 error={!!errors.email}
                 label="Email"
                 id="email"
+                color="secondary"
                 name="email"
                 onChange={(e) => { console.log(e.target);setEmail(e.target.value)}}
                 helperText={errors.email && errors.email.message}
@@ -108,6 +110,7 @@ const AuthPage = () => {
                 required
                 error={!!errors.password}
                 name="password"
+                color="secondary"
                 type={passwordType}
                 label="Password"
                 id="password"
@@ -142,7 +145,7 @@ const AuthPage = () => {
                 }}
               />
             </FormGroup>
-            <Button type="submit" color="primary" variant="contained" className={classes.submitButton}>LOGIN</Button>
+            <Button type="submit" color="secondary" variant="contained" className={classes.submitButton}>LOGIN</Button>
           </form>
           <Notification className={classes.notification} />
         </Paper>
