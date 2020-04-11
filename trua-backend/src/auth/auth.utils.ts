@@ -11,8 +11,6 @@ export class UserRegister {
   @IsNotEmpty()
   @MinLength(8,
     { message: 'Password must be at least 8 characters in length.' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    { message: 'Password must contain at least 1 lowercase and 1 uppercase letter and at least 1 number.' })
   password: string;
 }
 

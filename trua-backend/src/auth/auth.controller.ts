@@ -2,6 +2,7 @@ import { Controller, Request, Post, Get, UseGuards, Param, Query, Body, Logger }
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserRegister } from './auth.utils';
+import { ValidationError } from 'class-validator';
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }

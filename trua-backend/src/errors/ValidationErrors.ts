@@ -2,6 +2,7 @@ import { ValidationError } from 'class-validator';
 import { BadRequestException } from '@nestjs/common';
 
 class ValidationErrors extends BadRequestException {
+    message!: string;
     constructor(validationErrors: ValidationError[]) {
         const message = validationErrors
         .map(vm => Object.values(vm.constraints)
@@ -12,6 +13,8 @@ class ValidationErrors extends BadRequestException {
         }))
         .join('. ');
         super(message);
+        this.message = message;
+
     }
 }
 

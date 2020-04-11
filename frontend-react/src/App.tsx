@@ -7,17 +7,15 @@ import { ThemeProvider, useTheme } from '@material-ui/core';
 import { NotificationContainer } from 'react-notifications';
 
 function App() {
-const theme = useTheme()
+  const theme = useTheme()
 
   return (
     <div className="App">
-    <ThemeProvider theme={theme}>
-
-      <Router>
-        <MainRoutes/>
-      </Router>
-      <NotificationContainer />
-
+      <ThemeProvider theme={theme}>
+        <Router>
+          <MainRoutes />
+        </Router>
+        <NotificationContainer />
       </ThemeProvider>
     </div>
   );

@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Container, Paper,  Tab, Tabs,  } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import useNotify from '../utils/notifications';
-import LoginForm from '../components/Login.form';
+import LoginForm from '../components/forms/Login.form';
 import TabPanel from '../components/common/TabPanels';
 import {  useLocation } from 'react-router-dom';
+import RegisterForm from '../components/forms/Register.form';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
@@ -54,11 +54,9 @@ const AuthPage = () => {
   }
   const classes = useStyles()
   const { hash } = useLocation()
-  const notify = useNotify();
   const [value, setValue] = React.useState(getTabIndex(hash));
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setValue(newValue);
-    notify("info", "tab changed!")
   };
 
   return (
@@ -83,7 +81,7 @@ const AuthPage = () => {
             <LoginForm></LoginForm>
           </TabPanel>
           <TabPanel value={value} index={1}>
-            Item Two
+            <RegisterForm></RegisterForm>
           </TabPanel>
         </Paper>
       </Container>

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
-import useNotify from '../utils/notifications';
+import useNotify from '../../utils/notifications';
 
-import { Button, Container, FormGroup, Paper, TextField, InputAdornment, makeStyles, createStyles, Theme, useTheme } from '@material-ui/core';
+import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme } from '@material-ui/core';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
+import { useRegister } from '../../api/auth';
 const useStyles = makeStyles((theme: Theme) => createStyles({
     paper: {
         display: 'flex',
@@ -40,21 +41,34 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     }
 }));
 
-const LoginForm = () => {
+const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
     const { handleSubmit, register, errors } = useForm();
-    // const login = useLogin();
+    const registerUser = useRegister();
     const notify = useNotify();
     const classes = useStyles()
     const [passwordType, setPasswordType] = useState('password')
     const onSubmit = (values: any) => {
-        // if (values.length) return
-        // login({ email, password })
-        //   .catch((err: Error) => { notify('error', err) });
+        if (values.length) return
+        registerUser({ email, password, username })
+          .then(user=> notify("ok", `Account for ${user.username} created successfully!`))
+          .catch((err: Error) => { notify('error', err.message) });
     };
     return (
         <form noValidate onSubmit={handleSubmit(onSubmit)} className={classes.form}>
+              <FormGroup className={classes.formGroup}>
+                <TextField
+                    name="username"
+                    color="secondary"
+                    type="text"
+                    label="Username"
+                    id="username"
+                    value={username}
+                    onChange={(e: any) => setUsername(e.target.value)}
+                />
+            </FormGroup>
             <FormGroup className={classes.formGroup}>
                 <TextField
                     required
@@ -126,4 +140,4 @@ const LoginForm = () => {
     )
 }
 
-export default LoginForm
+export default RegisterForm
