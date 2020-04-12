@@ -7,6 +7,7 @@ import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
 import { useLogin } from '../../api/auth'
 import { useDispatch } from 'react-redux';
 import { loginOk } from '../../redux/auth/auth.actions';
+import { useHistory } from 'react-router-dom';
 const useStyles = makeStyles((theme: Theme) => createStyles({
     paper: {
         display: 'flex',
@@ -50,12 +51,16 @@ const LoginForm = () => {
     const login = useLogin();
     const notify = useNotify();
     const classes = useStyles()
+    const history = useHistory()
     const dispatch = useDispatch()
     const [passwordType, setPasswordType] = useState('password')
     const onSubmit = (values: any) => {
         if (values.length) return
         login({ email, password })
-            .then((user) => dispatch(loginOk(user)))
+            .then((user) => {
+                dispatch(loginOk(user))
+                history.push("/")
+            })
             .catch((err: Error) => { notify('error', err.message) });
     };
     return (

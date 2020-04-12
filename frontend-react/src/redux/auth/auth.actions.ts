@@ -6,7 +6,7 @@ export const loginStart = (userCredentials: {email: string,password: string}) =>
     payload: userCredentials
 })
 
-export const loginOk = (user: []) => ({
+export const loginOk = (user: any) => ({
     type: LOGIN_OK,
     payload: {
         user
