@@ -3,13 +3,14 @@ import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { NavLink } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/auth/auth.actions';
 import { Typography } from '@material-ui/core';
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import SettingsIcon from '@material-ui/icons/Settings'
 import UserIcon from '@material-ui/icons/Person'
 import styled from 'styled-components';
+import { selectUser } from '../redux/auth/auth.selectors';
 
 
 const UserSettingsStyled = styled.div`
@@ -33,7 +34,8 @@ const MenuStyled = styled(Menu)`
 `
 export default function UserSettingsMenu() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-
+    const dispatch = useDispatch()
+    const user = useSelector(selectUser)
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -41,7 +43,6 @@ export default function UserSettingsMenu() {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const dispatch = useDispatch()
 
 
     const handleLogout = () => {
@@ -54,7 +55,7 @@ export default function UserSettingsMenu() {
             <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
                 <UserIcon />
                 <Typography>
-                    User
+                    {user.username}
                 </Typography>
             </Button>
             <MenuStyled
