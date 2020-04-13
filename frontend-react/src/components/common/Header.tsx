@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     toolbar:{
         backgroundColor: theme.palette.primary.main,
         color: theme.palette.getContrastText(theme.palette.primary.main),
+        justifyContent: 'space-between'
     },
     title: {
     },
