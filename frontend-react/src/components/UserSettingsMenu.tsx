@@ -55,7 +55,7 @@ export default function UserSettingsMenu() {
             <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
                 <UserIcon />
                 <Typography>
-                    {user.username}
+                    {user && user.username}
                 </Typography>
             </Button>
             <MenuStyled
@@ -65,7 +65,7 @@ export default function UserSettingsMenu() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <NavLink to="/user/profile">
+                <NavLink to="/app/user/profile">
                     <MenuItem onClick={handleClose}>
                         <SettingsIcon fontSize="small" />
                         <Typography>

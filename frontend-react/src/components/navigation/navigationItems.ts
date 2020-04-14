@@ -1,7 +1,12 @@
 export const navigationItems = [
     {
+        name: "Dashboard",
+        link: "/app/dashboard",
+        icon:'dashboard'
+    },
+    {
         name: "Events",
-        link: "/events/list",
+        link: "/app/events/list",
         icon:'events'
     }
 ]

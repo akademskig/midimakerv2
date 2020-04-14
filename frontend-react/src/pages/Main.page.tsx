@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Paper } from '@material-ui/core';
-import MainLayout from '../layouts/Main.layout';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -26,11 +25,9 @@ const MainPage = () => {
   const classes = useStyles()
 
   return (
-      <MainLayout>
         <Paper className={classes.paper}>
        I'm dashboard
         </Paper>
-      </MainLayout>
   );
 };
 

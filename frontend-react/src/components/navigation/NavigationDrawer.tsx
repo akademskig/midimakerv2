@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Component } from 'react';
 import clsx from 'clsx';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -15,13 +15,15 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import EventIcon from '@material-ui/icons/Event';
 import MailIcon from '@material-ui/icons/Mail';
+import DashboardIcon from '@material-ui/icons/DashboardOutlined';
 import UserSettingsMenu from '../UserSettingsMenu';
 import { navigationItems } from './navigationItems';
+import { NavLink } from 'react-router-dom';
 
 const drawerWidth = 220;
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
+const styles = (theme: any) =>
+    ({
         root: {
             display: 'flex',
             flexDirection: 'column'
@@ -107,123 +109,127 @@ const useStyles = makeStyles((theme: Theme) =>
                 flexShrink: 0,
             },
         },
-    }),
-);
+    })
 
-export default function NavigationDrawer({ children }: { children: any }, ...props: any) {
-    const { container } = props
-    const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
-    const [mobileOpen, setMobileOpen] = React.useState(false);
+class NavigationDrawer extends Component<{ children: any, classes: any }> {
 
-    const handleDrawerToggle = () => {
-        if (open)
-            return setOpen(false);
-        setOpen(true)
-    };
-    const handleMobileToggle = () => {
-        if (mobileOpen)
-            return setMobileOpen(false);
-        setMobileOpen(true)
-    };
-
-    return (
-        <div className={classes.root}>
-            <CssBaseline />
-            <AppBar
-                className={classes.appBar}
-            >
-                <Toolbar className={classes.toolbar}>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerToggle}
-                        edge="start"
-                        className={classes.toggleButton}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleMobileToggle}
-                        edge="start"
-                        className={classes.mobileToggleButton}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <UserSettingsMenu />
-                </Toolbar>
-            </AppBar>
-            <nav className={classes.appContent}>
-                <Hidden xsUp implementation="css">
-                    <Drawer
-                        container={container}
-                        variant="temporary"
-                        className={classes.drawerMobile}
-                        ModalProps={{
-                            keepMounted: true, // Better open performance on mobile.
-                        }}
-                        classes={{
-                            paper: classes.drawerPaperMobile,
-                        }}
-                        open={mobileOpen}
-                        onClose={handleMobileToggle}
-                    >
-                        <Divider />
-                        <List>
-                            {navigationItems.map((item, index) => (
-                                <ListItem button key={index}>
-                                    <ListItemIcon>{ getIcon(item.icon)}</ListItemIcon>
-                                    <ListItemText primary={item.name} />
-                                </ListItem>
-                            ))}
-                        </List>
-                        <Divider />
-                    </Drawer>
-                </Hidden>
-                <Hidden xsDown implementation="css">
-                    <Drawer
-                        variant="permanent"
-                        className={clsx(classes.drawer, {
-                            [classes.drawerOpen]: open,
-                            [classes.drawerClose]: !open,
-                        })}
-                        classes={{
-                            paper: clsx(classes.drawerPaper, {
-                                [classes.drawerOpen]: open,
-                                [classes.drawerClose]: !open,
-                            }),
-                        }}
-                    >
-                        <Divider />
-                        <List>
-                            {navigationItems.map((item, index) => (
-                                <ListItem button key={index}>
-                                    <ListItemIcon>{
-                                        getIcon(item.icon)
-                                    }</ListItemIcon>
-                                    <ListItemText primary={item.name} />
-                                </ListItem>
-                            ))}
-                        </List>
-                        <Divider />
-                    </Drawer>
-                </Hidden>
-                <main className={classes.content}>
-                    {children}
-                </main>
-            </nav>
-        </div>
-    );
+    state = {
+        open: false,
+        mobileOpen: false
+    }
+    handleDrawerToggle = () => {
+        this.setState({
+            open: !this.state.open
+        })
+    }
+    handleMobileToggle = () => {
+        this.setState({
+            mobileOpen: !this.state.mobileOpen,
+        })
+    }
+    render() {
+        const { children, classes } = this.props
+        return (
+            <div className={classes.root}>
+                <CssBaseline />
+                <AppBar
+                    className={classes.appBar}
+                >
+                    <Toolbar className={classes.toolbar}>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={this.handleDrawerToggle}
+                            edge="start"
+                            className={classes.toggleButton}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={this.handleMobileToggle}
+                            edge="start"
+                            className={classes.mobileToggleButton}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <UserSettingsMenu />
+                    </Toolbar>
+                </AppBar>
+                <nav className={classes.appContent}>
+                    <Hidden xsUp implementation="css">
+                        <Drawer
+                            variant="temporary"
+                            className={classes.drawerMobile}
+                            ModalProps={{
+                                keepMounted: true, // Better open performance on mobile.
+                            }}
+                            classes={{
+                                paper: classes.drawerPaperMobile,
+                            }}
+                            open={this.state.mobileOpen}
+                            onClose={this.handleMobileToggle}
+                        >
+                            <Divider />
+                            <List>
+                                {navigationItems.map((item, index) => (
+                                    <NavLink to={item.link} key={index} replace>
+                                        <ListItem button >
+                                            <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
+                                            <ListItemText primary={item.name} />
+                                        </ListItem>
+                                    </NavLink>
+                                ))}
+                            </List>
+                            <Divider />
+                        </Drawer>
+                    </Hidden>
+                    <Hidden xsDown implementation="css">
+                        <Drawer
+                            variant="permanent"
+                            className={clsx(classes.drawer, {
+                                [classes.drawerOpen]: this.state.open,
+                                [classes.drawerClose]: !this.state.open,
+                            })}
+                            classes={{
+                                paper: clsx(classes.drawerPaper, {
+                                    [classes.drawerOpen]: this.state.open,
+                                    [classes.drawerClose]: !this.state.open,
+                                }),
+                            }}
+                        >
+                            <Divider />
+                            <List>
+                                {navigationItems.map((item, index) => (
+                                    <NavLink to={item.link} key={index} replace>
+                                        <ListItem button >
+                                            <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
+                                            <ListItemText primary={item.name} />
+                                        </ListItem>
+                                    </NavLink>
+                                ))}
+                            </List>
+                            <Divider />
+                        </Drawer>
+                    </Hidden>
+                    <main className={classes.content}>
+                        {children}
+                    </main>
+                </nav>
+            </div>
+        );
+    }
 }
-
-
+//@ts-ignore
+export default withStyles(styles)(NavigationDrawer)
 const getIcon = (icon: string) => {
     switch (icon) {
         case 'events':
             return <EventIcon></EventIcon>
+        case 'dashboard':
+            return <DashboardIcon></DashboardIcon>
         default:
-            return <MailIcon/>
+            return <MailIcon />
     }
 }

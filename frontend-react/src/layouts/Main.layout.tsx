@@ -2,6 +2,7 @@
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components'
 import NavigationDrawer from '../components/navigation/NavigationDrawer';
+import { MainRoutes } from '../routes';
 
 const LayoutContainer = styled.div`
  ${({ theme }) => `
@@ -22,7 +23,7 @@ const MainLayout = ({ children }: { children: any }) => {
     <Fragment>
       <NavigationDrawer>
         <LayoutContainer>
-          {children}
+         <MainRoutes></MainRoutes>
         </LayoutContainer>
       </NavigationDrawer>
     </Fragment>

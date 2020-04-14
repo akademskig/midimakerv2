@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Button, Container, Paper,  Tab, Tabs,  } from '@material-ui/core';
+import { Button, Container, Paper, Tab, Tabs, } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import LoginForm from '../components/forms/Login.form';
 import TabPanel from '../components/common/TabPanels';
-import {  useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import RegisterForm from '../components/forms/Register.form';
+import MainLayout from '../layouts/Main.layout';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   }
 }));
 
-const AuthPage = () => {
+const UserProfile = () => {
   const getTabIndex = (hash: string) => {
     switch (hash) {
       case "#login":
@@ -59,34 +60,14 @@ const AuthPage = () => {
   };
 
   return (
-      <Container maxWidth="xs" className={classes.container}>
-        <Tabs
-          value={value}
-          indicatorColor="secondary"
-          color="secondary"
-          onChange={handleChange}
-          aria-label="Authentication tabs"
-        >
-            <Tab className={classes.tab} label="LOGIN" component="a"/>
-            <Tab className={classes.tab} label="REGISTER" />
-
-        </Tabs>
-        <Paper className={classes.paper}>
-          <Button className={classes.box}>
-            <LockIcon color="secondary" fontSize="large"></LockIcon>
-          </Button>
-
-          <TabPanel value={value} index={0}>
-            <LoginForm></LoginForm>
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <RegisterForm></RegisterForm>
-          </TabPanel>
-        </Paper>
-      </Container>
+      <Paper className={classes.paper}>
+        <Button className={classes.box}>
+          <LockIcon color="secondary" fontSize="large"></LockIcon>
+        </Button>
+      </Paper>
   );
 };
 
-export default AuthPage
+export default UserProfile
 
 
