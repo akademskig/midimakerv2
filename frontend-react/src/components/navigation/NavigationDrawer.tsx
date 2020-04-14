@@ -13,9 +13,10 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
+import EventIcon from '@material-ui/icons/Event';
 import MailIcon from '@material-ui/icons/Mail';
-import UserSettingsMenu from './UserSettingsMenu';
+import UserSettingsMenu from '../UserSettingsMenu';
+import { navigationItems } from './navigationItems';
 
 const drawerWidth = 220;
 
@@ -171,22 +172,14 @@ export default function NavigationDrawer({ children }: { children: any }, ...pro
                     >
                         <Divider />
                         <List>
-                            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                                <ListItem button key={text}>
-                                    <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                    <ListItemText primary={text} />
+                            {navigationItems.map((item, index) => (
+                                <ListItem button key={index}>
+                                    <ListItemIcon>{ getIcon(item.icon)}</ListItemIcon>
+                                    <ListItemText primary={item.name} />
                                 </ListItem>
                             ))}
                         </List>
                         <Divider />
-                        <List>
-                            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                                <ListItem button key={text}>
-                                    <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                    <ListItemText primary={text} />
-                                </ListItem>
-                            ))}
-                        </List>
                     </Drawer>
                 </Hidden>
                 <Hidden xsDown implementation="css">
@@ -205,22 +198,16 @@ export default function NavigationDrawer({ children }: { children: any }, ...pro
                     >
                         <Divider />
                         <List>
-                            {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                                <ListItem button key={text}>
-                                    <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                    <ListItemText primary={text} />
+                            {navigationItems.map((item, index) => (
+                                <ListItem button key={index}>
+                                    <ListItemIcon>{
+                                        getIcon(item.icon)
+                                    }</ListItemIcon>
+                                    <ListItemText primary={item.name} />
                                 </ListItem>
                             ))}
                         </List>
                         <Divider />
-                        <List>
-                            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                                <ListItem button key={text}>
-                                    <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                    <ListItemText primary={text} />
-                                </ListItem>
-                            ))}
-                        </List>
                     </Drawer>
                 </Hidden>
                 <main className={classes.content}>
@@ -229,4 +216,14 @@ export default function NavigationDrawer({ children }: { children: any }, ...pro
             </nav>
         </div>
     );
+}
+
+
+const getIcon = (icon: string) => {
+    switch (icon) {
+        case 'events':
+            return <EventIcon></EventIcon>
+        default:
+            return <MailIcon/>
+    }
 }

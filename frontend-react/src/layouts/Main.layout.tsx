@@ -1,7 +1,7 @@
 
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components'
-import NavigationDrawer from '../components/NavigationDrawer';
+import NavigationDrawer from '../components/navigation/NavigationDrawer';
 
 const LayoutContainer = styled.div`
  ${({ theme }) => `
