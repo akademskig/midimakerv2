@@ -1,13 +1,9 @@
 
 import React from 'react';
-import { Button, Container, Paper, Tab, Tabs, } from '@material-ui/core';
+import { Button, Paper } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import LoginForm from '../components/forms/Login.form';
-import TabPanel from '../components/common/TabPanels';
 import { useLocation } from 'react-router-dom';
-import RegisterForm from '../components/forms/Register.form';
-import MainLayout from '../layouts/Main.layout';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
