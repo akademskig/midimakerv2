@@ -3,12 +3,13 @@ import {
   BrowserRouter as Router,
 } from "react-router-dom";
 import AppRoutes from './routes';
-import { useTheme, MuiThemeProvider } from '@material-ui/core';
+import { MuiThemeProvider } from '@material-ui/core';
 import { NotificationContainer } from 'react-notifications';
 import { ThemeProvider } from 'styled-components';
+import theme from './theme';
 
 function App() {
-  const theme = useTheme()
+ 
   return (
     <div className="App">
       <ThemeProvider theme={theme}>

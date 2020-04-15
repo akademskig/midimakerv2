@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import clsx from 'clsx';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, Theme } from '@material-ui/core/styles';
+import styled from 'styled-components'
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Hidden from '@material-ui/core/Hidden';
@@ -72,9 +73,6 @@ const styles = (theme: any) =>
             },
 
         },
-        appContent: {
-            display: 'flex'
-        },
         content: {
             flexGrow: 1,
         },
@@ -89,6 +87,23 @@ const styles = (theme: any) =>
             },
         },
     })
+
+const NavigationStyled = styled.nav`
+        display: flex;
+    `
+
+const NavLinkStyled = styled(NavLink)`
+    &{ 
+        text-decoration: none;
+        color: inherit;
+    }
+    &.link-active{
+        div{
+            color: ${({ theme }: { theme: Theme }) => theme.palette.getContrastText(theme.palette.primary.light)};
+            background-color:${({ theme }) => theme.palette.primary.light}
+        }
+    }
+`
 
 class NavigationDrawer extends Component<{ children: any, classes: any }> {
 
@@ -113,7 +128,7 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
                 <AppToolbar
                     handleDrawerToggle={this.handleDrawerToggle}
                     handleMobileToggle={this.handleMobileToggle} />
-                <nav className={classes.appContent}>
+                <NavigationStyled >
                     <Hidden xsUp implementation="css">
                         <Drawer
                             variant="temporary"
@@ -130,12 +145,12 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
                             <Divider />
                             <List>
                                 {navigationItems.map((item, index) => (
-                                    <NavLink to={item.link} key={index} replace>
+                                    <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
                                         <ListItem button >
                                             <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
                                             <ListItemText primary={item.name} />
                                         </ListItem>
-                                    </NavLink>
+                                    </NavLinkStyled>
                                 ))}
                             </List>
                             <Divider />
@@ -158,12 +173,12 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
                             <Divider />
                             <List>
                                 {navigationItems.map((item, index) => (
-                                    <NavLink to={item.link} key={index} replace>
+                                    <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
                                         <ListItem button >
                                             <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
                                             <ListItemText primary={item.name} />
                                         </ListItem>
-                                    </NavLink>
+                                    </NavLinkStyled>
                                 ))}
                             </List>
                             <Divider />
@@ -172,7 +187,7 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
                     <main className={classes.content}>
                         {children}
                     </main>
-                </nav>
+                </NavigationStyled>
             </div>
         );
     }
