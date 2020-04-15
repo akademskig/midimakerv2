@@ -1,8 +1,8 @@
 
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components'
-import NavigationDrawer from '../components/navigation/NavigationDrawer';
-import { MainRoutes } from '../routes';
+import NavigationDrawer from './navigation/NavigationDrawer';
+import { MainRoutes } from '../../routes';
 
 const LayoutContainer = styled.div`
  ${({ theme }) => `
