@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/auth/auth.actions';
 import { Typography } from '@material-ui/core';
@@ -35,6 +35,7 @@ const MenuStyled = styled(Menu)`
 export default function UserSettingsMenu() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const dispatch = useDispatch()
+    const history = useHistory()
     const user = useSelector(selectUser)
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -47,6 +48,7 @@ export default function UserSettingsMenu() {
 
     const handleLogout = () => {
         dispatch(logout())
+        history.push("/auth")
     }
 
 
@@ -65,7 +67,7 @@ export default function UserSettingsMenu() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <NavLink to="/app/user/profile">
+                <NavLink to="/user/profile">
                     <MenuItem onClick={handleClose}>
                         <SettingsIcon fontSize="small" />
                         <Typography>
