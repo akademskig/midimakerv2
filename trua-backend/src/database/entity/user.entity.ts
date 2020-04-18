@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Timestamp } from 'typeorm';
-import { UserRoles } from './types';
+import { UserRoles } from '../../users/types/types';
 import { IsEmail, Length } from 'class-validator';
 
 @Entity()

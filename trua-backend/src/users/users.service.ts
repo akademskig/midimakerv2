@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { validate } from 'class-validator';
 import { QueryBuilderService } from 'src/utils/queryBuilder.service';
 import ValidationErrors from '../errors/ValidationErrors';
+import UserUpdate from './types/userUpdate.type';
 
 @Injectable()
 export class UsersService {
@@ -21,20 +22,20 @@ export class UsersService {
     return this.userRepository.findOne(query);
   }
 
-  async getAll(params): Promise<{data: User[], count: number}> {
+  async getAll(params): Promise<{ data: User[], count: number }> {
     const query = this.qbs.buildQuery(params, 'User');
     const res = await this.userRepository.findAndCount(query);
     const data = res[0];
     const count = res[1];
-    return {data, count};
+    return { data, count };
   }
 
   async createNew({ username, password, email }: UserRegister): Promise<User> {
-    const existingUser = await this.findOne({username});
+    const existingUser = await this.findOne({ username });
     if (existingUser) {
       throw new BadRequestException(`Username ${existingUser.username} already exists!`);
     }
-    const existingEmail = await this.findOne({email});
+    const existingEmail = await this.findOne({ email });
     if (existingEmail) {
       throw new BadRequestException(`Email ${existingEmail.email} already exists!`);
     }
@@ -47,9 +48,15 @@ export class UsersService {
     }
     return this.userRepository.save(user);
   }
-  async updateOne(id: {id: string}, user: User) {
-    const {id: extractedId, updatedAt, createdAt, ...userValues} = user;
-    return this.userRepository.update(id, userValues);
+  async updateOne(id: { id: string }, userData: User) {
+    const user = new UserUpdate(userData);
+    const errors = await validate(user);
+    if (errors.length) {
+      throw new ValidationErrors(errors);
+    }
+    const { id: extractedId, updatedAt, createdAt, ...userValues } = userData;
+    await this.userRepository.update(id, userValues);
+    return this.findOne(id);
   }
 
   async deleteById(id) {

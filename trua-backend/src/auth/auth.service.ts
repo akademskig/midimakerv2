@@ -3,6 +3,7 @@ import { Injectable, Param, UnauthorizedException, Logger } from '@nestjs/common
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegister, comparePasswords } from 'src/auth/auth.utils';
+import { hashPassword } from './auth.utils';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
   async signIn(user: any) {
     const payload = { username: user.username, id: user.id, role: user.role };
     return {
+      id: user.id,
       username: user.username,
       email: user.email,
       access_token: this.jwtService.sign(payload),
@@ -38,5 +40,14 @@ export class AuthService {
       const { password, ...userData } = userCreated;
       return userData;
     }
+  }
+
+  async updatePassword(id, {oldPassword, newPassword}: {oldPassword: string, newPassword: string}) {
+    const user = await this.usersService.findOne(id);
+    if (user && !await comparePasswords(oldPassword, user.password)) {
+      throw new UnauthorizedException('Invalid password');
+    }
+    user.password = await hashPassword(newPassword)
+    return this.usersService.updateOne(id, user)
   }
 }

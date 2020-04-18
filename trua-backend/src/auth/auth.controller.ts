@@ -1,4 +1,4 @@
-import { Controller, Request, Post, Get, UseGuards, Param, Query, Body, Logger } from '@nestjs/common';
+import { Controller, Request, Post, Get, UseGuards, Param, Query, Body, Logger, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserRegister } from './auth.utils';
@@ -17,6 +17,14 @@ export class AuthController {
     async register(@Body() user: UserRegister) {
         try {
             return this.authService.register(user);
+        } catch (error) {
+            Logger.error('Error', JSON.stringify(error), 'AuthController');
+        }
+    }
+    @Put('/changePassword/:id')
+    async changePassword(@Param() id, @Body() passwords){
+        try {
+            return this.authService.updatePassword(id, passwords);
         } catch (error) {
             Logger.error('Error', JSON.stringify(error), 'AuthController');
         }
