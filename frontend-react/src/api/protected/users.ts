@@ -1,26 +1,22 @@
 import Axios from 'axios'
 import { getToken } from '../utils/index';
-const instance = Axios.create({
-    
-})
 class Users {
     baseUrl = `http://localhost:4000`
     accessToken = null
-    axios : any
-    constructor (){
-        const accessToken  = getToken()
-
-        this.axios = Axios.create({
+    get axios() {
+        const accessToken = getToken()
+        const axios = Axios.create({
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             }
         })
-
+        return axios
     }
-    updateUser = async ({ userId, email, username }: { userId: string, email: string; username: string }) => {
+    updateUser = async ({ userId, email, username }: { userId: string, email?: string; username?: string }) => {
+        const body = Object.assign({}, email && { email }, username && { username })
         try {
-            const res = await this.axios.put(`${this.baseUrl}/users/${userId}`, { email, username })
+            const res = await this.axios.put(`${this.baseUrl}/users/${userId}`, body)
             return res.data
         } catch (err) {
 
