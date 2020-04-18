@@ -13,6 +13,7 @@ import UserProfile from './pages/UserProfile.page';
 import MainLayout from './layouts/mainLayout/Main.layout';
 import { GuardProvider, GuardedRoute } from "react-router-guards"
 import { GuardFunctionRouteProps } from 'react-router-guards/dist/types';
+import SettingsPage from './pages/SettingsPage';
 
 let isAuth = false
 function checkAuth(to: GuardFunctionRouteProps | null, from: GuardFunctionRouteProps | null, next: any) {
@@ -38,8 +39,8 @@ export const MainRoutes = () => {
     <GuardProvider guards={[checkAuth]}>
       <Switch>
         <GuardedRoute path="/dashboard" component={MainPage} />
-        <GuardedRoute path="/user/profile" component={UserProfile} />
         <GuardedRoute path="/events/list" component={UserProfile} />
+        <GuardedRoute path="/settings" component={SettingsPage} />
         <GuardedRoute path="/" component={() => <Redirect to="/dashboard"></Redirect>} />
       </Switch>
     </GuardProvider>

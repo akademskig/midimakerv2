@@ -12,6 +12,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import EventIcon from '@material-ui/icons/Event';
 import MailIcon from '@material-ui/icons/Mail';
 import DashboardIcon from '@material-ui/icons/DashboardOutlined';
+import SettingsIcon from '@material-ui/icons/Settings';
+
 import { navigationItems } from './navigationItems';
 import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
@@ -200,6 +202,8 @@ const getIcon = (icon: string) => {
             return <EventIcon></EventIcon>
         case 'dashboard':
             return <DashboardIcon></DashboardIcon>
+            case 'settings':
+                return <SettingsIcon></SettingsIcon>
         default:
             return <MailIcon />
     }

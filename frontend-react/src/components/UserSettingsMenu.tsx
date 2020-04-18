@@ -67,7 +67,7 @@ export default function UserSettingsMenu() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <NavLink to="/user/profile">
+                <NavLink to="/settings/user">
                     <MenuItem onClick={handleClose}>
                         <SettingsIcon fontSize="small" />
                         <Typography>

@@ -1,4 +1,4 @@
-import { LOGIN_START, LOGIN_OK, LOGOUT, SET_TOKEN, REMOVE_TOKEN } from './auth.types';
+import { LOGIN_START, LOGIN_OK, LOGOUT, SET_TOKEN, REMOVE_TOKEN, UPDATE_OK } from './auth.types';
 
 
 export const loginStart = (userCredentials: {email: string,password: string}) => ({
@@ -8,6 +8,12 @@ export const loginStart = (userCredentials: {email: string,password: string}) =>
 
 export const loginOk = (user: any) => ({
     type: LOGIN_OK,
+    payload: {
+        user
+    }
+})
+export const updateOk = (user: any) => ({
+    type: UPDATE_OK,
     payload: {
         user
     }

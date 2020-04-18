@@ -12,6 +12,7 @@ const LayoutContainer = styled.div`
   width: 100%;
   justify-content: flex-start;
   padding: 1em;
+  ${css({ 'min-height': "calc(100vh - 64px)" })};
   ${theme.breakpoints.down('xs')} {
     ${css({ 'min-height': "calc(100vh - 56px)" })}
     padding: 0.5em;

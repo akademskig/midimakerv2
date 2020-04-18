@@ -1,19 +1,19 @@
-import { LOGIN_START, LOGIN_OK, LOGOUT } from './auth.types';
+import { LOGIN_START, LOGIN_OK, LOGOUT, UPDATE_OK } from './auth.types';
 const initialState = {
-    accessToken: "",
     loading: false,
-    user: null
+    user: null,
+    accessToken: null
 }
 
 function authReducer(state = initialState, action: { type: string, payload: any }) {
     switch (action.type) {
         case LOGIN_OK: {
             const { user } = action.payload
-            const {accessToken,...userData} = user
+            const {access_token,...userData} = user
             return {
                 ...state,
                 user: userData,
-                accessToken,
+                accessToken: access_token,
                 loading: false,
             }
         }
@@ -27,6 +27,15 @@ function authReducer(state = initialState, action: { type: string, payload: any 
             return {
                 ...state,
                 user: null
+            }
+        }
+        case UPDATE_OK: {
+            const { user } = action.payload
+            const {access_token,...userData} = user
+            return {
+                ...state,
+                user: userData,
+                loading: false,
             }
         }
         default: return state

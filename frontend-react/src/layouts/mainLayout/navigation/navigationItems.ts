@@ -8,5 +8,10 @@ export const navigationItems = [
         name: "Events",
         link: "/events/list",
         icon:'events'
+    },
+    {
+        name: "Settings",
+        link: "/settings",
+        icon:'settings'
     }
 ]
