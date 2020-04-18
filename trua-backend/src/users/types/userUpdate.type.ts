@@ -3,10 +3,10 @@ import { UserRoles } from './types';
 
 export default class UserUpdate {
     id: string;
-
+    @IsOptional()
     @Length(3, 500)
     username: string;
-
+    @IsOptional()
     @IsEmail()
     email: string;
 

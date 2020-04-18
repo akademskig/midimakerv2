@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
-import useNotify from '../../utils/notifications';
 
-import { makeStyles, createStyles, Theme, List, IconButton, Divider } from '@material-ui/core';
+import { Theme, List, IconButton, Divider } from '@material-ui/core';
 import styled from 'styled-components';
 import { EmailField, UsernameField } from './FormFields'
 import ListItem from '@material-ui/core/ListItem';
@@ -10,49 +9,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import EditIcon from '@material-ui/icons/Edit';
-import SaveIcon from '@material-ui/icons/Save';
-import CancelIcon from '@material-ui/icons/Cancel';
 import LockIcon from '@material-ui/icons/Lock';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { selectUser } from '../../redux/auth/auth.selectors';
-import { useUpdateUser } from '../../api/protected/users';
-import { updateOk } from '../../redux/auth/auth.actions';
 import { ChangePasswordForm } from './ChangePassword.form';
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-    paper: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: theme.spacing() * 3,
-        border: `solid 1px ${theme.palette.grey[300]}`,
-        borderRadius: theme.shape.borderRadius
-    },
-    form: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-    formGroup: {
-        margin: theme.spacing() * 1.5,
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-    submitButton: {
-        width: '100px',
-        marginTop: theme.spacing() * 2,
-    },
-    eyeButton: {
-        minWidth: 'auto',
-        padding: theme.spacing() * 0.5,
-        color: theme.palette.secondary.dark
-    },
-    notification: {
-        minWidth: 'auto'
-    }
-}));
-
-
+import ChangeUserDataForm from './ChangeUserData.form';
 
 const FormContainer = styled.div`
     ul{
@@ -63,9 +24,31 @@ const FormContainer = styled.div`
             display: flex;
             align-items: center;
             justify-content: space-between;
+            .buttonEdit{
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.secondary.light};
+                    svg{
+                        color: white;
+                    }
+                }
             span.actionButtons{
                 display:inline-flex;
-                padding:1em;
+                padding:0.75em;
+                .buttonSave{
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.error.light};
+                    svg{
+                        color: white;
+                    }
+                };
+                .buttonCancel{
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.success.light};
+                    svg{
+                        color: white;
+                    }
+                };
+              
+                >:first-child{
+                    margin-right: 0.2em;
+                }
             }
         }
     }
@@ -77,30 +60,12 @@ const FormContainer = styled.div`
 `
 const UserSettings = () => {
     const user = useSelector(selectUser)
-    const [email, setEmail] = useState(user.email);
-
-    const dispatch = useDispatch()
     const [usernameEdit, setUsernameEdit] = useState(false);
     const [emailEdit, setEmailEdit] = useState(false);
     const [passwordEdit, setPasswordEdit] = useState(false);
+    const [email, setEmail] = useState(user.email);
     const [username, setUsername] = useState(user.username);
-    const { handleSubmit, register, errors } = useForm({ mode: "onChange" });
-    const updateUser = useUpdateUser();
-    const notify = useNotify();
-    const classes = useStyles()
-    const onSubmit = (values: any) => {
-        if (values.length) return
-        updateUser({ userId: user.id, email, username })
-            .then(user => {
-                console.log(user)
-                setEmailEdit(false)
-                setUsernameEdit(false)
-                dispatch(updateOk(user))
-                notify("ok", `Account for ${user.username} updated successfully!`)
-            })
-            .catch((err: Error) => { notify('error', err.message) });
-    };
-
+    const { register, errors } = useForm({ mode: "onChange" });
 
     const handleFieldCancel = (field: string) => {
         switch (field) {
@@ -120,66 +85,43 @@ const UserSettings = () => {
     return (
         <FormContainer>
             <List>
-                <form noValidate onSubmit={handleSubmit(onSubmit)} className={classes.form} >
-                    {
-                        usernameEdit ?
-                            <ListItem>
+                {
+                    usernameEdit ?
+                        <ListItem>
+                            <ChangeUserDataForm {...{ field: "username", value: username, handleFieldCancel, setEdit: setUsernameEdit }}>
                                 <UsernameField  {...{ username, setUsername, errors, register }} />
-                                <span className="actionButtons">
-                                    <Avatar>
-                                        <IconButton type="submit" >
-                                            <SaveIcon />
-                                        </IconButton>
-                                    </Avatar>
-                                    <Avatar>
-                                        <IconButton onClick={() => handleFieldCancel('username')}>
-                                            <CancelIcon />
-                                        </IconButton>
-                                    </Avatar>
-                                </span>
-                            </ListItem> :
-                            <ListItem>
-                                <ListItemText primary="Username" secondary={username} />
-                                <ListItemAvatar>
-                                    <Avatar>
-                                        <IconButton onClick={() => setUsernameEdit(true)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Avatar>
-                                </ListItemAvatar>
-                            </ListItem>
-                    }
-                    {
-                        emailEdit ?
-                            <ListItem>
+                            </ChangeUserDataForm>
+                        </ListItem> :
+                        <ListItem>
+                            <ListItemText primary="Username" secondary={username} />
+                            <ListItemAvatar>
+                                <Avatar className="buttonEdit">
+                                    <IconButton color="primary" onClick={() => setUsernameEdit(true)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                </Avatar>
+                            </ListItemAvatar>
+                        </ListItem>
+                }
+                {
+                    emailEdit ?
+                        <ListItem>
+                            <ChangeUserDataForm {...{ field: "email", value: email, handleFieldCancel, setEdit: setEmailEdit }}>
                                 <EmailField  {...{ email, setEmail, errors, register }} />
-                                <span className="actionButtons">
-                                    <Avatar>
-                                        <IconButton type="submit" >
-                                            <SaveIcon />
-                                        </IconButton>
-                                    </Avatar>
-                                    <Avatar>
-                                        <IconButton onClick={() => handleFieldCancel('email')}>
-                                            <CancelIcon />
-                                        </IconButton>
-                                    </Avatar>
-                                </span>
-
-                            </ListItem> :
-                            <ListItem>
-                                <ListItemText primary="Email" secondary={email} />
-                                <ListItemAvatar>
-                                    <Avatar>
-                                        <IconButton onClick={() => setEmailEdit(true)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                    </Avatar>
-                                </ListItemAvatar>
-                            </ListItem>
-                    }
-                    <Divider />
-                </form>
+                            </ChangeUserDataForm>
+                        </ListItem> :
+                        <ListItem>
+                            <ListItemText primary="Email" secondary={email} />
+                            <ListItemAvatar>
+                                <Avatar className="buttonEdit">
+                                    <IconButton onClick={() => setEmailEdit(true)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                </Avatar>
+                            </ListItemAvatar>
+                        </ListItem>
+                }
+                <Divider />
                 {
                     passwordEdit ?
                         <ChangePasswordForm {...{ setPasswordEdit }}></ChangePasswordForm>
