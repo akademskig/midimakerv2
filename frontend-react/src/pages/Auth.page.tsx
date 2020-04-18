@@ -5,7 +5,7 @@ import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import LoginForm from '../components/forms/Login.form';
 import TabPanel from '../components/common/TabPanels';
-import {  useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import RegisterForm from '../components/forms/Register.form';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -67,8 +67,8 @@ const AuthPage = () => {
           onChange={handleChange}
           aria-label="Authentication tabs"
         >
-            <Tab className={classes.tab} label="LOGIN" component="a"/>
-            <Tab className={classes.tab} label="REGISTER" />
+            <Tab className={classes.tab} label="LOGIN" href="/auth#login"/>
+            <Tab className={classes.tab} label="REGISTER" href="/auth#register"/>
 
         </Tabs>
         <Paper className={classes.paper}>
