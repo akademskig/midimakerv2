@@ -44,8 +44,6 @@ export default function UserSettingsMenu() {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
-
     const handleLogout = () => {
         dispatch(logout())
         history.push("/auth")
@@ -67,7 +65,7 @@ export default function UserSettingsMenu() {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
-                <NavLink to="/settings/user">
+                <NavLink to="/settings#user">
                     <MenuItem onClick={handleClose}>
                         <SettingsIcon fontSize="small" />
                         <Typography>

@@ -45,9 +45,9 @@ const ContainerStyled = styled(Paper)`
 const SettingsPage = () => {
     const getTabIndex = (hash: string) => {
         switch (hash) {
-            case "#login":
+            case "#user":
                 return 0
-            case "#register":
+            case "#preferences":
                 return 1
             default:
                 return 0
@@ -55,28 +55,23 @@ const SettingsPage = () => {
     }
     const classes = useStyles()
     const { hash } = useLocation()
-    const [value, setValue] = React.useState(getTabIndex(hash));
-    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-        setValue(newValue);
-    };
-
+    
     return (
         <ContainerStyled className={classes.paperContainer}>
             <Tabs
-                value={value}
+                value={getTabIndex(hash)}
                 indicatorColor="secondary"
                 color="secondary"
-                onChange={handleChange}
                 aria-label="Authentication tabs"
             >
-                <Tab className={classes.tab} label="USER">
+                <Tab className={classes.tab} label="USER" href="#user">
                 </Tab>
-                <Tab className={classes.tab} label="PREFERENCES" />
+                <Tab className={classes.tab} label="PREFERENCES"  href="#preferences"/>
             </Tabs>
-            <TabPanel value={value} index={0}>
+            <TabPanel value={getTabIndex(hash)} index={0}>
                 <UserSettings />
             </TabPanel>
-            <TabPanel value={value} index={1}>
+            <TabPanel value={getTabIndex(hash)} index={1}>
             </TabPanel>
         </ContainerStyled>
     );
