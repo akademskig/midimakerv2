@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button, Container, Paper,  Tab, Tabs,  } from '@material-ui/core';
+import { Button, Container, Paper, Tab, Tabs, } from '@material-ui/core';
 import LockIcon from '@material-ui/icons/Lock';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import LoginForm from '../components/forms/Login.form';
@@ -53,37 +53,32 @@ const AuthPage = () => {
   }
   const classes = useStyles()
   const { hash } = useLocation()
-  const [value, setValue] = React.useState(getTabIndex(hash));
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
 
   return (
-      <Container maxWidth="xs" className={classes.container}>
-        <Tabs
-          value={value}
-          indicatorColor="secondary"
-          color="secondary"
-          onChange={handleChange}
-          aria-label="Authentication tabs"
-        >
-            <Tab className={classes.tab} label="LOGIN" href="/auth#login"/>
-            <Tab className={classes.tab} label="REGISTER" href="/auth#register"/>
+    <Container maxWidth="xs" className={classes.container}>
+      <Tabs
+        value={getTabIndex(hash)}
+        indicatorColor="secondary"
+        color="secondary"
+        aria-label="Authentication tabs"
+      >
+        <Tab className={classes.tab} label="LOGIN" href="/auth#login" />
+        <Tab className={classes.tab} label="REGISTER" href="/auth#register" />
 
-        </Tabs>
-        <Paper className={classes.paper}>
-          <Button className={classes.box}>
-            <LockIcon color="secondary" fontSize="large"></LockIcon>
-          </Button>
+      </Tabs>
+      <Paper className={classes.paper}>
+        <Button className={classes.box}>
+          <LockIcon color="secondary" fontSize="large"></LockIcon>
+        </Button>
 
-          <TabPanel value={value} index={0}>
-            <LoginForm></LoginForm>
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <RegisterForm></RegisterForm>
-          </TabPanel>
-        </Paper>
-      </Container>
+        <TabPanel value={getTabIndex(hash)} index={0}>
+          <LoginForm></LoginForm>
+        </TabPanel>
+        <TabPanel value={getTabIndex(hash)} index={1}>
+          <RegisterForm></RegisterForm>
+        </TabPanel>
+      </Paper>
+    </Container>
   );
 };
 

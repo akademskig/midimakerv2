@@ -5,6 +5,7 @@ import useNotify from '../../utils/notifications';
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme } from '@material-ui/core';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
 import { useRegister } from '../../api/auth';
+import { useHistory } from 'react-router-dom';
 const useStyles = makeStyles((theme: Theme) => createStyles({
     paper: {
         display: 'flex',
@@ -48,17 +49,21 @@ const RegisterForm = () => {
     const { handleSubmit, register, errors } = useForm();
     const registerUser = useRegister();
     const notify = useNotify();
+    const history = useHistory()
     const classes = useStyles()
     const [passwordType, setPasswordType] = useState('password')
     const onSubmit = (values: any) => {
         if (values.length) return
         registerUser({ email, password, username })
-          .then(user=> notify("ok", `Account for ${user.username} created successfully!`))
-          .catch((err: Error) => { notify('error', err.message) });
+            .then(user => {
+                history.push('/auth#login')
+                notify("ok", `Account for ${user.username} created successfully!`)
+            })
+            .catch((err: Error) => { notify('error', err.message) });
     };
     return (
         <form noValidate onSubmit={handleSubmit(onSubmit)} className={classes.form}>
-              <FormGroup className={classes.formGroup}>
+            <FormGroup className={classes.formGroup}>
                 <TextField
                     name="username"
                     color="secondary"
@@ -135,7 +140,7 @@ const RegisterForm = () => {
                     }}
                 />
             </FormGroup>
-            <Button type="submit" color="secondary" variant="contained" className={classes.submitButton}>LOGIN</Button>
+            <Button type="submit" color="secondary" variant="contained" className={classes.submitButton}>REGISTER</Button>
         </form>
     )
 }
