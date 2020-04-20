@@ -1,12 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { UserRegister, hashPassword } from 'src/auth/auth.utils';
 import { Repository } from 'typeorm';
-import User from 'src/database/entity/user.entity';
+import User from '../database/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate } from 'class-validator';
-import { QueryBuilderService } from 'src/utils/queryBuilder.service';
+import { QueryBuilderService } from '../utils/queryBuilder.service';
 import ValidationErrors from '../errors/ValidationErrors';
 import UserUpdate from './types/userUpdate.type';
+import { AuthUtils } from '../auth/auth.utils';
+import { UserRegister } from './types/UserRegister.type';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +17,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly qbs: QueryBuilderService,
+    private readonly authUtils: AuthUtils,
   ) { }
 
   async findOne(query): Promise<User | undefined> {
@@ -39,7 +41,7 @@ export class UsersService {
     if (existingEmail) {
       throw new BadRequestException(`Email ${existingEmail.email} already exists!`);
     }
-    const hashedPassword = await hashPassword(password);
+    const hashedPassword = await this.authUtils.hashPassword(password);
     const user = new User({ username, password, email });
     const errors = await validate(user);
     user.password = hashedPassword;

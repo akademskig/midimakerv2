@@ -6,10 +6,13 @@ import { CustomStrategy } from './custom.strategy';
 import { AuthController } from './auth.controller';
 import JwtModule from './jwt.config';
 import { JwtStrategy } from './jwt.strategy';
+import MailService from '../mailer/mail.service';
+import {SendgridModule} from '../mailer/sendgrid.module';
+import { AuthUtils } from './auth.utils';
 
 @Module({
-  imports: [UsersModule, PassportModule, JwtModule],
-  providers: [AuthService, CustomStrategy, JwtStrategy],
+  imports: [ SendgridModule, UsersModule, PassportModule, JwtModule],
+  providers: [AuthUtils, MailService, AuthService, CustomStrategy, JwtStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

@@ -1,8 +1,8 @@
 import { Controller, Request, Post, Get, UseGuards, Param, Query, Body, Logger, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { UserRegister } from './auth.utils';
 import { ValidationError } from 'class-validator';
+import { UserRegister } from '../users/types/UserRegister.type';
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
