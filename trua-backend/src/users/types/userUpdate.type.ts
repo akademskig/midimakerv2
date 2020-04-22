@@ -1,5 +1,6 @@
 import { IsEmail, Length, IsEnum, IsEmpty, IsOptional } from 'class-validator';
 import { UserRoles } from './types';
+import VerificationToken from '../../database/entity/verificationToken.entity';
 
 export default class UserUpdate {
     id: string;
@@ -15,11 +16,15 @@ export default class UserUpdate {
     role: UserRoles;
 
     @IsOptional()
+    tokenId: string;
+
+    @IsOptional()
     company: string;
 
     constructor(user) {
-        const { username, email } = user;
+        const { username, email, token } = user;
         this.username = username;
         this.email = email;
+        this.tokenId = token
     }
 }

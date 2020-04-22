@@ -1,6 +1,6 @@
 import React from 'react';
 import { EmailField } from 'react-admin';
-import { List, Datagrid, TextField, Create, SimpleForm, ReferenceInput, SelectInput, TextInput, Edit, Filter, required, minLength, email, Show, SimpleShowLayout, DateField } from 'react-admin';
+import { List, Datagrid, TextField, Create, SimpleForm, ReferenceInput, SelectInput, TextInput, Edit, Filter, required, minLength, email, Show, SimpleShowLayout, DateField, BooleanInput, BooleanField } from 'react-admin';
 export const UserList = (props: any) => (
     <List filters={<UserFilter />}{...props}>
         <Datagrid rowClick="show">
@@ -8,6 +8,7 @@ export const UserList = (props: any) => (
             <EmailField source="email" />
             <TextField source="role" />
             <TextField source="company" />
+            <TextField source="isVerified" />
         </Datagrid>
     </List>
 );
@@ -19,6 +20,7 @@ export const UserCreate = (props: any) => (
             <TextInput source="password" validate={[required(), minLength(8)]} />
             <SelectInput source="role" optionText="name" validate={[required()]} choices={[{ id: 'admin', name: "Admin" }, { id: 'regular', name: 'Regular' }]} />
             <TextInput source="company" />
+            <BooleanInput label="Verified" source="isVerified" />
         </SimpleForm>
     </Create>
 );
@@ -33,6 +35,7 @@ export const UserEdit = (props: any) => (
             <TextInput source="email" validate={[required(), email()]} />
             <SelectInput source="role" optionText="name" validate={[required()]} choices={[{ id: 'admin', name: "Admin" }, { id: 'regular', name: 'Regular' }]} />
             <TextInput source="company" />
+            <BooleanInput label="Verified" source="isVerified" />
         </SimpleForm>
     </Edit>
 );
@@ -56,6 +59,7 @@ export const UserShow = (props: any) => (
             <TextField source="company" />
             <DateField locales="de-DE" source="createdAt" showTime />
             <DateField locales="de-DE" label="Last updated" source="updatedAt" showTime />
+            <BooleanField label="Verified" source="isVerified" />
         </SimpleShowLayout>
     </Show>
 );

@@ -41,6 +41,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
+    "service": "^0.1.4",
     "typeorm": "^0.2.22"
   },
   "devDependencies": {

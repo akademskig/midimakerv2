@@ -12,7 +12,8 @@ import MailService from '../../dist/mailer/mail.service';
 import { AuthUtils } from './auth.utils';
 import { QueryBuilderService } from '../utils/queryBuilder.service';
 import User from '../database/entity/user.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken  } from '@nestjs/typeorm';
+import VerificationToken from '../database/entity/verificationToken.entity';
 
 describe('Auth Controller', () => {
   let controller: AuthController;
@@ -23,7 +24,12 @@ describe('Auth Controller', () => {
       providers: [UsersService, QueryBuilderService, AuthUtils, MailService, AuthService, CustomStrategy, JwtStrategy, {
         provide: getRepositoryToken(User),
         useValue: 'UserRepository',
-      }],
+      },
+       {
+        provide: getRepositoryToken(VerificationToken),
+        useValue: 'VerificationTokenRepository',
+      },
+     ],
       controllers: [AuthController],
     }).compile();
 

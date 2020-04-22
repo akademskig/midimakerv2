@@ -9,9 +9,11 @@ import { JwtStrategy } from './jwt.strategy';
 import MailService from '../mailer/mail.service';
 import {SendgridModule} from '../mailer/sendgrid.module';
 import { AuthUtils } from './auth.utils';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import VerificationToken from '../database/entity/verificationToken.entity';
 
 @Module({
-  imports: [ SendgridModule, UsersModule, PassportModule, JwtModule],
+  imports: [ SendgridModule, UsersModule, PassportModule, JwtModule, TypeOrmModule.forFeature([VerificationToken])],
   providers: [AuthUtils, MailService, AuthService, CustomStrategy, JwtStrategy],
   controllers: [AuthController],
   exports: [AuthService],

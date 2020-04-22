@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Timestamp } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Timestamp, OneToOne, JoinColumn } from 'typeorm';
 import { UserRoles } from '../../users/types/types';
 import { IsEmail, Length } from 'class-validator';
+import VerificationToken from './verificationToken.entity';
 
 @Entity()
 export default class User {
@@ -28,6 +29,13 @@ export default class User {
     @Column({ type: 'text', nullable: true })
     company: string;
 
+    @OneToOne(type => VerificationToken, {cascade: true})
+    @JoinColumn()
+    verificationToken: string;
+
+    @Column({ type: Boolean, default: false })
+    isVerified: boolean;
+
     @CreateDateColumn()
     createdAt: Timestamp;
 
@@ -38,9 +46,10 @@ export default class User {
         if (!user) {
             return this;
         }
-        const { username, email, password } = user;
+        const { username, email, password, verificationTokenId } = user;
         this.username = username;
         this.email = email;
+        this.verificationToken = verificationTokenId;
         this.password = password;
     }
 }

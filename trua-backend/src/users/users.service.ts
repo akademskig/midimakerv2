@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, QueryRunner } from 'typeorm';
 import User from '../database/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate } from 'class-validator';
@@ -32,7 +32,7 @@ export class UsersService {
     return { data, count };
   }
 
-  async createNew({ username, password, email }: UserRegister): Promise<User> {
+  async createNew({ username, password, email, verificationTokenId }: UserRegister, queryRunner?: QueryRunner): Promise<User> {
     const existingUser = await this.findOne({ username });
     if (existingUser) {
       throw new BadRequestException(`Username ${existingUser.username} already exists!`);
@@ -42,15 +42,18 @@ export class UsersService {
       throw new BadRequestException(`Email ${existingEmail.email} already exists!`);
     }
     const hashedPassword = await this.authUtils.hashPassword(password);
-    const user = new User({ username, password, email });
+    const user = new User({ username, password, email, verificationTokenId });
     const errors = await validate(user);
     user.password = hashedPassword;
     if (errors.length) {
       throw new ValidationErrors(errors);
     }
+    if (queryRunner) {
+      return queryRunner.manager.save(user);
+    }
     return this.userRepository.save(user);
   }
-  async updateOne(id: { id: string }, userData: User) {
+  async updateOne(id: string, userData: User) {
     const user = new UserUpdate(userData);
     const errors = await validate(user);
     if (errors.length) {
@@ -59,6 +62,10 @@ export class UsersService {
     const { id: extractedId, updatedAt, createdAt, ...userValues } = userData;
     await this.userRepository.update(id, userValues);
     return this.findOne(id);
+  }
+
+  async verifyUser({email, token}) {
+    return this.userRepository.update({email, verificationToken: token}, {isVerified: true});
   }
 
   async deleteById(id) {
