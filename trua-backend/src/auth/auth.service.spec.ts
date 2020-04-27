@@ -21,7 +21,7 @@ describe('AuthService', () => {
   let vT;
 
   afterAll(async () => {
-    const user = await getConnection()
+    await getConnection()
       .getRepository(User)
       .createQueryBuilder('user')
       .delete()
