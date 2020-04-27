@@ -32,7 +32,7 @@ export class UsersService {
     return { data, count };
   }
 
-  async createNew({ username, password, email, verificationTokenId }: UserRegister, queryRunner?: QueryRunner): Promise<User> {
+  async createNew({ username, password, email }: UserRegister, queryRunner?: QueryRunner): Promise<User> {
     const existingUser = await this.findOne({ username });
     if (existingUser) {
       throw new BadRequestException(`Username ${existingUser.username} already exists!`);
@@ -42,7 +42,7 @@ export class UsersService {
       throw new BadRequestException(`Email ${existingEmail.email} already exists!`);
     }
     const hashedPassword = await this.authUtils.hashPassword(password);
-    const user = new User({ username, password, email, verificationTokenId });
+    const user = new User({ username, password, email });
     const errors = await validate(user);
     user.password = hashedPassword;
     if (errors.length) {
@@ -53,21 +53,16 @@ export class UsersService {
     }
     return this.userRepository.save(user);
   }
-  async updateOne(id: string, userData: User) {
+  async updateOne(query: { id?: string, email?: string }, userData: UserUpdate) {
     const user = new UserUpdate(userData);
     const errors = await validate(user);
     if (errors.length) {
       throw new ValidationErrors(errors);
     }
-    const { id: extractedId, updatedAt, createdAt, ...userValues } = userData;
-    await this.userRepository.update(id, userValues);
-    return this.findOne(id);
+    const { id: extractedId, ...userValues } = userData;
+    await this.userRepository.update(query, userValues);
+    return this.findOne(query);
   }
-
-  async verifyUser({email, token}) {
-    return this.userRepository.update({email, verificationToken: token}, {isVerified: true});
-  }
-
   async deleteById(id) {
     return this.userRepository.remove(id);
   }

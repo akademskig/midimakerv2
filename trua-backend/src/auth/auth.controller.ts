@@ -21,7 +21,7 @@ export class AuthController {
         }
     }
     @Put('/change_password/:id')
-    async changePassword(@Param() id, @Body() passwords){
+    async changePassword(@Param() id, @Body() passwords) {
         try {
             return this.authService.updatePassword(id, passwords);
         } catch (error) {
@@ -29,7 +29,7 @@ export class AuthController {
         }
     }
     @Get('/verify_email')
-    async verifyEmail(@Query() {email, token}){
+    async verifyEmail(@Query() {email, token}) {
         try {
             return this.authService.verifyUser({email, token});
         } catch (error) {

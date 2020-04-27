@@ -1,30 +1,29 @@
-import { IsEmail, Length, IsEnum, IsEmpty, IsOptional } from 'class-validator';
+import { IsEmail, Length, IsEnum, IsOptional } from 'class-validator';
 import { UserRoles } from './types';
-import VerificationToken from '../../database/entity/verificationToken.entity';
 
 export default class UserUpdate {
-    id: string;
+    id?: string;
     @IsOptional()
     @Length(3, 500)
-    username: string;
+    username?: string;
     @IsOptional()
     @IsEmail()
-    email: string;
+    email?: string;
 
     @IsOptional()
     @IsEnum(UserRoles)
-    role: UserRoles;
+    role?: UserRoles;
 
     @IsOptional()
-    tokenId: string;
+    company?: string;
 
     @IsOptional()
-    company: string;
+    isVerified: boolean;
 
     constructor(user) {
-        const { username, email, token } = user;
+        const { username, email, isVerified } = user;
         this.username = username;
         this.email = email;
-        this.tokenId = token
+        this.isVerified = isVerified;
     }
 }

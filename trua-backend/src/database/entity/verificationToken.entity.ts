@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, Timestamp, JoinColumn, OneToOne, AfterInsert } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Timestamp, JoinColumn, OneToOne } from 'typeorm';
+import User from './user.entity';
 
 @Entity()
 export default class VerificationToken {
@@ -7,6 +8,10 @@ export default class VerificationToken {
 
     @Column()
     token: string;
+
+    @OneToOne(type => User, { onDelete: 'CASCADE' })
+    @JoinColumn()
+    user: string;
 
     @Column()
     duration: number;
@@ -18,8 +23,9 @@ export default class VerificationToken {
         if (!data) {
             return this;
         }
-        const { token, duration } = data;
+        const { token, duration, user } = data;
         this.token = token;
         this.duration = duration;
+        this.user = user;
     }
 }

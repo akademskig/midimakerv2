@@ -8,10 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class AuthUtils {
 
-  constructor(
-    @InjectRepository(VerificationToken)
-    private readonly tokenRepository: Repository<VerificationToken>) { }
-
   hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 10);
   }
@@ -19,9 +15,10 @@ export class AuthUtils {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async createVerificationToken(userData, queryRunner: QueryRunner) {
+  async createVerificationToken(userId, queryRunner: QueryRunner) {
     const token = new VerificationToken({
-      token: bcrypt.hashSync(userData, 10),
+      user: userId,
+      token: bcrypt.hashSync(userId, 10),
       duration: 86400000, // 1 day
     });
     return queryRunner.manager.save(token);

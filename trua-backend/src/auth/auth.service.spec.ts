@@ -8,47 +8,37 @@ import { SendgridModule } from '../mailer/sendgrid.module';
 import { PassportModule } from '@nestjs/passport';
 import { CustomStrategy } from './custom.strategy';
 import { JwtStrategy } from './jwt.strategy';
-import { getRepositoryToken, TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import User from '../database/entity/user.entity';
 import { QueryBuilderService } from '../utils/queryBuilder.service';
-import { Repository, Connection, getConnection } from 'typeorm';
+import { Connection, getConnection, createQueryBuilder } from 'typeorm';
 import VerificationToken from '../database/entity/verificationToken.entity';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
-
-import { createConnection } from 'typeorm';
-import { async } from 'rxjs/internal/scheduler/async';
 import { AppModule } from '../app.module';
 
 describe('AuthService', () => {
   let service: AuthService;
   let userId;
-  const UserRepository: Repository<User> = null;
-  const TokenRepository: Repository<VerificationToken> = null;
-  let connection: Connection;
-  const dbConfig: TypeOrmModuleOptions = {
-    name: 'testconnection',
-    type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'dbadmin',
-    password: 'dbpass#123',
-    database: 'dbex',
-    entities: [User, VerificationToken],
-    synchronize: true,
-};
+  let vT;
 
+  afterAll(async () => {
+    const user = await getConnection()
+      .getRepository(User)
+      .createQueryBuilder('user')
+      .delete()
+      .where({ email: vT.user.email })
+      .execute();
+  });
   it('should be defined', async () => {
-
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule, SendgridModule, PassportModule, JwtModule, TypeOrmModule.forFeature([VerificationToken])],
       providers: [Connection, UsersService, QueryBuilderService, AuthUtils, MailService, AuthService, CustomStrategy, JwtStrategy, {
         provide: getRepositoryToken(User),
         useValue: 'UserRepository',
       },
-      {
-        provide: getRepositoryToken(VerificationToken),
-        useValue: 'VerificationTokenRepository',
-      }],
+        {
+          provide: getRepositoryToken(VerificationToken),
+          useValue: 'VerificationTokenRepository',
+        }],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -56,26 +46,36 @@ describe('AuthService', () => {
   });
 
   it('should register a user', async () => {
-     const res = await service.register({username: 'marta', email: 'akademski.gradjanin@gmail.com', password: 'testpassowrd123'});
-     userId = res.id;
-     expect(typeof res.id === 'string').toBe(true);
+    const res = await service.register({ username: 'marta', email: 'akademski.gradjanin@gmail.com', password: 'testpassowrd123' });
+    userId = res.id;
+    expect(typeof res.id === 'string').toBe(true);
   });
   it('should generate verification token', async () => {
-    const data = await getConnection()
-    .getRepository(User)
-    .createQueryBuilder('user')
-    .leftJoinAndSelect('user.verificationToken', 'verificationToken')
-    .where({id: userId})
-    .getOne();
+    vT = await
+      createQueryBuilder('verification_token', 'vT')
+        .leftJoinAndSelect('vT.user', 'user')
+        .where('user.id = :id', { id: userId })
+        .getOne();
 
     const expected = {
       token: expect.any(String),
       id: expect.any(String),
       duration: expect.any(Number),
       createdAt: expect.any(Date),
-  };
-    expect(data.verificationToken).toEqual(
+    };
+    expect(vT).toEqual(
       expect.objectContaining(expected),
     );
-});
+  });
+  it('should verifiy email', async () => {
+    await service.verifyUser({ email: vT.user.email, token: vT.token });
+    const user = await getConnection()
+      .getRepository(User)
+      .createQueryBuilder()
+      .select()
+      .where({ email: vT.user.email })
+      .getOne();
+
+    expect(user.isVerified).toEqual(true);
+  });
 });

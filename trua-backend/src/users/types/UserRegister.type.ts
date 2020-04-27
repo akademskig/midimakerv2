@@ -11,7 +11,4 @@ export class UserRegister {
     @MinLength(8,
         { message: 'Password must be at least 8 characters in length.' })
     password: string;
-
-    @IsNotEmpty()
-    verificationTokenId?: string;
 }

@@ -29,10 +29,6 @@ export default class User {
     @Column({ type: 'text', nullable: true })
     company: string;
 
-    @OneToOne(type => VerificationToken, {cascade: true})
-    @JoinColumn()
-    verificationToken: string;
-
     @Column({ type: Boolean, default: false })
     isVerified: boolean;
 
@@ -46,10 +42,9 @@ export default class User {
         if (!user) {
             return this;
         }
-        const { username, email, password, verificationTokenId } = user;
+        const { username, email, password } = user;
         this.username = username;
         this.email = email;
-        this.verificationToken = verificationTokenId;
         this.password = password;
     }
 }
