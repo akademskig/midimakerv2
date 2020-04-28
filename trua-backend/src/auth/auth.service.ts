@@ -1,5 +1,5 @@
 
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger, BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthUtils } from './auth.utils';
@@ -63,10 +63,10 @@ export class AuthService {
   async updatePassword(id, { oldPassword, newPassword }: { oldPassword: string, newPassword: string }) {
     const user = await this.usersService.findOne(id);
     if (user && !await this.authUtils.comparePasswords({ password: oldPassword, hashedPassword: user.password })) {
-      throw new UnauthorizedException('Invalid password');
+      throw new BadRequestException('Invalid password');
     }
     user.password = await this.authUtils.hashPassword(newPassword);
-    return this.usersService.updateOne({ id }, user);
+    return this.usersService.updateOne(id, user);
   }
 
   async verifyUser({ email, token }: { email: string, token: string }) {

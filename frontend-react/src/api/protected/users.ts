@@ -32,7 +32,7 @@ class Users {
     }
     changePassword = async ({ userId, oldPassword, newPassword }: { userId: string, oldPassword: string; newPassword: string }) => {
         try {
-            const res = await this.axios.put(`${this.baseUrl}/auth/changePassword/${userId}`, { oldPassword, newPassword })
+            const res = await this.axios.put(`${this.baseUrl}/auth/change_password/${userId}`, { oldPassword, newPassword })
             return res.data
         } catch (err) {
             const errRes = err.response ? err.response.data : 'An error occurred'

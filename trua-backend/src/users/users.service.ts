@@ -59,7 +59,7 @@ export class UsersService {
     if (errors.length) {
       throw new ValidationErrors(errors);
     }
-    const { id: extractedId, ...userValues } = userData;
+    const { id: extractedId, ...userValues } = user;
     await this.userRepository.update(query, userValues);
     return this.findOne(query);
   }

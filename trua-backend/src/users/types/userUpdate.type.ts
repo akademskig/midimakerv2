@@ -15,15 +15,19 @@ export default class UserUpdate {
     role?: UserRoles;
 
     @IsOptional()
+    password?: string;
+
+    @IsOptional()
     company?: string;
 
     @IsOptional()
     isVerified: boolean;
 
     constructor(user) {
-        const { username, email, isVerified } = user;
+        const { username, email, isVerified, password } = user;
         this.username = username;
         this.email = email;
         this.isVerified = isVerified;
+        this.password = password;
     }
 }
