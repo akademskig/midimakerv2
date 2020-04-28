@@ -5,10 +5,11 @@ import { PasswordField } from './FormFields';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { selectUser } from '../../redux/auth/auth.selectors';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useChangePassword } from '../../api/protected/users';
 import useNotify from '../../utils/notifications';
 import AlertIcon from '@material-ui/icons/Warning'
+import { logout } from '../../redux/auth/auth.actions';
 
 
 const ChangePasswordFormStyled = styled.div`
@@ -48,6 +49,7 @@ export const ChangePasswordForm = ({ setPasswordEdit }: any) => {
     const user = useSelector(selectUser)
     const changePassword = useChangePassword()
     const notify = useNotify()
+    const dispatch = useDispatch()
     const onChangePassword = (values: any) => {
         if (values.length) return
         changePassword({ userId: user.id, oldPassword, newPassword })
@@ -55,7 +57,11 @@ export const ChangePasswordForm = ({ setPasswordEdit }: any) => {
                 setPasswordEdit(false)
                 notify("ok", `Account for ${user.username} updated successfully!`)
             })
-            .catch((err: Error) => { notify('error', err.message) })
+            .catch((err: any) => { 
+                if(err.statusCode === 401 ||err.statusCode === 403){
+                    dispatch(logout());}
+                notify('error', err.message) 
+            });
 
     }
     return (

@@ -24,8 +24,9 @@ const ChangeUserDataForm = ({ field, value, handleFieldCancel, children, setEdit
                 setEdit(false)
                 notify("ok", `Account for ${user.username} updated successfully!`)
             })
-            .catch((err: Error) => { 
-                dispatch(logout());
+            .catch((err: any) => { 
+                if(err.statusCode === 401 ||err.statusCode === 403){
+                dispatch(logout());}
                 notify('error', err.message) 
             });
     };
