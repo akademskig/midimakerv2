@@ -25,9 +25,17 @@ export default class UserUpdate {
 
     constructor(user) {
         const { username, email, isVerified, password } = user;
-        this.username = username;
-        this.email = email;
+        if (username) {
+        this.username = username ;
+        }
+        if (email) {
+        this.email = email ;
+        }
+        if (isVerified) {
         this.isVerified = isVerified;
+        }
+        if (password) {
         this.password = password;
+        }
     }
 }
