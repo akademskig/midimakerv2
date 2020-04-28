@@ -23,12 +23,12 @@ function checkAuth(to: GuardFunctionRouteProps | null, from: GuardFunctionRouteP
   next.redirect('/auth');
 };
 
-const AppRoutes = () => {
+const AppRoutes = (props: any) => {
   isAuth = useSelector(isAuthenticated)
   return (
     <Switch>
       <Route path="/auth" exact component={AuthPage} />
-      <Route path="/" component={MainLayout} />
+      <Route path="/" component={() => isAuth ? <MainLayout {...props}/>: <Redirect to='/auth'/>} />
     </Switch>
 
   )
