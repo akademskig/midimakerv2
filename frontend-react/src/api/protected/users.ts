@@ -21,11 +21,10 @@ class Users {
         } catch (err) {
 
             const errRes = err.response ? err.response.data : 'An error occurred'
-            if (errRes.statusCode === 401) {
-                err.message = "Access restricted."
-                throw err
-            }
-            console.log(errRes)
+            // if (errRes.statusCode === 401) {
+            //     err.message = "Access restricted."
+            //     throw err
+            // }
             console.error(JSON.stringify(errRes))
             throw errRes
         }
