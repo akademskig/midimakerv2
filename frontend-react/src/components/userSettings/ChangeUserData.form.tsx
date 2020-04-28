@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useUpdateUser } from '../../api/protected/users';
 import useNotify from '../../utils/notifications';
-import { updateOk } from '../../redux/auth/auth.actions';
+import { updateOk, logout } from '../../redux/auth/auth.actions';
 import { selectUser } from '../../redux/auth/auth.selectors';
 
 const ChangeUserDataForm = ({ field, value, handleFieldCancel, children, setEdit }: any) => {
@@ -24,7 +24,10 @@ const ChangeUserDataForm = ({ field, value, handleFieldCancel, children, setEdit
                 setEdit(false)
                 notify("ok", `Account for ${user.username} updated successfully!`)
             })
-            .catch((err: Error) => { notify('error', err.message) });
+            .catch((err: Error) => { 
+                dispatch(logout());
+                notify('error', err.message) 
+            });
     };
     return (
         <form noValidate onSubmit={handleSubmit(onSubmit)}  >
