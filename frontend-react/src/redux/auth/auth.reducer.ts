@@ -26,6 +26,7 @@ function authReducer(state = initialState, action: { type: string, payload: any 
         case LOGOUT: {
             return {
                 ...state,
+                accessToken:null,
                 user: null
             }
         }
