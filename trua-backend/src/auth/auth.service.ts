@@ -80,12 +80,22 @@ export class AuthService {
 
       if (!vT) {
         return 'User not found';
-      } else if (vT.createdAt + vT.duration > Date.now()) {
+      } else if (vT.createdAt + vT.duration < Date.now()) {
         return 'Verification token expired.';
       }
       if (vT.token === token) {
-        await this.usersService.updateOne({ email }, { isVerified: true });
-        await getRepository('verification_token').delete({ token });
+        const qR = getConnection().createQueryRunner();
+        await qR.startTransaction();
+        try {
+          await this.usersService.updateOne({ email }, { isVerified: true }, qR);
+          await qR.manager.delete('verification_token', { token });
+          await qR.commitTransaction();
+        } catch (err) {
+          await qR.rollbackTransaction();
+          throw err;
+        } finally {
+          await qR.release();
+        }
       }
       return `Email ${email} successfully verified!`;
     } catch (err) {

@@ -53,14 +53,18 @@ export class UsersService {
     }
     return this.userRepository.save(user);
   }
-  async updateOne(query: { id?: string, email?: string }, userData: UserUpdate) {
+  async updateOne(query: { id?: string, email?: string }, userData: UserUpdate, queryRunner?: QueryRunner) {
     const user = new UserUpdate(userData);
     const errors = await validate(user);
     if (errors.length) {
       throw new ValidationErrors(errors);
     }
     const { id: extractedId, ...userValues } = user;
-    await this.userRepository.update(query, userValues);
+    if (queryRunner) {
+      await queryRunner.manager.update('user', query, userValues);
+    } else {
+      await this.userRepository.update(query, userValues);
+    }
     return this.findOne(query);
   }
   async deleteById(id) {
