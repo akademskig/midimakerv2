@@ -11,7 +11,6 @@ class Auth {
           { headers: {
             'Content-Type': 'application/json'
           } })
-        this.accessToken = res.data.access_token
         return res.data
       } catch (err) {
         const errRes = err.response ? err.response.data : 'An error occurred'
@@ -26,6 +25,7 @@ class Auth {
           { headers: {
             'Content-Type': 'application/json'
           } })
+        this.accessToken = res.data.access_token
         return res.data
       } catch (err) {
         const errRes = err.response ? err.response.data : 'An error occurred'
