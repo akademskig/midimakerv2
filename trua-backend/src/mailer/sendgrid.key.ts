@@ -1,1 +1,0 @@
-export const SENDGRID_KEY = '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'

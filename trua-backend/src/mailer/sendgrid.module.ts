@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
-import { SENDGRID_KEY } from './sendgrid.key';
 import { SendGridModule } from '@anchan828/nest-sendgrid';
+import { SG_API_KEY } from '../config/index';
 
-sgMail.setApiKey(SENDGRID_KEY);
+sgMail.setApiKey(SG_API_KEY);
 @Module({
     imports: [
       SendGridModule.forRoot({
-        apikey: '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',
+        apikey: SG_API_KEY,
       }),
     ],
   })
