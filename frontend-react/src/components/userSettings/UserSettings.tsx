@@ -25,7 +25,7 @@ const FormContainer = styled.div`
             align-items: center;
             justify-content: space-between;
             .buttonEdit{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.secondary.light};
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
                     svg{
                         color: white;
                     }
@@ -34,13 +34,13 @@ const FormContainer = styled.div`
                 display:inline-flex;
                 padding:0.75em;
                 .buttonSave{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.error.light};
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
                     svg{
                         color: white;
                     }
                 };
                 .buttonCancel{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.success.light};
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.error.light};
                     svg{
                         color: white;
                     }
