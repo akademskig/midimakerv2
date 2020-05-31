@@ -6,12 +6,8 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { selectUser } from '../../redux/auth/auth.selectors';
 import { useSelector, useDispatch } from 'react-redux';
-import { useChangePassword } from '../../api/protected/users';
-import useNotify from '../../utils/notifications';
 import AlertIcon from '@material-ui/icons/Warning'
-import { logout } from '../../redux/auth/auth.actions';
 import { crudUpdateStart } from '../../redux/crud/crud.actions';
-import { getError } from '../../redux/global/global.selectors';
 
 
 const ChangePasswordFormStyled = styled.div`

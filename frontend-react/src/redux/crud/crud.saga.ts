@@ -1,12 +1,8 @@
 import { call, put, takeEvery, delay } from 'redux-saga/effects';
-import { REQUEST_START } from '../global/global.actionTypes';
 import { requestError, showNotification, hideNotification, requestEnd, requestStart } from '../global/global.actions';
 import { logout, updateUserOk } from '../auth/auth.actions';
-import { UPDATE_USER_START } from '../auth/auth.actionTypes';
 import users from '../../api/protected/users';
 import { CRUD_UPDATE_START } from './crud.actionTypes';
-import { crudUpdateOk } from './crud.actions';
-import useNotify from '../../utils/notifications';
 function* checkError(error: any) {
     if (error.statusCode === 401 || error.statusCode === 403) {
         yield put(logout())

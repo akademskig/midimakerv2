@@ -11,7 +11,6 @@ import { isAuthenticated } from './redux/auth/auth.selectors';
 import MainPage from './pages/Main.page';
 import MainLayout from './layouts/mainLayout/Main.layout';
 import { GuardProvider, GuardedRoute } from "react-router-guards"
-import { GuardFunctionRouteProps } from 'react-router-guards/dist/types';
 import SettingsPage from './pages/SettingsPage';
 import EventsPage from './pages/Events.page';
 
@@ -36,7 +35,6 @@ const AppRoutes = (props: any) => {
 
 export const MainRoutes = () => {
   const isAuth = useSelector(isAuthenticated)
-  console.log(isAuth)
   return (
     <GuardProvider guards={[(to, from, next )=> isAuth ? next(): next.redirect("/auth")]}>
       <Switch>
