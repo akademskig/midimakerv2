@@ -5,6 +5,7 @@ import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { composeWithDevTools } from "redux-devtools-extension"
 import authSaga from './auth/auth.saga';
+import crudSaga from './crud/crud.saga';
 const sagaMiddleware = createSagaMiddleware()
 
 const persistConfig = {
@@ -25,3 +26,4 @@ export {
 }
 
 sagaMiddleware.run(authSaga)
+sagaMiddleware.run(crudSaga)

@@ -7,8 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useUpdateUser } from '../../api/protected/users';
 import useNotify from '../../utils/notifications';
-import { updateOk, logout } from '../../redux/auth/auth.actions';
+import { updateUserOk, logout, updateUserStart } from '../../redux/auth/auth.actions';
 import { selectUser } from '../../redux/auth/auth.selectors';
+import { requestStart } from '../../redux/global/global.actions';
+import { getError } from '../../redux/global/global.selectors';
+import { crudUpdateStart } from '../../redux/crud/crud.actions';
 
 const ChangeUserDataForm = ({ field, value, handleFieldCancel, children, setEdit }: any) => {
     const user = useSelector(selectUser)
@@ -18,33 +21,36 @@ const ChangeUserDataForm = ({ field, value, handleFieldCancel, children, setEdit
     const notify = useNotify();
     const onSubmit = (values: any) => {
         if (values.length) return
-        updateUser({ userId: user.id, [field]: value})
-            .then(user => {
-                dispatch(updateOk(user))
-                setEdit(false)
-                notify("ok", `Account for ${user.username} updated successfully!`)
-            })
-            .catch((err: any) => { 
-                if(err.statusCode === 401 ||err.statusCode === 403){
-                dispatch(logout());}
-                notify('error', err.message) 
-            });
+        dispatch(crudUpdateStart({ meta:{ resource: 'users', endpoint: '/'},  data: { userId: user.id, [field]: value } }))
+        setEdit(false)
+        // updateUser({ userId: user.id, [field]: value})
+        //     .then(user => {
+        //         dispatch(updateUserOk(user))
+        //         
+        //         notify("ok", `Account for ${user.username} updated successfully!`)
+        //     })
+        //     .catch((err: any) => { 
+        //         console.log(err)
+        //         if(err.statusCode === 401 ||err.statusCode === 403)
+        //         dispatch(logout());
+        //         notify('error', err.message) 
+        //     });
     };
     return (
         <form noValidate onSubmit={handleSubmit(onSubmit)}  >
             {children}
-                <span className="actionButtons">
-                    <Avatar className="buttonSave">
-                        <IconButton type="submit" >
-                            <SaveIcon />
-                        </IconButton>
-                    </Avatar>
-                    <Avatar className="buttonCancel">
-                        <IconButton onClick={() => handleFieldCancel(field)}>
-                            <CancelIcon />
-                        </IconButton>
-                    </Avatar>
-                </span>
+            <span className="actionButtons">
+                <Avatar className="buttonSave">
+                    <IconButton type="submit" >
+                        <SaveIcon />
+                    </IconButton>
+                </Avatar>
+                <Avatar className="buttonCancel">
+                    <IconButton onClick={() => handleFieldCancel(field)}>
+                        <CancelIcon />
+                    </IconButton>
+                </Avatar>
+            </span>
         </form>
     )
 }

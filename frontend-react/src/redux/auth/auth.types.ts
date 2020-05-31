@@ -5,5 +5,6 @@ export type AuthState = {
         email: string,
         accessToken: string
     },
-    accessToken: string
+    accessToken: string,
+    notification: string
 }

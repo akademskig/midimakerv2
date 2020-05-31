@@ -10,7 +10,7 @@ function useNotify() {
             case 'info':
                 NotificationManager.info(message, title, timeout);
                 break;
-            case 'ok':
+            case 'success':
                 NotificationManager.success(message, title, timeout);
                 break;
             case 'warning':

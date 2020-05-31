@@ -1,4 +1,4 @@
-import { LOGIN_START, LOGIN_OK, LOGOUT, SET_TOKEN, REMOVE_TOKEN, UPDATE_OK } from './auth.types';
+import { LOGIN_START, LOGIN_OK, LOGOUT, SET_TOKEN, REMOVE_TOKEN, UPDATE_USER_OK, UPDATE_USER_START } from './auth.actionTypes';
 
 
 export const loginStart = (userCredentials: {email: string,password: string}) => ({
@@ -11,14 +11,19 @@ export const loginOk = (user: any) => ({
     payload: {
         user
     }
+    
 })
-export const updateOk = (user: any) => ({
-    type: UPDATE_OK,
-    payload: {
+export const updateUserStart = (user: any) => ({
+    type: UPDATE_USER_START,
+    payload: 
         user
-    }
 })
-
+export const updateUserOk = (user: any) => ({
+    type: UPDATE_USER_OK,
+    payload:{
+        user,
+        notification: 'User updated successfully'
+}})
 export const logout = () => ({
     type: LOGOUT,
 })

@@ -15,16 +15,16 @@ import { GuardFunctionRouteProps } from 'react-router-guards/dist/types';
 import SettingsPage from './pages/SettingsPage';
 import EventsPage from './pages/Events.page';
 
-let isAuth = false
-function checkAuth(to: GuardFunctionRouteProps | null, from: GuardFunctionRouteProps | null, next: any) {
-  if (isAuth) {
-    next();
-  }
-  next.redirect('/auth');
-};
+// function checkAuth(to: GuardFunctionRouteProps | null, from: GuardFunctionRouteProps | null, next: any) {
+//   const isAuth = useSelector(isAuthenticated)
+//   if (isAuth) {
+//     next();
+//   }
+//   next.redirect('/auth');
+// };
 
 const AppRoutes = (props: any) => {
-  isAuth = useSelector(isAuthenticated)
+  const isAuth = useSelector(isAuthenticated)
   return (
     <Switch>
       <Route path="/auth" exact component={AuthPage} />
@@ -35,8 +35,10 @@ const AppRoutes = (props: any) => {
 }
 
 export const MainRoutes = () => {
+  const isAuth = useSelector(isAuthenticated)
+  console.log(isAuth)
   return (
-    <GuardProvider guards={[checkAuth]}>
+    <GuardProvider guards={[(to, from, next )=> isAuth ? next(): next.redirect("/auth")]}>
       <Switch>
         <GuardedRoute path="/dashboard" component={MainPage} />
         <GuardedRoute path="/events" component={EventsPage} />

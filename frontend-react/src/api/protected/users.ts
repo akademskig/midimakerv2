@@ -13,19 +13,28 @@ class Users {
         })
         return axios
     }
+    updateResource = async({meta, data}: { meta: any, data: any}) =>{
+        console.log(meta)
+        switch(meta.endpoint){
+            case '/':{
+                return this.updateUser(data)
+            }
+            case 'changePassword':{
+                return this.changePassword(data)
+            }
+            default:
+                return Promise.reject(null)
+        }
+       
+    }
     updateUser = async ({ userId, email, username }: { userId: string, email?: string; username?: string }) => {
         const body = Object.assign({}, email && { email }, username && { username })
         try {
             const res = await this.axios.put(`${this.baseUrl}/users/${userId}`, body)
             return res.data
         } catch (err) {
-
             const errRes = err.response ? err.response.data : 'An error occurred'
-            // if (errRes.statusCode === 401) {
-            //     err.message = "Access restricted."
-            //     throw err
-            // }
-            console.error(JSON.stringify(errRes))
+            console.error(JSON.stringify(errRes), err.response)
             throw errRes
         }
     }
@@ -35,7 +44,7 @@ class Users {
             return res.data
         } catch (err) {
             const errRes = err.response ? err.response.data : 'An error occurred'
-            console.error(JSON.stringify(errRes))
+            console.error(JSON.stringify(errRes), err.response)
             throw errRes
         }
     }

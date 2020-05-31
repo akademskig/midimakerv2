@@ -10,6 +10,8 @@ import { useChangePassword } from '../../api/protected/users';
 import useNotify from '../../utils/notifications';
 import AlertIcon from '@material-ui/icons/Warning'
 import { logout } from '../../redux/auth/auth.actions';
+import { crudUpdateStart } from '../../redux/crud/crud.actions';
+import { getError } from '../../redux/global/global.selectors';
 
 
 const ChangePasswordFormStyled = styled.div`
@@ -47,23 +49,14 @@ export const ChangePasswordForm = ({ setPasswordEdit }: any) => {
     const { handleSubmit, register, errors, formState } = useForm({ mode: "onChange" });
     const { isValid } = formState
     const user = useSelector(selectUser)
-    const changePassword = useChangePassword()
-    const notify = useNotify()
     const dispatch = useDispatch()
+    
     const onChangePassword = (values: any) => {
         if (values.length) return
-        changePassword({ userId: user.id, oldPassword, newPassword })
-            .then(() => {
-                setPasswordEdit(false)
-                notify("ok", `Account for ${user.username} updated successfully!`)
-            })
-            .catch((err: any) => { 
-                if(err.statusCode === 401 ||err.statusCode === 403){
-                    dispatch(logout());}
-                notify('error', err.message) 
-            });
-
+        dispatch(crudUpdateStart({meta: {resource: 'users', endpoint: 'changePassword'}, data: { userId: user.id, oldPassword, newPassword }}))
+        setPasswordEdit(false)
     }
+   
     return (
         <ChangePasswordFormStyled>
             <div className="title">
