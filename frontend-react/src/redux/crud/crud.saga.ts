@@ -4,7 +4,7 @@ import { logout, updateUserOk } from '../auth/auth.actions';
 import users from '../../api/protected/users';
 import { CRUD_UPDATE_START } from './crud.actionTypes';
 function* checkError(error: any) {
-   let parsedError = error.response && error.response.data || new Error("An error occured")
+   let parsedError = (error.response && error.response.data) || new Error("An error occured")
     if (parsedError.statusCode === 401 || parsedError.statusCode === 403) {
         yield put(logout())
     }
