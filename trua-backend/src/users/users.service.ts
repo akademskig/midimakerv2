@@ -67,6 +67,15 @@ export class UsersService {
     }
     return this.findOne(query);
   }
+  async updatePassword(id, { oldPassword, newPassword }: { oldPassword: string, newPassword: string }) {
+    const user = await this.findOne(id);
+    if (user && !await this.authUtils.comparePasswords({ password: oldPassword, hashedPassword: user.password })) {
+      throw new BadRequestException('Invalid password');
+    }
+    user.password = await this.authUtils.hashPassword(newPassword);
+    return this.updateOne(id, user);
+  }
+
   async deleteById(id) {
     return this.userRepository.remove(id);
   }

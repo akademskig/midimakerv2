@@ -1,14 +1,18 @@
-import { Controller, UseGuards, Get, Query, Res, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query, Res, Param, Post, Body, Put, Delete, Logger, Inject, forwardRef } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { RolesGuard } from '../guards/roles.guard';
 import { AdminOrOwnerGuard } from '../guards/adminOrOwner.guard';
+import { AuthService } from '../auth/auth.service';
+import { OwnerGuard } from '../guards/owner.guard';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
 
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    ) { }
 
     @UseGuards(RolesGuard)
     @Get('/')
@@ -27,6 +31,15 @@ export class UsersController {
     @Put(':id')
     async updateOne(@Param() id, @Body() user) {
       return this.usersService.updateOne(id, user);
+    }
+    @UseGuards(OwnerGuard)
+    @Put('/change_password/:id')
+    async changePassword(@Param() id, @Body() passwords) {
+        try {
+            return this.usersService.updatePassword(id, passwords);
+        } catch (error) {
+            Logger.error('Error', JSON.stringify(error), 'UsersController');
+        }
     }
     @UseGuards(RolesGuard)
     @Delete(':id')

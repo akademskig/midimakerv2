@@ -60,15 +60,6 @@ export class AuthService {
     }
   }
 
-  async updatePassword(id, { oldPassword, newPassword }: { oldPassword: string, newPassword: string }) {
-    const user = await this.usersService.findOne(id);
-    if (user && !await this.authUtils.comparePasswords({ password: oldPassword, hashedPassword: user.password })) {
-      throw new BadRequestException('Invalid password');
-    }
-    user.password = await this.authUtils.hashPassword(newPassword);
-    return this.usersService.updateOne(id, user);
-  }
-
   async verifyUser({ email, token }: { email: string, token: string }) {
     try {
       const qB: any = await

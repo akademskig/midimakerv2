@@ -20,18 +20,10 @@ export class AuthController {
             Logger.error('Error', JSON.stringify(error), 'AuthController');
         }
     }
-    @Put('/change_password/:id')
-    async changePassword(@Param() id, @Body() passwords) {
-        try {
-            return this.authService.updatePassword(id, passwords);
-        } catch (error) {
-            Logger.error('Error', JSON.stringify(error), 'AuthController');
-        }
-    }
     @Get('/verify_email')
-    async verifyEmail(@Query() {email, token}) {
+    async verifyEmail(@Query() { email, token }) {
         try {
-            return this.authService.verifyUser({email, token});
+            return this.authService.verifyUser({ email, token });
         } catch (error) {
             Logger.error('Error', JSON.stringify(error), 'AuthController');
         }
