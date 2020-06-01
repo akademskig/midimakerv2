@@ -4,11 +4,11 @@ import { logout, updateUserOk } from '../auth/auth.actions';
 import users from '../../api/protected/users';
 import { CRUD_UPDATE_START } from './crud.actionTypes';
 function* checkError(error: any) {
-    if (error.statusCode === 401 || error.statusCode === 403) {
+   let parsedError = error.response && error.response.data || new Error("An error occured")
+    if (parsedError.statusCode === 401 || parsedError.statusCode === 403) {
         yield put(logout())
     }
-    error.message = error.message || error.error || "An error occurred"
-    return error
+    return parsedError
 }
 function* crudUpdate(updateData: any) {
     yield put(requestStart())
@@ -22,9 +22,9 @@ function* crudUpdate(updateData: any) {
             }
         }
     } catch (error) {
-        yield checkError(error)
-        yield put(showNotification({ key: nId, type: 'error', message: error.message }))
-        yield put(requestError({ error }))
+        let parsedError = yield checkError(error)
+        yield put(showNotification({ key: nId, type: 'error', message: parsedError.message }))
+        yield put(requestError({ error: parsedError }))
     }
     yield put(requestEnd())
     yield delay(5000)
