@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       borderRadius: theme.shape.borderRadius
     },
     fab: {
-      position: 'absolute',
+      position: 'fixed',
       bottom: '10px',
       right: '10px'
     }

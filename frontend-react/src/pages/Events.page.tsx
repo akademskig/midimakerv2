@@ -25,11 +25,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     border: `solid 1px ${theme.palette.grey[300]}`,
     borderRadius: theme.shape.borderRadius
   },
-  fab: {
-    position: 'absolute',
-    bottom: '10px',
-    right: '10px'
-  }
+  
 }));
 
 const EventsPage = () => {
