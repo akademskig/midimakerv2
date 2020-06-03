@@ -5,9 +5,22 @@ import { QueryRunner, getConnection } from 'typeorm';
 import Location from '../database/entity/location.entity';
 import { validate } from 'class-validator';
 import ValidationErrors from 'src/errors/ValidationErrors';
+import { QueryBuilderService } from '../utils/queryBuilder.service';
 
 @Injectable()
 export class EventsService {
+
+    constructor(
+        private readonly qbs: QueryBuilderService,
+    ) { }
+
+    async getAll(params): Promise<{ data: Event[], count: number }> {
+        const query = this.qbs.buildQuery(params, 'Event');
+        const res = await getConnection().getRepository(Event).findAndCount(query);
+        const data = res[0];
+        const count = res[1];
+        return { data, count };
+    }
 
     async createNew(event: EventNew): Promise<Event> {
         const qR = getConnection().createQueryRunner();
@@ -31,6 +44,7 @@ export class EventsService {
         } catch (error) {
             await qR.rollbackTransaction();
             Logger.error('Error', JSON.stringify(error), 'EventsService');
+            throw error;
         } finally {
             await qR.release();
         }

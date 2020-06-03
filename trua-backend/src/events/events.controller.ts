@@ -1,9 +1,12 @@
-import { Controller, Post, Body, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Logger, Get, Query, Res, Req, ExecutionContext, UseGuards } from '@nestjs/common';
 import { EventNew } from './types/EventNew.type';
 import { validate } from 'class-validator';
 import { EventsService } from './events.service';
 import { getConnection } from 'typeorm';
+import ValidationErrors from 'src/errors/ValidationErrors';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('events')
 export class EventsController {
 
@@ -12,7 +15,20 @@ export class EventsController {
     ) { }
 
     @Post()
-    async createNew(@Body() event: EventNew) {
+    async createNew(@Body() event, @Req() req) {
+        event.owner = req.user.userId;
+        const eventO = new EventNew(event);
+        const errors = await validate(eventO);
+        if (errors.length) {
+            throw new ValidationErrors(errors);
+        }
         return this.eventsService.createNew(event);
+    }
+    @Get()
+    async getAll(@Query() query, @Res() res) {
+        const users = await this.eventsService.getAll(query);
+        res.set('X-Total-Count', users.count);
+        res.set('Access-Control-Expose-Headers', ['X-Total-Count']);
+        res.send(users.data);
     }
 }

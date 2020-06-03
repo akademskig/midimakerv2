@@ -1,4 +1,5 @@
-export const CRUD_GET_LIST_START = "CRUD_GET_LIST_START"
+export const FETCH_LIST = "FETCH_LIST"
+export const FETCH_LIST_OK = "FETCH_LIST_OK"
+export const ADD_NEW_ITEM = "ADD_NEW_ITEM"
 export const CRUD_UPDATE_START = "CRUD_UPDATE_START"
-export const CRUD_GET_LIST_OK = "CRUD_GET_LIST_OK"
 export const CRUD_UPDATE_OK = "CUD_UPDATE_OK"

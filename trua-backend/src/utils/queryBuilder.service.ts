@@ -8,7 +8,7 @@ export class QueryBuilderService {
     const searchQ = this.queryBySearchQuery(params, entity);
     const propQ = this.queryByProp(params);
     const where = searchQ.concat(propQ && searchQ ? 'AND' : '').concat(propQ);
-    return Object.assign({}, paginationQ, {where});
+    return Object.assign({}, paginationQ, { where });
   }
   queryByPaginationParams(params) {
     const { _end, _start, _sort, _order } = params;
@@ -28,7 +28,7 @@ export class QueryBuilderService {
     return Object.assign({}, order, select);
   }
   queryBySearchQuery(params, entity) {
-    const {q} = params;
+    const { q } = params;
     let where = '';
 
     if (!q) { return where; }
@@ -36,7 +36,11 @@ export class QueryBuilderService {
     switch (entity) {
       case 'User': {
         fields = ['email', 'username'];
+        break;
       }
+      case 'Event':
+        fields = ['name'];
+        break;
     }
     fields.forEach((f, idx) => {
       where = where.concat(
@@ -49,7 +53,7 @@ export class QueryBuilderService {
     return where;
   }
   queryByProp(params) {
-    const {id} = params;
+    const { id } = params;
     let where = '';
     where = id && `id='${id}'` || '';
     return where;
