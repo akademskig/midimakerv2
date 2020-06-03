@@ -1,4 +1,4 @@
-import React, { cloneElement } from 'react';
+import React from 'react';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -23,10 +23,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function ModalC({ open, setOpen, children, disableBackdropClick }: { open: boolean, setOpen: (opened: boolean) => void, children: any, disableBackdropClick?: boolean }) {
     const classes = useStyles();
 
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -48,7 +44,7 @@ export default function ModalC({ open, setOpen, children, disableBackdropClick }
             >
                 <Fade in={open}>
                     <Paper className={classes.paper} elevation={2}>
-                        {cloneElement(children, { modalClose: handleClose })}
+                        {children}
                     </Paper>
                 </Fade>
             </Modal>

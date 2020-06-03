@@ -2,7 +2,6 @@ import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useForm } from "react-hook-form";
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme, IconButton, Tooltip } from '@material-ui/core';
 import AddLocationIcon from '@material-ui/icons/AddLocation';
-import { useHistory } from 'react-router-dom';
 import { addNewItem } from '../../redux/crud/crud.actions';
 import { useDispatch } from 'react-redux';
 import GoogleMapC from '../googleMap/GoogleMapC';
@@ -49,7 +48,6 @@ export default function AddEventForm({ modalClose }: { modalClose: Dispatch<SetS
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(new Date().toLocaleString());
     const [mapOpen, setMapOpen] = useState(false);
-    const [duration, setDuration] = useState('');
     const dispatch = useDispatch()
     const [coords, setCoords] = useState({ lat: 0, lng: 0 })
     const { handleSubmit, register, errors} = useForm();

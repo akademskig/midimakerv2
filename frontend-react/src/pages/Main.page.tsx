@@ -2,8 +2,6 @@
 import React from 'react';
 import { Paper } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import TableC from '../components/common/TableC';
-import EventsList from '../components/events/events.list';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {

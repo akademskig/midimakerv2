@@ -3,7 +3,6 @@ import { fetchList } from '../../redux/crud/crud.actions';
 import EventItem from './event.item';
 import React from 'react';
 import { selectDataList } from '../../redux/crud/crud.selectors';
-import { Length } from 'class-validator';
 
 export default function EventsList() {
 

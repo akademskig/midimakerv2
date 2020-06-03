@@ -3,7 +3,7 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
+// import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
@@ -15,8 +15,6 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../redux/auth/auth.selectors';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,8 +49,6 @@ export default function EventItem({event}: {event: any}) {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-
-  const user = useSelector(selectUser)
 
   return (
     <Card className={classes.root}>

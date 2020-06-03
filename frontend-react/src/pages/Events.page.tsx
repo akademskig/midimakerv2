@@ -1,12 +1,8 @@
 
-import React, { Fragment, useState } from 'react';
-import { Paper, Fab } from '@material-ui/core';
+import React, { Fragment } from 'react';
+import { Paper } from '@material-ui/core';
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import EventsList from '../components/events/events.list';
-import AddIcon from '@material-ui/icons/Add'
-import ModalC from '../components/common/ModalC';
-import LoginForm from '../components/forms/Login.form';
-import AddEventForm from '../components/forms/AddEvent.form';
 import AddEventC from '../components/events/AddEventC';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({

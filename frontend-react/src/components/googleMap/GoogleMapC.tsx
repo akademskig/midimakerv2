@@ -1,9 +1,7 @@
 // @ts-nocheck
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
-import React, { Component, Dispatch, SetStateAction, useState } from 'react';
-import { makeStyles, createStyles, Paper } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-import zIndex from '@material-ui/core/styles/zIndex';
+import React, { Dispatch, SetStateAction } from 'react';
+import { makeStyles } from '@material-ui/core';
 import ModalC from '../common/ModalC';
 
 const useStyles = makeStyles((theme) => ({
@@ -49,7 +47,6 @@ export function GoogleMapC({ coords, setCoords, google, mapOpen, setMapOpen }: G
     }
 
     function onMapInit() {
-        console.log(coords)
         if (coords.lat && coords.lng) {
             return
         }
@@ -66,16 +63,7 @@ export function GoogleMapC({ coords, setCoords, google, mapOpen, setMapOpen }: G
             lng: e.latLng.lng()
         })
     }
-    function centerMoved(mapProps, map, e) {
-        this.setState({
-            coords: {
-                latitude: e.latLng.lat(),
-                longitude: e.latLng.lng()
-            }
-        })
-    }
 
-    const { classes } = useStyles()
     return (
         <ModalC open={mapOpen} setOpen={setMapOpen} disableBackdropClick={false}>
             <Map
@@ -105,9 +93,7 @@ export function GoogleMapC({ coords, setCoords, google, mapOpen, setMapOpen }: G
                 />
 
                 <InfoWindow onClose={onInfoWindowClose}>
-                    <div>
-                        <h1></h1>
-                    </div>
+                   
                 </InfoWindow>
             </Map>
         </ModalC>
