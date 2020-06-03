@@ -38,8 +38,8 @@ export default function AddEventC() {
             <Fab className={classes.fab} color="secondary" aria-label="add" onClick={() => setAddEventOpen(true)}>
                 <AddIcon />
             </Fab>
-            <ModalC open={addEventOpen} setOpen={setAddEventOpen}>
-                <AddEventForm></AddEventForm>
+            <ModalC open={addEventOpen} setOpen={setAddEventOpen} disableBackdropClick={true}>
+                <AddEventForm modalClose={setAddEventOpen} ></AddEventForm>
             </ModalC>
         </Fragment>
 

@@ -17,13 +17,13 @@ export default class Location {
     @Column('decimal')
     longitude: number;
 
-    @Column()
+    @Column({ type: 'text', nullable: true })
     street: string;
 
-    @Column('text')
+    @Column({ type: 'text', nullable: true })
     city: string;
 
-    @Column('text')
+    @Column({ type: 'text', nullable: true })
     country: string;
 
     @CreateDateColumn()

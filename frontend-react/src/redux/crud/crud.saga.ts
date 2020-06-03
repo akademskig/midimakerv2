@@ -51,8 +51,11 @@ function* addNewItem(addItemData: any) {
     yield put(requestStart())
     const nId = Date.now()
     try {
-        const dataList = yield call(dataProvider.addNew, addItemData)
+        const event = yield call(dataProvider.addNew, addItemData)
+        const dataList = yield call(dataProvider.fetchList, addItemData)
+        console.log(dataList)
         yield put(fetchListOk({ events: dataList }))
+
     } catch (error) {
         console.log(error)
         let parsedError = yield checkError(error)

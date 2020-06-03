@@ -7,8 +7,8 @@ function crudReducer(state = initialState, action: { type: string, payload: any 
         case FETCH_LIST_OK: {
             const  data = action.payload
             return {
-                ...data,
                 ...state,
+                ...data,
             }
         }
         default: return state
