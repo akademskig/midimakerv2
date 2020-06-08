@@ -5,6 +5,7 @@ import users from '../../api/protected/users';
 import { CRUD_UPDATE_START, FETCH_LIST, ADD_NEW_ITEM } from './crud.actionTypes';
 import dataProvider from '../../api/protected/events';
 import { fetchListOk } from './crud.actions';
+
 function* checkError(error: any) {
     let parsedError = (error.response && error.response.data) || new Error("An error occured")
     if (parsedError.statusCode === 401 || parsedError.statusCode === 403) {
@@ -33,7 +34,6 @@ function* crudUpdate(updateData: any) {
     yield put(hideNotification(nId))
 }
 function* fetchList(getListData: any) {
-    console.log(getListData)
     yield put(requestStart())
     const nId = Date.now()
     try {
@@ -53,11 +53,9 @@ function* addNewItem(addItemData: any) {
     try {
         yield call(dataProvider.addNew, addItemData)
         const dataList = yield call(dataProvider.fetchList, addItemData)
-        console.log(dataList)
         yield put(fetchListOk({ events: dataList }))
 
     } catch (error) {
-        console.log(error)
         let parsedError = yield checkError(error)
         yield put(showNotification({ key: nId, type: 'error', message: parsedError.message }))
         yield put(requestError({ error: parsedError }))

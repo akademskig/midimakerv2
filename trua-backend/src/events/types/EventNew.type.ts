@@ -23,7 +23,6 @@ export class EventNew {
     @IsNumber()
     duration: number;
 
-    @IsNotEmpty()
     owner: User;
 
     participants: User[];

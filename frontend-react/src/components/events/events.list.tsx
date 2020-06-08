@@ -1,19 +1,29 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, connect } from 'react-redux';
 import { fetchList } from '../../redux/crud/crud.actions';
 import EventItem from './event.item';
-import React from 'react';
+import React, { Component, Dispatch } from 'react';
 import { selectDataList } from '../../redux/crud/crud.selectors';
 
-export default function EventsList() {
+class EventsList extends Component<any> {
 
-    const dispatch = useDispatch()
-
-    let events = useSelector(selectDataList('events'))
-    if(!events.length){
-        dispatch(fetchList({ meta: { resource: 'events' } }))
+    componentDidMount() {
+        const { fetchEvents } = this.props
+        fetchEvents()
     }
-    return (
-        events && events.map((e: any) => <EventItem key={e.id}event={e} />)
-
-    )
+    render() {
+        const { events } = this.props
+        return (
+            events && events.map((e: any) => <EventItem key={e.id} event={e} />)
+        )
+    }
 }
+
+const mapDispatchToProps = (dispatch: Dispatch<any>) => ({
+    fetchEvents: () => dispatch(fetchList({ meta: { resource: 'events' }, params: { include: "owner, location" } }))
+})
+
+const mapStateToProps = (state: any) => ({
+    events: selectDataList('events')(state)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(EventsList)

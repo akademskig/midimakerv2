@@ -65,7 +65,7 @@ export default function AddEventForm({ modalClose }: { modalClose: Dispatch<SetS
             latitude: coords.lat,
             longitude: coords.lng
         }
-        dispatch(addNewItem({ meta: { resource: 'events' }, data: { events: { name, startTime, endTime, location } } }))
+        dispatch(addNewItem({ meta: { resource: 'events' }, params: {include:'location, owner'}, data: { events: { name, startTime, endTime, location } } }))
         modalClose(false)
     };
     return (

@@ -16,13 +16,12 @@ export class EventsController {
 
     @Post()
     async createNew(@Body() event, @Req() req) {
-        event.owner = req.user.userId;
         const eventO = new EventNew(event);
         const errors = await validate(eventO);
         if (errors.length) {
             throw new ValidationErrors(errors);
         }
-        return this.eventsService.createNew(event);
+        return this.eventsService.createNew(event, req.user.userId);
     }
     @Get()
     async getAll(@Query() query, @Res() res) {

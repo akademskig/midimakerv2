@@ -29,7 +29,7 @@ class DataProvider {
         if (params) {
             Object.keys(params).forEach((key: string, idx) => {
                 //@ts-ignore
-                paramsString.concat(`${idx === 0 ? '?' : '&'}${key}=${params[key]}`)
+                paramsString = paramsString.concat(`${idx === 0 ? '?' : '&'}${key}=${params[key]}`)
             })
         }
         const res = await this.axios.get(`${this.baseUrl}/${resource}${paramsString}`)
@@ -55,7 +55,8 @@ type GetParams = {
     _end: number,
     _order: string,
     _sort: string,
-    q: string
+    q: string,
+    include: string
 }
 type PostData = {
    events?: EventData
