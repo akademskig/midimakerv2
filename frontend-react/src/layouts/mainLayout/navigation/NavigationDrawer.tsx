@@ -1,10 +1,9 @@
-import React, { Component, useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { withStyles, Theme, makeStyles } from '@material-ui/core/styles';
+import { Theme, makeStyles } from '@material-ui/core/styles';
 import styled from 'styled-components'
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
-import Hidden from '@material-ui/core/Hidden';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -17,6 +16,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import { navigationItems } from './navigationItems';
 import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
+import useScreenSize from '../../../providers/screenSize.provider';
 
 const drawerWidth = 220;
 
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme: any) =>
         },
         mobileToggleButton: {
             marginRight: 36,
-            [theme.breakpoints.up('sm')]: {
+            [theme.breakpoints.up('xs')]: {
                 display: 'none'
             },
         },
@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme: any) =>
             },
         },
         drawerMobile: {
-            [theme.breakpoints.up('sm')]: {
+            [theme.breakpoints.up('xs')]: {
                 width: 0,
                 flexShrink: 0,
                 display: 'none'
@@ -73,17 +73,19 @@ const useStyles = makeStyles((theme: any) =>
             [theme.breakpoints.up('sm')]: {
                 width: theme.spacing(7.5) + 1,
             },
-
         },
         content: {
             flexGrow: 1,
         },
         drawerPaper: {
             marginTop: '64px',
+            [theme.breakpoints.down('xs')]: {
+                marginTop: '56px'
+            },
         },
         drawerPaperMobile: {
             width: drawerWidth,
-            [theme.breakpoints.up('sm')]: {
+            [theme.breakpoints.up('xs')]: {
                 width: 0,
                 flexShrink: 0,
             },
@@ -108,16 +110,27 @@ const NavLinkStyled = styled(NavLink)`
 `
 
 export default function NavigationDrawer({ children, theme }: any) {
-
-    const [open, setOpen] = useState(theme)
+    const [open, setOpen] = useState(false)
+    const { isMobile, isTablet, isDesktop  } = useScreenSize()
     const [mobileOpen, setMobileOpen] = useState(false)
     const classes = useStyles(theme)
+
     const handleDrawerToggle = useCallback(() => {
         setOpen(!open)
     }, [ open, setOpen ])
+
     const handleMobileToggle = useCallback(() => {
        setMobileOpen(!mobileOpen)
-    }, [ ])
+    }, [ mobileOpen ])
+
+    useEffect(() => {
+        if(!isDesktop){
+            setOpen(false)
+        }
+        else if(isDesktop){
+            setOpen(true)
+        }
+    }, [setOpen, isDesktop])
         
         return (
             <div className={classes.root}>
@@ -125,20 +138,21 @@ export default function NavigationDrawer({ children, theme }: any) {
                     handleDrawerToggle={handleDrawerToggle}
                     handleMobileToggle={handleMobileToggle} />
                 <NavigationStyled >
-                    <Hidden xsUp implementation="css">
+                    {isMobile && 
                         <Drawer
-                            variant="temporary"
-                            className={classes.drawerMobile}
-                            ModalProps={{
-                                keepMounted: true, // Better open performance on mobile.
+                        anchor='left'
+                        variant="temporary"
+                        className={classes.drawerMobile}
+                        ModalProps={{
+                            keepMounted: true, // Better open performance on mobile.
+                        }}
+                        classes={{
+                            paper: classes.drawerPaperMobile,
                             }}
-                            classes={{
-                                paper: classes.drawerPaperMobile,
-                            }}
-                            open={mobileOpen}
-                            onClose={handleMobileToggle}
+                        open={mobileOpen}
+                        onClose={handleMobileToggle}
                         >
-                            <Divider />
+                        <Divider />
                             <List>
                                 {navigationItems.map((item, index) => (
                                     <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
@@ -151,35 +165,35 @@ export default function NavigationDrawer({ children, theme }: any) {
                             </List>
                             <Divider />
                         </Drawer>
-                    </Hidden>
-                    <Hidden xsDown implementation="css">
-                        <Drawer
-                            variant="permanent"
-                            className={clsx(classes.drawer, {
+                        }
+                   { !isMobile && 
+                    <Drawer
+                        variant="permanent"
+                        className={clsx(classes.drawer, {
+                            [classes.drawerOpen]: open,
+                            [classes.drawerClose]: !open,
+                        })}
+                        classes={{
+                            paper: clsx(classes.drawerPaper, {
                                 [classes.drawerOpen]: open,
                                 [classes.drawerClose]: !open,
-                            })}
-                            classes={{
-                                paper: clsx(classes.drawerPaper, {
-                                    [classes.drawerOpen]: open,
-                                    [classes.drawerClose]: !open,
-                                }),
-                            }}
-                        >
-                            <Divider />
-                            <List>
-                                {navigationItems.map((item, index) => (
-                                    <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
-                                        <ListItem button >
-                                            <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
-                                            <ListItemText primary={item.name} />
-                                        </ListItem>
-                                    </NavLinkStyled>
-                                ))}
-                            </List>
-                            <Divider />
-                        </Drawer>
-                    </Hidden>
+                            }),
+                        }}
+                    >
+                    <Divider />
+                    <List>
+                        {navigationItems.map((item, index) => (
+                            <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
+                                <ListItem button >
+                                    <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
+                                    <ListItemText primary={item.name} />
+                                </ListItem>
+                            </NavLinkStyled>
+                        ))}
+                    </List>
+                    <Divider />
+                </Drawer>
+                   }
                     <main className={classes.content}>
                         {children}
                     </main>

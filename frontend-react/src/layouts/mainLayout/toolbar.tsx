@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar } from '@material-ui/core';
+import { AppBar, Toolbar, useTheme } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import IconButton from '@material-ui/core/IconButton';
 import UserSettingsMenu from '../../components/UserSettingsMenu';
@@ -19,13 +19,14 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     },
     toggleButton: {
         marginRight: 36,
-        [theme.breakpoints.down('xs')]: {
-            display: 'none'
+        display: 'none',
+        [theme.breakpoints.up('xs')]: {
+            display: 'block'
         },
     },
     mobileToggleButton: {
         marginRight: 36,
-        [theme.breakpoints.up('sm')]: {
+        [theme.breakpoints.up('xs')]: {
             display: 'none'
         },
     },
@@ -39,7 +40,9 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 }))
 
 const AppToolbar = ({handleDrawerToggle, handleMobileToggle}:{handleDrawerToggle: any, handleMobileToggle: any}) => {
-    const classes = useStyles()
+    const theme = useTheme()
+    console.log(theme)
+    const classes = useStyles(theme)
     return (
         <AppBar
             className={classes.appBar}
