@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import SaveIcon from '@material-ui/icons/Save';
 import { IconButton } from '@material-ui/core';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { selectUser } from '../../redux/auth/auth.selectors';
-import { crudUpdateStart } from '../../redux/crud/crud.actions';
+import { AuthCtx } from '../../providers/auth.provider';
+import usersApi from '../../api/protected/users'
 
 const ChangeUserDataForm = ({ field, value, handleFieldCancel, children, setEdit }: any) => {
-    const user = useSelector(selectUser)
-    const dispatch = useDispatch()
+    const { updateUser } = usersApi
+    const { user } = useContext(AuthCtx)
+
     const { handleSubmit } = useForm({ mode: "onChange" });
-    const onSubmit = (values: any) => {
-        if (values.length) return
-        dispatch(crudUpdateStart({ meta:{ resource: 'users', endpoint: '/'},  data: { userId: user.id, [field]: value } }))
+    const onSubmit = async (values: any) => {
+        if (values.length || !user?.id) return
+        await updateUser({ userId: user.id, [field]: value })
         setEdit(false)
     };
     return (

@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, useCallback, useState } from 'react';
 import clsx from 'clsx';
-import { withStyles, Theme } from '@material-ui/core/styles';
+import { withStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import styled from 'styled-components'
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
@@ -20,7 +20,7 @@ import AppToolbar from '../toolbar';
 
 const drawerWidth = 220;
 
-const styles = (theme: any) =>
+const useStyles = makeStyles((theme: any) =>
     ({
         root: {
             display: 'flex',
@@ -88,7 +88,7 @@ const styles = (theme: any) =>
                 flexShrink: 0,
             },
         },
-    })
+    }))
 
 const NavigationStyled = styled.nav`
         display: flex;
@@ -107,29 +107,23 @@ const NavLinkStyled = styled(NavLink)`
     }
 `
 
-class NavigationDrawer extends Component<{ children: any, classes: any }> {
+export default function NavigationDrawer({ children, theme }: any) {
 
-    state = {
-        open: false,
-        mobileOpen: false
-    }
-    handleDrawerToggle = () => {
-        this.setState({
-            open: !this.state.open
-        })
-    }
-    handleMobileToggle = () => {
-        this.setState({
-            mobileOpen: !this.state.mobileOpen,
-        })
-    }
-    render() {
-        const { children, classes } = this.props
+    const [open, setOpen] = useState(theme)
+    const [mobileOpen, setMobileOpen] = useState(false)
+    const classes = useStyles(theme)
+    const handleDrawerToggle = useCallback(() => {
+        setOpen(!open)
+    }, [ open, setOpen ])
+    const handleMobileToggle = useCallback(() => {
+       setMobileOpen(!mobileOpen)
+    }, [ ])
+        
         return (
             <div className={classes.root}>
                 <AppToolbar
-                    handleDrawerToggle={this.handleDrawerToggle}
-                    handleMobileToggle={this.handleMobileToggle} />
+                    handleDrawerToggle={handleDrawerToggle}
+                    handleMobileToggle={handleMobileToggle} />
                 <NavigationStyled >
                     <Hidden xsUp implementation="css">
                         <Drawer
@@ -141,8 +135,8 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
                             classes={{
                                 paper: classes.drawerPaperMobile,
                             }}
-                            open={this.state.mobileOpen}
-                            onClose={this.handleMobileToggle}
+                            open={mobileOpen}
+                            onClose={handleMobileToggle}
                         >
                             <Divider />
                             <List>
@@ -162,13 +156,13 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
                         <Drawer
                             variant="permanent"
                             className={clsx(classes.drawer, {
-                                [classes.drawerOpen]: this.state.open,
-                                [classes.drawerClose]: !this.state.open,
+                                [classes.drawerOpen]: open,
+                                [classes.drawerClose]: !open,
                             })}
                             classes={{
                                 paper: clsx(classes.drawerPaper, {
-                                    [classes.drawerOpen]: this.state.open,
-                                    [classes.drawerClose]: !this.state.open,
+                                    [classes.drawerOpen]: open,
+                                    [classes.drawerClose]: !open,
                                 }),
                             }}
                         >
@@ -193,17 +187,15 @@ class NavigationDrawer extends Component<{ children: any, classes: any }> {
             </div>
         );
     }
-}
 //@ts-ignore
-export default withStyles(styles)(NavigationDrawer)
 const getIcon = (icon: string) => {
     switch (icon) {
         case 'events':
             return <EventIcon></EventIcon>
         case 'dashboard':
             return <DashboardIcon></DashboardIcon>
-            case 'settings':
-                return <SettingsIcon></SettingsIcon>
+        case 'settings':
+            return <SettingsIcon></SettingsIcon>
         default:
             return <MailIcon />
     }

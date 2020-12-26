@@ -4,8 +4,9 @@ import useNotify from '../../utils/notifications';
 
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme } from '@material-ui/core';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
-import { useRegister } from '../../api/auth';
+import { register as registerUser} from '../../api/auth';
 import { useHistory } from 'react-router-dom';
+
 const useStyles = makeStyles((theme: Theme) => createStyles({
     paper: {
         display: 'flex',
@@ -47,7 +48,6 @@ const RegisterForm = () => {
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const { handleSubmit, register, errors } = useForm();
-    const registerUser = useRegister();
     const notify = useNotify();
     const history = useHistory()
     const classes = useStyles()

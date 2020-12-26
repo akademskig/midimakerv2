@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
 
 import { Theme, List, IconButton, Divider } from '@material-ui/core';
@@ -11,9 +11,9 @@ import Avatar from '@material-ui/core/Avatar';
 import EditIcon from '@material-ui/icons/Edit';
 import LockIcon from '@material-ui/icons/Lock';
 import { useSelector } from 'react-redux';
-import { selectUser } from '../../redux/auth/auth.selectors';
 import { ChangePasswordForm } from './ChangePassword.form';
 import ChangeUserDataForm from './ChangeUserData.form';
+import { AuthCtx } from '../../providers/auth.provider';
 
 const FormContainer = styled.div`
     ul{
@@ -59,23 +59,23 @@ const FormContainer = styled.div`
     }
 `
 const UserSettings = () => {
-    const user = useSelector(selectUser)
+    const {user} = useContext(AuthCtx)
     const [usernameEdit, setUsernameEdit] = useState(false);
     const [emailEdit, setEmailEdit] = useState(false);
     const [passwordEdit, setPasswordEdit] = useState(false);
-    const [email, setEmail] = useState(user.email);
-    const [username, setUsername] = useState(user.username);
+    const [email, setEmail] = useState(user && user.email);
+    const [username, setUsername] = useState(user && user.username);
     const { register, errors } = useForm({ mode: "onChange" });
 
     const handleFieldCancel = (field: string) => {
         switch (field) {
             case "username": {
-                setUsername(user.username)
+                setUsername(username)
                 setUsernameEdit(false)
                 break
             }
             case "email": {
-                setEmail(user.email)
+                setEmail(email)
                 setEmailEdit(false)
                 break
             }

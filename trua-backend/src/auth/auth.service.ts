@@ -1,5 +1,5 @@
 
-import { Injectable, UnauthorizedException, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthUtils } from './auth.utils';
@@ -22,19 +22,20 @@ export class AuthService {
       const { password: pwd, ...result } = user;
       return result;
     } else if (user && !await this.authUtils.comparePasswords({ password, hashedPassword: user.password })) {
-      throw new UnauthorizedException('Invalid password');
+      throw new NotFoundException('Invalid username or password');
     } else if (!user) {
-      throw new UnauthorizedException('User doesn\'t exist!');
+      throw new NotFoundException('User doesn\'t exist!');
     }
   }
   async signIn(user: any) {
     const payload = { username: user.username, id: user.id, role: user.role };
     return {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      access_token: this.jwtService.sign(payload),
-      role: user.role,
+      user: {
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      accessToken: this.jwtService.sign(payload),
     };
   }
 

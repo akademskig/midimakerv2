@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
 import useNotify from '../../utils/notifications';
 
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme } from '@material-ui/core';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
-import { useLogin } from '../../api/auth'
+import { signIn } from '../../api/auth'
 import { useDispatch } from 'react-redux';
-import { loginOk } from '../../redux/auth/auth.actions';
 import { useHistory } from 'react-router-dom';
+import { AuthCtx } from '../../providers/auth.provider';
 const useStyles = makeStyles((theme: Theme) => createStyles({
     paper: {
         display: 'flex',
@@ -48,20 +48,21 @@ const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { handleSubmit, register, errors } = useForm();
-    const login = useLogin();
     const notify = useNotify();
+    const { setAuthData } = useContext(AuthCtx)
     const classes = useStyles()
     const history = useHistory()
-    const dispatch = useDispatch()
+
     const [passwordType, setPasswordType] = useState('password')
     const onSubmit = (values: any) => {
         if (values.length) return
-        login({ email, password })
-            .then((user) => {
-                dispatch(loginOk(user))
+        signIn({ email, password })
+            .then((authData: any) => {
+                console.log(authData)
+                setAuthData(authData)
                 history.push("/")
             })
-            .catch((err: Error) => { notify('error', err.message) });
+            .catch((err: Error) => { console.log('errpr'); notify('error', err.message) });
     };
     return (
         <form noValidate onSubmit={handleSubmit(onSubmit)} className={classes.form}>

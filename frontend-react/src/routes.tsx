@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import {
   Route,
@@ -7,12 +7,12 @@ import {
 } from "react-router-dom";
 import AuthPage from './pages/Auth.page';
 import { useSelector } from 'react-redux';
-import { isAuthenticated } from './redux/auth/auth.selectors';
 import MainPage from './pages/Main.page';
 import MainLayout from './layouts/mainLayout/Main.layout';
 import { GuardProvider, GuardedRoute } from "react-router-guards"
 import SettingsPage from './pages/SettingsPage';
 import EventsPage from './pages/Events.page';
+import { AuthCtx } from './providers/auth.provider';
 
 // function checkAuth(to: GuardFunctionRouteProps | null, from: GuardFunctionRouteProps | null, next: any) {
 //   const isAuth = useSelector(isAuthenticated)
@@ -23,7 +23,8 @@ import EventsPage from './pages/Events.page';
 // };
 
 const AppRoutes = (props: any) => {
-  const isAuth = useSelector(isAuthenticated)
+  
+  const {isAuth} = useContext(AuthCtx)
   return (
     <Switch>
       <Route path="/auth" exact component={AuthPage} />
@@ -34,7 +35,7 @@ const AppRoutes = (props: any) => {
 }
 
 export const MainRoutes = () => {
-  const isAuth = useSelector(isAuthenticated)
+  const {isAuth} = useContext(AuthCtx)
   return (
     <GuardProvider guards={[(to, from, next )=> isAuth ? next(): next.redirect("/auth")]}>
       <Switch>

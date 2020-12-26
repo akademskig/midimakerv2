@@ -8,7 +8,7 @@ export const dbConfig: TypeOrmModuleOptions = {
     host: 'localhost',
     port: 5432,
     username: 'dbadmin',
-    password: 'dbpass#123',
+    password: 'dbadmin#123',
     database: 'dbex',
     entities: [User, VerificationToken, Event, Location],
     synchronize: true,

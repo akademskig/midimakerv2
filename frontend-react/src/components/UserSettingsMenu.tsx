@@ -1,16 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { NavLink, useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/auth/auth.actions';
+import { logout } from '../api/auth';
 import { Typography } from '@material-ui/core';
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import SettingsIcon from '@material-ui/icons/Settings'
 import UserIcon from '@material-ui/icons/Person'
 import styled from 'styled-components';
-import { selectUser } from '../redux/auth/auth.selectors';
+import { AuthCtx } from '../providers/auth.provider'
 
 
 const UserSettingsStyled = styled.div`
@@ -34,9 +33,8 @@ const MenuStyled = styled(Menu)`
 `
 export default function UserSettingsMenu() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const dispatch = useDispatch()
     const history = useHistory()
-    const user = useSelector(selectUser)
+    const { user } = useContext(AuthCtx)
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -44,8 +42,8 @@ export default function UserSettingsMenu() {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const handleLogout = () => {
-        dispatch(logout())
+    const handleLogout = async () => {
+        await logout()
         history.push("/auth")
     }
 

@@ -2,12 +2,12 @@ import styled from "styled-components"
 import { Typography, Theme, Button } from "@material-ui/core"
 import ListItem from '@material-ui/core/ListItem';
 import { PasswordField } from './FormFields';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { selectUser } from '../../redux/auth/auth.selectors';
 import { useSelector, useDispatch } from 'react-redux';
 import AlertIcon from '@material-ui/icons/Warning'
-import { crudUpdateStart } from '../../redux/crud/crud.actions';
+import usersApi from '../../api/protected/users'
+import { AuthCtx } from "../../providers/auth.provider";
 
 
 const ChangePasswordFormStyled = styled.div`
@@ -40,16 +40,17 @@ const ChangePasswordFormStyled = styled.div`
 `
 
 export const ChangePasswordForm = ({ setPasswordEdit }: any) => {
+    const { changePassword } = usersApi
     const [newPassword, setNewPassword] = useState('');
     const [oldPassword, setOldPassword] = useState('');
     const { handleSubmit, register, errors, formState } = useForm({ mode: "onChange" });
     const { isValid } = formState
-    const user = useSelector(selectUser)
+    const { user } = useContext(AuthCtx)
     const dispatch = useDispatch()
     
-    const onChangePassword = (values: any) => {
-        if (values.length) return
-        dispatch(crudUpdateStart({meta: {resource: 'users', endpoint: 'changePassword'}, data: { userId: user.id, oldPassword, newPassword }}))
+    const onChangePassword = async (values: any) => {
+        if (values.length || !user?.id) return
+        await changePassword({ userId: user.id, oldPassword, newPassword })
         setPasswordEdit(false)
     }
    

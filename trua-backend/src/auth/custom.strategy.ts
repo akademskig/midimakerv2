@@ -11,10 +11,6 @@ export class CustomStrategy extends PassportStrategy(Strategy) {
 
   async validate(req): Promise<any> {
     const {email, password} = req.body;
-    const user = await this.authService.validateUser(email, password);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
-    return user;
+    return this.authService.validateUser(email, password);
   }
 }

@@ -6,7 +6,10 @@ import AppRoutes from './routes';
 import { MuiThemeProvider } from '@material-ui/core';
 import { ThemeProvider } from 'styled-components';
 import theme from './theme';
-import Notifications from './components/common/Notifications';
+import AuthProvider from './providers/auth.provider';
+import DataProvider from './providers/data.provider';
+import Notifications from './components/common/notifications/Notifications';
+import NotificationsProvider from './components/common/notifications/Notifications.provider';
 
 function App() {
 
@@ -15,12 +18,17 @@ function App() {
     <div className="App">
       <ThemeProvider theme={theme}>
         <MuiThemeProvider theme={theme}>
-          <Router>
-            <AppRoutes />
-          </Router>
+          <NotificationsProvider>
+          <AuthProvider>
+            <DataProvider>
+            <Router>
+              <AppRoutes />
+            </Router>
+            </DataProvider>
+          </AuthProvider>
+        </NotificationsProvider> 
         </MuiThemeProvider>
       </ThemeProvider>
-      <Notifications/ >
     </div>
   );
 }

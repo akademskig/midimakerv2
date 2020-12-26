@@ -2,9 +2,9 @@ import React, { useState, Dispatch, SetStateAction } from 'react';
 import { useForm } from "react-hook-form";
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme, IconButton, Tooltip } from '@material-ui/core';
 import AddLocationIcon from '@material-ui/icons/AddLocation';
-import { addNewItem } from '../../redux/crud/crud.actions';
 import { useDispatch } from 'react-redux';
 import GoogleMapC from '../googleMap/GoogleMapC';
+import { useEvents } from '../../api/protected/events'
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
     paper: {
@@ -44,11 +44,11 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 export default function AddEventForm({ modalClose }: { modalClose: Dispatch<SetStateAction<boolean>>}) {
     const [name, setName] = useState('');
+    const { addNew } = useEvents()
     const [locationName, setLocationName] = useState('');
     const [startTime, setStartTime] = useState(new Date());
-    const [endTime, setEndTime] = useState(new Date().toLocaleString());
+    const [endTime, setEndTime] = useState(new Date());
     const [mapOpen, setMapOpen] = useState(false);
-    const dispatch = useDispatch()
     const [coords, setCoords] = useState({ lat: 0, lng: 0 })
     const { handleSubmit, register, errors} = useForm();
     const [locationError, setLocationError] = useState(false)
@@ -60,12 +60,12 @@ export default function AddEventForm({ modalClose }: { modalClose: Dispatch<SetS
         }
       
         if (values.length) return
-        const location ={
+        const location = {
             name: locationName,
             latitude: coords.lat,
             longitude: coords.lng
         }
-        dispatch(addNewItem({ meta: { resource: 'events' }, params: {include:'location, owner'}, data: { events: { name, startTime, endTime, location } } }))
+        addNew({ name, startTime, endTime, location })
         modalClose(false)
     };
     return (

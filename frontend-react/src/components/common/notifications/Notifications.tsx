@@ -1,11 +1,8 @@
-import React from 'react';
-import { selectNotification } from '../../redux/global/global.selectors';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import { Snackbar } from '@material-ui/core';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close'
-import { hideNotification } from '../../redux/global/global.actions';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,21 +27,22 @@ function Alert(props: AlertProps) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 export default function Notifications() {
-    const notifications = useSelector(selectNotification)
-    const dispatch = useDispatch()
+    const [notifications, setNotifications ] = useState<any[]>([])
     let messageInfo: any = null
-    let open = false
-
-    if (notifications.length) {
-        // Set a new snack when we don't have an active one
-        messageInfo = { ...notifications[0] };
-        open = true
-    } else if (!notifications.length) {
-        // Close an active snack when a new one is added
-        open = false
-    }
+    const [open, setOpen] = useState(false)
+    useEffect(() => {
+        if (notifications.length) {
+            // Set a new snack when we don't have an active one
+            messageInfo = { ...(notifications?.[0] || {}) };
+            setOpen(true)
+        } else if (!notifications.length) {
+            // Close an active snack when a new one is added
+           setOpen(false)
+        }
+    }, [setOpen, open])
+   
     const handleClose = (event: React.SyntheticEvent | MouseEvent, reason?: string) => {
-        dispatch(hideNotification(messageInfo && messageInfo.key))
+        setOpen(false)
     };
 
     const handleExited = () => {
