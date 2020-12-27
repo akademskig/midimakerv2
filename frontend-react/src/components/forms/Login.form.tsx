@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
-import useNotify from '../../utils/notifications';
+import useNotify from '../common/notifications/notifications';
 
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme } from '@material-ui/core';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
@@ -58,7 +58,6 @@ const LoginForm = () => {
         if (values.length) return
         signIn({ email, password })
             .then((authData: any) => {
-                console.log(authData)
                 setAuthData(authData)
                 history.push("/")
             })

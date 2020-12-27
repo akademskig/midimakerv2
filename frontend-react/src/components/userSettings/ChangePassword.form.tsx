@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import AlertIcon from '@material-ui/icons/Warning'
 import usersApi from '../../api/protected/users'
 import { AuthCtx } from "../../providers/auth.provider";
+import useUsers from "../../api/protected/users";
+import useNotify from "../common/notifications/notifications";
 
 
 const ChangePasswordFormStyled = styled.div`
@@ -40,17 +42,19 @@ const ChangePasswordFormStyled = styled.div`
 `
 
 export const ChangePasswordForm = ({ setPasswordEdit }: any) => {
-    const { changePassword } = usersApi
+    const { changePassword } = useUsers()
+    const notify = useNotify()
     const [newPassword, setNewPassword] = useState('');
     const [oldPassword, setOldPassword] = useState('');
     const { handleSubmit, register, errors, formState } = useForm({ mode: "onChange" });
     const { isValid } = formState
     const { user } = useContext(AuthCtx)
-    const dispatch = useDispatch()
     
     const onChangePassword = async (values: any) => {
         if (values.length || !user?.id) return
-        await changePassword({ userId: user.id, oldPassword, newPassword })
+        changePassword({ userId: user.id, oldPassword, newPassword })
+        .then(() => notify('success', 'User updated'))
+        .catch((error)=> notify('error', error.message))
         setPasswordEdit(false)
     }
    

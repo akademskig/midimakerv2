@@ -8,7 +8,6 @@ import { ThemeProvider } from 'styled-components';
 import theme from './theme';
 import AuthProvider from './providers/auth.provider';
 import DataProvider from './providers/data.provider';
-import Notifications from './components/common/notifications/Notifications';
 import NotificationsProvider from './components/common/notifications/Notifications.provider';
 
 function App() {

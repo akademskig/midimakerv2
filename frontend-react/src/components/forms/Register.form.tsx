@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
-import useNotify from '../../utils/notifications';
+import useNotify from '../common/notifications/notifications';
 
 import { Button, FormGroup, TextField, InputAdornment, makeStyles, createStyles, Theme } from '@material-ui/core';
 import EyeIcon from '@material-ui/icons/RemoveRedEyeOutlined';
@@ -57,7 +57,7 @@ const RegisterForm = () => {
         registerUser({ email, password, username })
             .then(user => {
                 history.push('/auth#login')
-                notify("ok", `Account for ${user.username} created successfully!`)
+                notify("success", `Account for ${user.username} created successfully!`)
             })
             .catch((err: Error) => { notify('error', err.message) });
     };

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, memo, useMemo } from 'react';
 
 import {
   Route,
@@ -23,12 +23,11 @@ import { AuthCtx } from './providers/auth.provider';
 // };
 
 const AppRoutes = (props: any) => {
-  
   const {isAuth} = useContext(AuthCtx)
   return (
     <Switch>
       <Route path="/auth" exact component={AuthPage} />
-      <Route path="/" component={() => isAuth ? <MainLayout {...props}/>: <Redirect to='/auth'/>} />
+      <Route path="/" component={MainLayout} />
     </Switch>
 
   )
@@ -48,4 +47,4 @@ export const MainRoutes = () => {
   )
 }
 
-export default AppRoutes
+export default memo(AppRoutes)

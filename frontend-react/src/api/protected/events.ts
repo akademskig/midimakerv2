@@ -2,7 +2,6 @@ import Axios from 'axios'
 import { useContext, useMemo, useState, useEffect } from 'react';
 import { AuthCtx } from '../../providers/auth.provider';
 import { DataCtx, TEvent } from '../../providers/data.provider';
-import { getToken } from '../utils/index';
 const baseUrl = `http://localhost:4000`
 
 type GetParams = {
@@ -12,10 +11,6 @@ type GetParams = {
     q?: string,
     include: string
 }
-type PostData = {
-    events?: TEvent
-}
-
 
 export const useEvents = () => {
     const { accessToken } = useContext(AuthCtx)
@@ -29,16 +24,6 @@ export const useEvents = () => {
     }), [accessToken])
 
 
-    const getResource = async ({ meta, query, data }: { meta: any, query?: any, data?: any }) => {
-        switch (meta.endpoint) {
-            case '/': {
-                return fetchList(query)
-            }
-            default:
-                return Promise.reject(null)
-        }
-
-    }
     const fetchList = async ({ params }: { params?: GetParams }) => {
         let paramsString = ''
         if (params) {
@@ -58,7 +43,6 @@ export const useEvents = () => {
     }
 
     return ({
-        getResource,
         fetchList,
         addNew,
         events

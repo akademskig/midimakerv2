@@ -10,7 +10,7 @@ interface IAuthProvider  {
 interface IAuthProviderContextValue {
     user: TUser | null,
     accessToken: string
-    setAuthData: Dispatch<React.SetStateAction<TUser | null>>,
+    setAuthData: Dispatch<React.SetStateAction<any | null>>,
     isAuth: boolean
 }
 
@@ -24,7 +24,7 @@ export type TUser = {
 const initialValue = {
     user: null,
     accessToken: '',
-    setAuthData: ((v: SetStateAction<TUser | null>) => (value: TUser | null) => value),
+    setAuthData: ((v: SetStateAction<any | null>) => (value: any | null) => value),
     isAuth: false
 }
 
@@ -39,10 +39,10 @@ export default function AuthProvider({ children }: IAuthProvider): JSX.Element {
     const setAuthData = useCallback(
         (authData) => {
             const { user, accessToken } = authData
-            setUser(user)
-            setAccessToken(accessToken)
-            cacheToken(accessToken)
-            cacheUser(user)
+            user && setUser(user)
+            accessToken && setAccessToken(accessToken)
+            accessToken && cacheToken(accessToken)
+            user && cacheUser(user)
         },
         [ setUser, setAccessToken ]
     )

@@ -55,7 +55,7 @@ const SettingsPage = () => {
     }
     const classes = useStyles()
     const { hash } = useLocation()
-    
+    console.log(hash)
     return (
         <ContainerStyled className={classes.paperContainer}>
             <Tabs

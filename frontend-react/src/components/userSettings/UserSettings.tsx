@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import { useForm } from "react-hook-form";
 
 import { Theme, List, IconButton, Divider } from '@material-ui/core';
@@ -34,7 +34,10 @@ const FormContainer = styled.div`
                 display:inline-flex;
                 padding:0.75em;
                 .buttonSave{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
+                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.dark};
+                    & :disabled {
+                        background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
+                    }
                     svg{
                         color: white;
                     }
@@ -67,28 +70,28 @@ const UserSettings = () => {
     const [username, setUsername] = useState(user && user.username);
     const { register, errors } = useForm({ mode: "onChange" });
 
-    const handleFieldCancel = (field: string) => {
+    const handleFieldCancel = useCallback((field: string) => {
         switch (field) {
             case "username": {
-                setUsername(username)
+                setUsername(user?.username || username)
                 setUsernameEdit(false)
                 break
             }
             case "email": {
-                setEmail(email)
+                setEmail(user?.email || email)
                 setEmailEdit(false)
                 break
             }
             default: break
         }
-    }
+    }, [ user ])
     return (
         <FormContainer>
             <List>
                 {
                     usernameEdit ?
                         <ListItem>
-                            <ChangeUserDataForm {...{ field: "username", value: username, handleFieldCancel, setEdit: setUsernameEdit }}>
+                            <ChangeUserDataForm {...{ field: "username", value: username, handleFieldCancel, errors }}>
                                 <UsernameField  {...{ username, setUsername, errors, register }} />
                             </ChangeUserDataForm>
                         </ListItem> :
@@ -106,7 +109,8 @@ const UserSettings = () => {
                 {
                     emailEdit ?
                         <ListItem>
-                            <ChangeUserDataForm {...{ field: "email", value: email, handleFieldCancel, setEdit: setEmailEdit }}>
+                            <ChangeUserDataForm {...{ field: "email", value: email, handleFieldCancel, errors
+                             }}>
                                 <EmailField  {...{ email, setEmail, errors, register }} />
                             </ChangeUserDataForm>
                         </ListItem> :

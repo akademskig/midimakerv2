@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Repository, QueryRunner } from 'typeorm';
 import User from '../database/entity/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -70,7 +70,7 @@ export class UsersService {
   async updatePassword(id, { oldPassword, newPassword }: { oldPassword: string, newPassword: string }) {
     const user = await this.findOne(id);
     if (user && !await this.authUtils.comparePasswords({ password: oldPassword, hashedPassword: user.password })) {
-      throw new BadRequestException('Invalid password');
+      throw new UnauthorizedException('Invalid password');
     }
     user.password = await this.authUtils.hashPassword(newPassword);
     return this.updateOne(id, user);
