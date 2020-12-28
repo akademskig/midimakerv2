@@ -204,8 +204,6 @@ export default function NavigationDrawer({ children, theme }: any) {
 //@ts-ignore
 const getIcon = (icon: string) => {
     switch (icon) {
-        case 'events':
-            return <EventIcon></EventIcon>
         case 'dashboard':
             return <DashboardIcon></DashboardIcon>
         case 'settings':
