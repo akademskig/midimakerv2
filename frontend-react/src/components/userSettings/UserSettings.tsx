@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback } from 'react';
+import React, { useContext, useState, useCallback, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 
 import { Theme, List, IconButton, Divider } from '@material-ui/core';
@@ -69,6 +69,11 @@ const UserSettings = () => {
     const [email, setEmail] = useState(user && user.email);
     const [username, setUsername] = useState(user && user.username);
     const { register, errors } = useForm({ mode: "onChange" });
+    
+    useEffect(() => {
+        setUsername(user?.username || '')
+        setEmail(user?.email || '') 
+    }, [user])
 
     const handleFieldCancel = useCallback((field: string) => {
         switch (field) {
