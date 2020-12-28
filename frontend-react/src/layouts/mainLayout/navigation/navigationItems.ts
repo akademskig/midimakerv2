@@ -8,5 +8,10 @@ export const navigationItems = [
         name: "Settings",
         link: "/settings",
         icon:'settings'
+    },
+    {
+        name: "New Midi",
+        link: "/newmidi",
+        icon:'music'
     }
 ]
