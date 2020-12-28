@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        position: 'relative',
+        position: 'fixed',
         maxHeight: '64px',
 
     },

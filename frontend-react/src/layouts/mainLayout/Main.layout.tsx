@@ -3,29 +3,29 @@ import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components'
 import NavigationDrawer from './navigation/NavigationDrawer';
 import { MainRoutes } from '../../routes';
+import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
-const LayoutContainer = styled.div`
- ${({ theme }) => `
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  width: 100%;
-  justify-content: flex-start;
-  padding: 1em;
-  ${css({ 'min-height': "calc(100vh - 64px)" })};
-  ${theme.breakpoints.down('xs')} {
-    ${css({ 'min-height': "calc(100vh - 56px)" })}
-    padding: 0.5em;
-  }
-  `}
-`
+const useStyles = makeStyles((theme: Theme) => createStyles({
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignContent: 'center',
+    width: '100%',
+    marginTop: '64px',
+    justifyContent: 'flexStart',
+    [theme.breakpoints.down('xs')]: {
+      marginTop: '54px'
+    }
+  },
+}));
 const MainLayout = ({ children }: { children: any }) => {
+  const classes = useStyles()
   return (
     <Fragment>
       <NavigationDrawer>
-        <LayoutContainer>
+        <div className={classes.container}>
          <MainRoutes></MainRoutes>
-        </LayoutContainer>
+        </div>
       </NavigationDrawer>
     </Fragment>
   )
