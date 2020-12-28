@@ -17,6 +17,7 @@ import {
 import { ICoordinates } from '../NotesGrid.types'
 import { ChannelRenderEvent, Note, PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
 import { AudioStateProviderContext } from '../../../providers/AudioStateProvider/AudioStateProvider'
+import useScreenSize from '../../../../providers/screenSize.provider'
 
 
 let rectangleHeight = 30
@@ -61,6 +62,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     useState<Array<number>>([])
   const [canvasTimeUnit, setCanvasTimeUnit] = useState(RECT_TIME)
   const [lastRectangle, setLastRectangle] = useState(0)
+  const { width } = useScreenSize()
 
   const canvasRef = createRef<HTMLCanvasElement>()
   const canvasBoxRef = createRef<HTMLDivElement>()
@@ -135,8 +137,8 @@ function NotesGridRenderer(): INotesGridRenderer {
     // wierd calculation of canvas width
     const xLength =
       compositionDuration * canvasTimeUnit + 5 <
-        window.innerWidth  / (RECT_WIDTH + RECT_SPACE)
-        ? (window.innerWidth + notesListWidth)/ (RECT_WIDTH + RECT_SPACE)
+        width  / (RECT_WIDTH + RECT_SPACE)
+        ? (width + notesListWidth)/ (RECT_WIDTH + RECT_SPACE)
         : compositionDuration * canvasTimeUnit + 5
 
     canvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE) - notesListWidth
@@ -154,7 +156,7 @@ function NotesGridRenderer(): INotesGridRenderer {
       xLength,
     }
 
-  }, [canvasElement, canvasBoxElement, channels, controllerState.RECORDING, canvasTimeUnit, notes.length])
+  }, [canvasElement, canvasBoxElement, channels, controllerState.RECORDING, canvasTimeUnit, notes.length, width])
 
   const renderEmptyCanvas = useCallback((canvasCtx, xLength) => {
     coordinatesMapLocal = []
