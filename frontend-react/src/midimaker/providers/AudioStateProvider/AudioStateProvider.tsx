@@ -15,9 +15,9 @@ const initailGridNotes: TRecordingGrid = {
     currentTime: 0
 }
 interface IControllerState {
-    PLAYING: boolean
-    RECORDING:boolean,
-    RECORDING_RESET: boolean
+    PLAYING?: boolean
+    RECORDING?:boolean,
+    RECORDING_RESET?: boolean
 }
 
 interface IAudioStateProviderContext {
@@ -30,7 +30,7 @@ interface IAudioStateProviderContext {
     noteDuration: number,
     channelColor: string,
     controllerState: IControllerState,
-    setControllerState: React.Dispatch<React.SetStateAction<IControllerState>>
+    setControllerState: (state: IControllerState) => void,
     gridNotes: TRecordingGrid,
     setGridNotes: React.Dispatch<React.SetStateAction<TRecordingGrid>>
 }
@@ -60,7 +60,7 @@ const initialCtxValue = {
         setChannels: ((value: React.SetStateAction<TChannel[] | []>) => (value: TChannel[]) => value),
         notes: [],
         controllerState: initialControllerState,
-        setControllerState: ((value: React.SetStateAction<IControllerState>) => (value: IControllerState) => value),
+        setControllerState: (state: IControllerState) => {},
         gridNotes: initailGridNotes,
         setGridNotes: ((value: React.SetStateAction<TRecordingGrid>) => (value: TRecordingGrid) => value),
 }
@@ -79,7 +79,12 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
 
     const [channels, setChannels] = useState<TChannel[]>([])
     const [gridNotes, setGridNotes] = useState(initailGridNotes)
-    console.log(channels, 'channels')
+    const setController = useCallback((state)=> {
+        setControllerState({
+            ...controllerState,
+            ...state
+        })
+    }, [controllerState])
 
     const notes = useMemo(() =>
         range(noteRange.first, noteRange.last)
@@ -96,7 +101,7 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         setChannels,
         notes,
         controllerState,
-        setControllerState,
+        setControllerState: setController,
         gridNotes,
         setGridNotes
     }), [channelColor, channels, controllerState, currentChannel, gridNotes, noteDuration, notes])

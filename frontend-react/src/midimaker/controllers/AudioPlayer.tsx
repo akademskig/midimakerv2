@@ -31,10 +31,11 @@ interface IAudioPlayer {
   stopPlayAll: () => void,
   stopAllNotes: () => void
 }
+const scheduledEvents: Array<number> = []
 function AudioPlayer(): IAudioPlayer {
   const activeAudioNodes = useRef<IActiveAudioNodes>({})
-  const scheduledEvents: Array<number> = []
   const { cachedInstruments, currentInstrument } = useContext(SoundfontProviderContext)
+  const { controllerState } = useContext(AudioStateProviderContext)
   const { channels } = useContext(AudioStateProviderContext)
 
 
@@ -63,10 +64,9 @@ function AudioPlayer(): IAudioPlayer {
       audioNodes && audioNodes[midiNumber] && audioNodes[midiNumber].stop()
       activeAudioNodes.current = { ...audioNodes, [midiNumber]: null }
     })
-  }, [])
+  }, [activeAudioNodes])
 
   const playNote = useCallback((lastEvent: PlayEvent, instrumentName?: string) => {
-    console.log(lastEvent)
     startNote(lastEvent.midiNumber, instrumentName)
     setTimeout(() => {
       stopNote(lastEvent.midiNumber)
@@ -75,6 +75,9 @@ function AudioPlayer(): IAudioPlayer {
 
   const playAll = useCallback(
     async () => {
+      if(controllerState.PLAYING){
+        return
+      }
       let joinedEvents: PlayChannelEvent[] = []
       if (channels.length > 0) {
         joinedEvents = flatMap(channels.map((channel: TChannel) => {
@@ -86,7 +89,7 @@ function AudioPlayer(): IAudioPlayer {
       const startAndEndTimes = uniq(
         flatMap(joinedEvents, (event) => [
           event.time,
-          event.time + event.duration,
+          Math.floor(event.time + event.duration),
         ])
       )
       startAndEndTimes.forEach((time, i) => {

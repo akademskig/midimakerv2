@@ -1,7 +1,7 @@
 export const RECT_WIDTH = 20
 export const RECT_SPACE = 1
 export const RECT_COLOR = '#fff'
-export const RECT_TIME = 5
+export const RECT_TIME = 10
 export const BAR_COLOR = '#d13a1f'
 export const RECORDING_BAR_COLOR = '#a0cf33'
 export const BAR_WIDTH = 4

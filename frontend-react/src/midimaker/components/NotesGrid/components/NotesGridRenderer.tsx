@@ -48,6 +48,7 @@ export interface INotesGridRenderer {
   coordinatesMapRef: RefObject<ICoordinates[]>,
   canvasTimeUnit: number,
   renderPlay: () => void
+  stopPlayRender: () => void,
   findNoteByGridCoordinates: (event: React.MouseEvent) => PlayEvent | null
 }
 
@@ -56,6 +57,8 @@ let canvasElement: HTMLCanvasElement
 let coordinatesMapLocal: ICoordinates[]
 let notesListWidth = 0
 let compositionDuration = 0
+let canvasCtx: CanvasRenderingContext2D | null = null
+
 function NotesGridRenderer(): INotesGridRenderer {
 
   const [recordingTimesRemained, setRecordingTimesRemained] =
@@ -120,7 +123,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     if (!canvasElement || !canvasBoxElement) {
       return
     }
-    const canvasCtx = canvasElement?.getContext('2d')
+    canvasCtx = canvasElement?.getContext('2d')
     if (!canvasCtx) {
       return
     }
@@ -137,8 +140,8 @@ function NotesGridRenderer(): INotesGridRenderer {
     // wierd calculation of canvas width
     const xLength =
       compositionDuration * canvasTimeUnit + 5 <
-        width  / (RECT_WIDTH + RECT_SPACE)
-        ? (width + notesListWidth)/ (RECT_WIDTH + RECT_SPACE)
+        (width - canvasBoxElement.getBoundingClientRect().left) / (RECT_WIDTH + RECT_SPACE)
+        ? (width - canvasBoxElement.getBoundingClientRect().left + notesListWidth)/ (RECT_WIDTH + RECT_SPACE)
         : compositionDuration * canvasTimeUnit + 5
 
     canvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE) - notesListWidth
@@ -148,7 +151,6 @@ function NotesGridRenderer(): INotesGridRenderer {
     fontSize.current = rectangleHeight * 0.6
 
     notesListWidth = fontSize.current + RECT_WIDTH + 5
-    console.log(notesListWidth)
     return {
       canvasBoxElement,
       canvasElement,
@@ -163,9 +165,6 @@ function NotesGridRenderer(): INotesGridRenderer {
     // draw notes to canvas
     const calculateFontYPosition = (i: number) => {
       return ((rectangleHeight / 1.3)) + (i * ((rectangleHeight + RECT_SPACE)))
-      // return rectangleHeight / fontSize + 2 +
-      // fontSize +
-      // i * (rectangleHeight + rectangleHeight / (fontSize * 2.5))
     }
     // eslint-disable-next-line array-callback-return
     notes.filter((note: Note, i: number): void => {
@@ -195,32 +194,24 @@ function NotesGridRenderer(): INotesGridRenderer {
     })
   }, [notes])
 
-  const renderTimerBar = useCallback((timer: number, canvasCtx: CanvasRenderingContext2D) => {
+  const renderTimerBar = useCallback((timer: number) => {
+    if (!canvasCtx) {
+      return
+    }
     const x =
-      RECT_WIDTH +
       Math.floor(timer * RECT_WIDTH * canvasTimeUnit) +
       notesListWidth
-    canvasCtx.fillStyle = controllerState.RECORDING
-      ? RECORDING_BAR_COLOR
-      : BAR_COLOR
     canvasCtx.fillStyle = controllerState.PLAYING
       ? BAR_COLOR
       : RECORDING_BAR_COLOR
-    canvasCtx.clearRect(x, 0, BAR_WIDTH, canvasElement.height)
-    canvasCtx.fillRect(x, 0, BAR_WIDTH, canvasElement.height)
+    canvasCtx.clearRect(lastRectangle, 0, BAR_WIDTH, canvasElement.height)
+    canvasCtx.strokeRect(x, 0, BAR_WIDTH, canvasElement.height)
     setLastRectangle(x)
     if (x >= canvasBoxElement.getBoundingClientRect().width - 200) {
       const y = 300
       canvasBoxElement.scroll(x + 100, y)
     }
-  }, [canvasTimeUnit, controllerState.PLAYING, controllerState.RECORDING])
-
-  // const x = RECT_WIDTH + Math.floor(n.time * RECT_WIDTH * this.state.rectTime) + this.offsetFirst
-  // const y = Math.floor(canvas.height - ((n.midiNumber - this.props.midiOffset) * RECT_HEIGHT + RECT_SPACE * (n.midiNumber - this.props.midiOffset))) - (RECT_HEIGHT + RECT_SPACE)
-  // const width = Math.floor(n.duration * RECT_WIDTH * this.state.rectTime)
-  // c.fillStyle = n.color ? n.color : this.state.channelColor
-  // c.clearRect(x, y, width, RECT_HEIGHT);
-  // c.fillRect(x, y, width, RECT_HEIGHT);
+  }, [canvasTimeUnit, controllerState.PLAYING, lastRectangle, setLastRectangle])
 
   const renderNotes = useCallback((joinedEvents: ChannelRenderEvent[],
     canvasElement: HTMLCanvasElement, canvasCtx: CanvasRenderingContext2D) => {
@@ -245,10 +236,10 @@ function NotesGridRenderer(): INotesGridRenderer {
   const drawInitial = useCallback(
     (timer?: number) => {
       const settings = canvasSetup(timer)
-      if (!settings) {
+      if (!settings || !canvasCtx) {
         return
       }
-      const { canvasCtx,  canvasElement, xLength } = settings
+      const { xLength } = settings
 
       const joinedEvents = flatMap(channels, (channel: TChannel) =>
         channel.notes.map((note) => ({ ...note, color: channel.color }))
@@ -258,13 +249,10 @@ function NotesGridRenderer(): INotesGridRenderer {
       if (joinedEvents.length > 0) {
         renderNotes(joinedEvents, canvasElement, canvasCtx)
       }
-      if (timer) {
-        renderTimerBar(timer, canvasCtx)
-      }
       if (lastRectangle && !timer) {
-        canvasCtx.fillStyle = controllerState.RECORDING
-          ? RECORDING_BAR_COLOR
-          : BAR_COLOR
+        // canvasCtx.fillStyle = controllerState.RECORDING
+        //   ? RECORDING_BAR_COLOR
+        //   : BAR_COLOR
         canvasCtx.fillStyle = controllerState.PLAYING
           ? BAR_COLOR
           : RECORDING_BAR_COLOR
@@ -280,29 +268,30 @@ function NotesGridRenderer(): INotesGridRenderer {
   const stopPlayRender = useCallback(() => {
     timers.current.forEach((t) => clearTimeout(t))
     setLastRectangle(0)
+    setControllerState({'PLAYING': false})
   }, [])
   // play rendering
   const renderPlay = useCallback(() => {
     if (controllerState.PLAYING) return
-    console.log(compositionDuration, 'compositionDuration')
-    for (let i = 0; i < compositionDuration; i += 0.05 / canvasTimeUnit) {
-      const t = window.setTimeout(() => {
-        const count = i
-        drawInitial(count)
-      }, Math.ceil(i * 1000))
+    const frequency =  Number((0.1 / canvasTimeUnit).toFixed(3))
+    for (let i = 0; i < compositionDuration; i += frequency ) {
+      const t = setTimeout(() => {
+        renderTimerBar(i)
+      }, i * 1000)
       timers.current = [...timers.current, t]
     }
-    window.setTimeout(() => stopPlayRender(), compositionDuration * 1000)
+    setTimeout(() => stopPlayRender(), compositionDuration * 1000)
   }, [
     canvasTimeUnit,
     controllerState.PLAYING,
-    drawInitial,
     stopPlayRender,
+    renderTimerBar,
+    compositionDuration
   ])
   //
   const showRecordingBar = useCallback(() => {
     const timesRemained = []
-    for (let i = 0; i < REC_TIME; i += 0.05 / canvasTimeUnit) {
+    for (let i = 0; i < REC_TIME; i += 0.01 / canvasTimeUnit) {
       timesRemained.push(i)
       const t = window.setTimeout(() => {
         drawInitial(i)
@@ -340,28 +329,6 @@ function NotesGridRenderer(): INotesGridRenderer {
   }, [drawInitial, gridNotes, recordingTimesRemained])
 
   useEffect(() => {
-    const { PLAYING, RECORDING, RECORDING_RESET } = controllerState
-    if (PLAYING) {
-      renderPlay()
-    } else if (!PLAYING) {
-      stopPlayRender()
-    } else if (RECORDING && RECORDING_RESET) {
-      showRecordingBar()
-      setControllerState({
-        ...controllerState,
-        RECORDING_RESET: false
-      })
-    } else if (RECORDING && !RECORDING_RESET) {
-      resumeRec()
-    } else if (!RECORDING) {
-      stopRecordingBar(true)
-    } else if (!RECORDING_RESET) {
-      stopRecordingBar(false)
-      resetRec()
-    }
-  }, [controllerState, renderPlay, resumeRec, showRecordingBar, stopPlayRender, stopRecordingBar, resetRec, setControllerState])
-
-  useEffect(() => {
     setCanvasTimeUnit(1 / noteDuration)
   }, [noteDuration])
   useEffect(() => {
@@ -375,6 +342,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     coordinatesMapRef,
     canvasTimeUnit,
     renderPlay,
+    stopPlayRender,
     findNoteByGridCoordinates
   }
 }
