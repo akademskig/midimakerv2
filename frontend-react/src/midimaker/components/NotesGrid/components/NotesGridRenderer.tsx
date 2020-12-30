@@ -204,7 +204,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     canvasCtx.fillStyle = controllerState.PLAYING
       ? BAR_COLOR
       : RECORDING_BAR_COLOR
-    canvasCtx.clearRect(lastRectangle, 0, BAR_WIDTH, canvasElement.height)
+    canvasCtx.clearRect(x, 0, BAR_WIDTH, canvasElement.height)
     canvasCtx.strokeRect(x, 0, BAR_WIDTH, canvasElement.height)
     setLastRectangle(x)
     if (x >= canvasBoxElement.getBoundingClientRect().width - 200) {
