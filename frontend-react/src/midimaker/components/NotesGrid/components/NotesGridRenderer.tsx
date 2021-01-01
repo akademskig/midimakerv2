@@ -201,11 +201,10 @@ function NotesGridRenderer(): INotesGridRenderer {
     const x =
       Math.floor(timer * RECT_WIDTH * canvasTimeUnit) +
       notesListWidth
-    canvasCtx.fillStyle = controllerState.PLAYING
-      ? BAR_COLOR
-      : RECORDING_BAR_COLOR
-    canvasCtx.clearRect(x, 0, BAR_WIDTH, canvasElement.height)
-    canvasCtx.strokeRect(x, 0, BAR_WIDTH, canvasElement.height)
+    // canvasCtx.fillStyle =
+    //   BAR_COLOR
+    // canvasCtx.clearRect(lastRectangle, 0, BAR_WIDTH, canvasElement.height)
+    // canvasCtx.fillRect(x, 0, BAR_WIDTH, canvasElement.height)
     setLastRectangle(x)
     if (x >= canvasBoxElement.getBoundingClientRect().width - 200) {
       const y = 300
@@ -234,8 +233,8 @@ function NotesGridRenderer(): INotesGridRenderer {
   }, [canvasTimeUnit, channelColor])
 
   const drawInitial = useCallback(
-    (timer?: number) => {
-      const settings = canvasSetup(timer)
+    () => {
+      const settings = canvasSetup()
       if (!settings || !canvasCtx) {
         return
       }
@@ -249,7 +248,8 @@ function NotesGridRenderer(): INotesGridRenderer {
       if (joinedEvents.length > 0) {
         renderNotes(joinedEvents, canvasElement, canvasCtx)
       }
-      if (lastRectangle && !timer) {
+      // show playing bar
+      if (lastRectangle) {
         // canvasCtx.fillStyle = controllerState.RECORDING
         //   ? RECORDING_BAR_COLOR
         //   : BAR_COLOR
@@ -260,7 +260,7 @@ function NotesGridRenderer(): INotesGridRenderer {
       }
     },
     [canvasSetup, channels, renderEmptyCanvas, lastRectangle, renderNotes,
-      renderTimerBar, controllerState.RECORDING, controllerState.PLAYING]
+      renderTimerBar, controllerState.PLAYING]
   )
 
 
@@ -294,7 +294,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     for (let i = 0; i < REC_TIME; i += 0.01 / canvasTimeUnit) {
       timesRemained.push(i)
       const t = window.setTimeout(() => {
-        drawInitial(i)
+        // drawInitial(i)
       }, Math.floor(i * 1000))
       recordingTimers.current = [...recordingTimers.current, t]
     }
@@ -306,7 +306,7 @@ function NotesGridRenderer(): INotesGridRenderer {
       const { currentTime } = gridNotes
       recordingTimers.current.forEach((t) => clearTimeout(t))
       if (!pause) setLastRectangle(0)
-      drawInitial(currentTime)
+      // drawInitial(currentTime)
     },
     [drawInitial, gridNotes]
   )
@@ -322,7 +322,7 @@ function NotesGridRenderer(): INotesGridRenderer {
       if (recordingTimesRemained[i] < currentTime) continue
       if (!start) start = recordingTimesRemained[i]
       const t = window.setTimeout(() => {
-        drawInitial(recordingTimesRemained[i])
+        // drawInitial(recordingTimesRemained[i])
       }, Math.floor((recordingTimesRemained[i] - start) * 1000))
       recordingTimers.current.push(t)
     }
