@@ -1,5 +1,4 @@
 import { useCallback, useContext } from 'react'
-import { isEqual } from 'lodash'
 import { PlayEvent, TChannel } from '../providers/SoundfontProvider/SoundFontProvider.types'
 import { SoundfontProviderContext } from '../providers/SoundfontProvider/SoundfontProvider'
 import { AudioStateProviderContext } from '../providers/AudioStateProvider/AudioStateProvider'
@@ -21,6 +20,7 @@ class Channel implements TChannel {
 
 interface IAudioController {
     handleToggleNote: (note: PlayEvent) => void,
+    updateNote: (note: PlayEvent) => void,
 }
 
 
@@ -50,7 +50,6 @@ function AudioController(): IAudioController {
         setChannels(newChannels)
 
     }, [channels, setChannels])
-
     const addNoteToCurrentChannel = useCallback((note: PlayEvent) => {
         if (!currentChannel) {
             return
@@ -66,12 +65,12 @@ function AudioController(): IAudioController {
         updateChannels(newChannel)
     }, [currentChannel, setCurrentChannel, updateChannels])
 
-    const removeNoteFromChannel = useCallback((duplicateIdx: number) => {
+    const removeNoteFromChannel = useCallback((channelNote) => {
         if (!currentChannel) {
             return
         }
-        const newNotes = currentChannel.notes.filter((note, idx) => idx !== duplicateIdx)
-        const newChannelDuration = newNotes.reduce((acc: number, e: PlayEvent) => acc < e.time ? e.time : acc, 0)
+        const newNotes = currentChannel.notes.filter((note) => note.noteId !== channelNote.noteId)
+        const newChannelDuration = newNotes.reduce((acc: number, e: PlayEvent) => acc < e.time + e.duration ? e.time + e.duration : acc, 0)
         const newChannel = {
             ...currentChannel,
             notes: newNotes,
@@ -81,14 +80,29 @@ function AudioController(): IAudioController {
         updateChannels(newChannel)
     }, [currentChannel, setCurrentChannel, updateChannels])
 
+    const updateNote = useCallback((currentNote: PlayEvent) => {
+        if(!currentChannel){
+            return
+        }
+        if(currentNote.duration <= 0){
+            return removeNoteFromChannel(currentNote)
+        }
+        const newNotes = currentChannel.notes.map(note=> note.noteId === currentNote.noteId ? currentNote : note)
+        const newChannelDuration = newNotes.reduce((acc: number, e: PlayEvent) => acc < e.time + e.duration ? e.time + e.duration : acc, 0)
+        const newChannel = {
+            ...currentChannel,
+            notes: newNotes,
+            duration: newChannelDuration
+        }
+        setCurrentChannel(newChannel)
+        updateChannels(newChannel)
+    }, [ currentChannel, removeNoteFromChannel, addNoteToCurrentChannel, updateChannels, setCurrentChannel ])
+
     const handleToggleNote = useCallback((note: PlayEvent) => {
+        const channelNote = (currentChannel?.notes || []).find(n=> n.noteId === note.noteId)
         if (
             !currentChannel ||
-            currentChannel.notes.findIndex(
-                (e) =>
-                    isEqual(e.midiNumber, note.midiNumber) &&
-                    e.time === note.time
-            ) === -1
+            !channelNote
         ) {
             const channel = channels.find(channel => channel.instrumentName === currentChannel?.instrumentName)
             if (!channel) {
@@ -96,20 +110,15 @@ function AudioController(): IAudioController {
             }
             addNoteToCurrentChannel(note)
         } else {
-            const duplicateIdx = currentChannel.notes.findIndex(
-                (e) =>
-                    isEqual(e.midiNumber, note.midiNumber) &&
-                    e.time === note.time
-            )
-            if (duplicateIdx !== -1 && currentChannel.notes.length > 0) {
-                removeNoteFromChannel(duplicateIdx)
-            }
+            if(channelNote){
+                removeNoteFromChannel(channelNote)}
         }
 
     }, [addNewChannel, addNoteToCurrentChannel, channels, currentChannel, removeNoteFromChannel])
 
     return ({
-        handleToggleNote
+        handleToggleNote,
+        updateNote
     })
 }
 

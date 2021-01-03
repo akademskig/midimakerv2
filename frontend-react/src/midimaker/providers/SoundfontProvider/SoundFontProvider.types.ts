@@ -43,9 +43,12 @@ export type Note = {
 };
 
 export interface PlayEvent  {
+  noteId: string,
   time: number;
   duration: number;
   midiNumber: number;
+  coordX: number;
+  coordY: number
 }
 
 export interface PlayChannelEvent extends PlayEvent {

@@ -1,9 +1,10 @@
-import { MouseEvent, useCallback } from 'react'
+import { MouseEvent, useCallback, useContext } from 'react'
 import useAudioPlayer from '../../../controllers/AudioPlayer'
 import { useNotesGridRenderer } from './NotesGridRenderer'
-import { TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
+import { PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
 import { TRecordingGrid, TSetRecordingGrid } from '../../../providers/AudioStateProvider/AudioStateProvider.types'
 import { useAudioController } from '../../../controllers/AudioController'
+import { AudioStateProviderContext } from '../../../providers/AudioStateProvider/AudioStateProvider'
 
 export interface INotesGridControllerProps {
   canvasTimeUnit: number,
@@ -14,28 +15,38 @@ export interface INotesGridControllerProps {
 }
 
 export interface INotesGridController {
-  toggleNote: (event: MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>) => void
+  toggleNote: (event: MouseEvent<HTMLDivElement | HTMLCanvasElement, globalThis.MouseEvent>) => void
+  findNoteInChannel: (event: MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>) => PlayEvent | undefined
 }
 
 function NotesGridController(): INotesGridController {
   const { playNote } = useAudioPlayer()
-  const { findNoteByGridCoordinates } = useNotesGridRenderer()
+  const { findNoteByGridCoordinates, canvasBoxRef, getX, getY, rectangleHeight } = useNotesGridRenderer()
   const { handleToggleNote } = useAudioController()
+  const { currentChannel, mappedEvents } = useContext(AudioStateProviderContext)
 
+  const findNoteInChannel = useCallback((event: MouseEvent)=> {
+    const currentNote = mappedEvents.find(mappedEvent => (getX(event) < mappedEvent.x + mappedEvent.width && getX(event) >= mappedEvent.x) &&
+     (getY(event) >= mappedEvent.y && getY(event)<= mappedEvent.y + rectangleHeight))
+
+    return currentChannel?.notes.find(note=> note.noteId === currentNote?.noteId)
+  }, [ currentChannel, canvasBoxRef, mappedEvents ])
+  
   const toggleNote = useCallback(
     (event) => {
+      event.stopPropagation()
       const note = findNoteByGridCoordinates(event)
       if(!note){
         return
       }
       playNote(note)
-
       handleToggleNote(note)
     },
     [findNoteByGridCoordinates, playNote, handleToggleNote]
   )
   return {
-    toggleNote
+    toggleNote,
+    findNoteInChannel,
   }
 }
 

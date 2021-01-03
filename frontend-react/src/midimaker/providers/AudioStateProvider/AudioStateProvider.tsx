@@ -1,8 +1,9 @@
-import React, { Children, createContext, ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { createContext, ReactElement, useCallback, useMemo, useState } from 'react'
 import { MidiNumbers } from 'react-piano'
 import { range } from 'lodash'
 import { Note, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
 import { TNoteRange, TRecordingGrid } from './AudioStateProvider.types'
+import { TMappedEvent } from '../../components/NotesGrid/components/NotesGridRenderer'
 
 const initialNoteRange = {
     first: 43,
@@ -33,6 +34,8 @@ interface IAudioStateProviderContext {
     setControllerState: (state: IControllerState) => void,
     gridNotes: TRecordingGrid,
     setGridNotes: React.Dispatch<React.SetStateAction<TRecordingGrid>>
+    mappedEvents: TMappedEvent[],
+    setMappedEvents: React.Dispatch<React.SetStateAction<TMappedEvent[]>>
 }
 
 interface IAudioStateProviderProps { 
@@ -63,20 +66,19 @@ const initialCtxValue = {
         setControllerState: (state: IControllerState) => {},
         gridNotes: initailGridNotes,
         setGridNotes: ((value: React.SetStateAction<TRecordingGrid>) => (value: TRecordingGrid) => value),
+        mappedEvents: [],
+        setMappedEvents: ((value: React.SetStateAction<TMappedEvent[]>) => (value:TMappedEvent[]) => value),
 }
 
 
 export const AudioStateProviderContext = createContext<IAudioStateProviderContext>(initialCtxValue)
 const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element => {
-    // const { currentInstrument } = ctx 
-
     const [noteRange, setNoteRange] = useState<TNoteRange>(initialNoteRange)
     const [noteDuration, setNoteDuration] = useState<number>(initialNoteDuration)
     const [channelColor, setChannelColor] = useState<string>(initialChannelColor)
-    const [gridRecording, setGridRecording] = useState<TRecordingGrid>(initailGridNotes)
     const [currentChannel, setCurrentChannel] = useState<TChannel | null>(initialChannel)
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
-
+    const [mappedEvents, setMappedEvents ] = useState<TMappedEvent[]>([])
     const [channels, setChannels] = useState<TChannel[]>([])
     const [gridNotes, setGridNotes] = useState(initailGridNotes)
     const setController = useCallback((state)=> {
@@ -103,8 +105,10 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         controllerState,
         setControllerState: setController,
         gridNotes,
-        setGridNotes
-    }), [channelColor, channels, controllerState, currentChannel, gridNotes, noteDuration, notes])
+        setGridNotes,
+        mappedEvents,
+        setMappedEvents
+    }), [channelColor, channels, controllerState, currentChannel, gridNotes, noteDuration, notes, mappedEvents])
 
     return (
         <AudioStateProviderContext.Provider value={ctxValue}>
