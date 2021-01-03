@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 
 const AppToolbar = ({handleDrawerToggle, handleMobileToggle}:{handleDrawerToggle: any, handleMobileToggle: any}) => {
     const theme = useTheme()
-    console.log(theme)
     const classes = useStyles(theme)
     return (
         <AppBar

@@ -1,5 +1,5 @@
 
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useCallback, useContext, useState, useEffect } from 'react'
 import Loader from '../shared/loader/Loader'
 import { SoundfontProviderContext } from '../../providers/SoundfontProvider/SoundfontProvider'
 import { useNotesGridController } from './components/NotesGridController'
@@ -18,6 +18,7 @@ export interface ICoordinates {
 
 const canvasStyle = {
     background: 'rgba(4,32,55,0.7)',
+    outline: 'none'
 }
 
 const SNotesGrid = styled.div`
@@ -28,7 +29,7 @@ function NotesGrid(): JSX.Element {
     const soundfontCtx = useContext<SoundfontProviderContextValue>(
         SoundfontProviderContext
     )
-    const { canvasRef, canvasBoxRef, canvasTimeUnit } = useNotesGridRenderer()
+    const { canvasRef, canvasBoxRef, canvasTimeUnit, setHoveredNote } = useNotesGridRenderer()
     const { updateNote } = useAudioController()
     const { loading } = soundfontCtx
     const { toggleNote, findNoteInChannel } = useNotesGridController()
@@ -45,11 +46,14 @@ function NotesGrid(): JSX.Element {
         const duration =( x - currentNote?.coordX) / RECT_WIDTH / canvasTimeUnit
         const newNote = { ...currentNote, duration }
         updateNote(newNote)
-    }, [updateNote, canvasBoxRef, toggleNote, setUpdatedNote, currentNote ])
+    }, [updateNote, canvasBoxRef, toggleNote, setUpdatedNote, currentNote, setHoveredNote ])
 
     const handleOnClick = useCallback((event) => {
         event.persist()
-        !event.shiftKey && toggleNote(event)
+        const note = !event.shiftKey && toggleNote(event)
+        if(note){
+            setCurrentNote(note)
+        }
       
     }, [ toggleNote])
 
@@ -63,6 +67,36 @@ function NotesGrid(): JSX.Element {
     const handleMouseUp = useCallback(()=> {
         setResizing(false)
     }, [ updateNote, updatedNote, setResizing ])
+
+    const handleKeyDown = useCallback((event) => {
+        event.persist()
+        if(!event.shiftKey || !currentNote){
+            return
+        }
+        setHoveredNote(currentNote)
+    }, [ setHoveredNote, findNoteInChannel, currentNote ])
+
+    const onMouseMove = useCallback((event) => {
+        const note = findNoteInChannel(event)
+        if(note){
+            setCurrentNote(note)
+        }
+        return resizing? onResize(event): null
+    }, [resizing, onResize, handleKeyDown, setCurrentNote])
+
+    useEffect(() => {
+        if(canvasRef.current){
+            canvasRef.current.tabIndex = 1000
+            canvasRef.current?.addEventListener('onKeydown',
+            handleKeyDown)
+            return () => {
+                canvasRef.current?.removeEventListener('onKeydown',
+            handleKeyDown)
+        } 
+            
+        }
+    }, [canvasRef])
+  
     const createCanvas = useCallback(
         () =>
             <SNotesGrid ref={canvasBoxRef} style={{ height: CANVAS_HEIGHT, background: CANVAS_BACKGROUND, position: 'relative'  }}>
@@ -72,8 +106,10 @@ function NotesGrid(): JSX.Element {
                     style={canvasStyle}
                     onClick={handleOnClick}
                     onMouseDown={handleMouseDown}
-                    onMouseMove={resizing? onResize: ()=> {}}
+                    onMouseMove={onMouseMove}
                     onMouseUp={handleMouseUp}
+                    onKeyDown={handleKeyDown}
+                    onKeyUp={()=> setHoveredNote(null)}
                 />
             </SNotesGrid>
         ,

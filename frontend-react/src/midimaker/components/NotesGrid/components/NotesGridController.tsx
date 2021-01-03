@@ -40,7 +40,7 @@ function NotesGridController(): INotesGridController {
         return
       }
       playNote(note)
-      handleToggleNote(note)
+      return handleToggleNote(note)
     },
     [findNoteByGridCoordinates, playNote, handleToggleNote]
   )

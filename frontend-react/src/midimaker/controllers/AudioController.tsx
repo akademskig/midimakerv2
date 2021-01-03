@@ -109,6 +109,7 @@ function AudioController(): IAudioController {
                 addNewChannel()
             }
             addNoteToCurrentChannel(note)
+            return note
         } else {
             if(channelNote){
                 removeNoteFromChannel(channelNote)}

@@ -10,7 +10,7 @@ const initialNoteRange = {
     last: 67,
 }
 const initialNoteDuration = 0.1
-const initialChannelColor = '#ff6600'
+const initialChannelColor = '#008080'
 const initailGridNotes: TRecordingGrid = {
     events: [],
     currentTime: 0
@@ -56,7 +56,7 @@ const initialControllerState = {
 const initialCtxValue = {
         currentChannel: null,
         setCurrentChannel: ((value: React.SetStateAction<TChannel | null>) => (value: TChannel) => value),
-        channelColor: '#ff6600',
+        channelColor: '#008080',
         setChannelColor: ((value: React.SetStateAction<string>) => (value: string) => value),
         noteDuration: 0.2,
         channels: [],

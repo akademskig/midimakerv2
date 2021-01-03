@@ -19,6 +19,7 @@ import { ICoordinates } from '../NotesGrid'
 import { Note, PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
 import { AudioStateProviderContext } from '../../../providers/AudioStateProvider/AudioStateProvider'
 import useScreenSize from '../../../../providers/screenSize.provider'
+import { lightenDarkenColor } from './utils'
 
 
 let rectangleHeight = 30
@@ -58,7 +59,8 @@ export interface INotesGridRenderer {
   findNoteByGridCoordinates: (event: React.MouseEvent) => PlayEvent | null,
   findMappedEvents: () => void,
   getX: (event: MouseEvent) => number,
-  getY: (event: MouseEvent) => number
+  getY: (event: MouseEvent) => number,
+  setHoveredNote: (event: PlayEvent | null) => void,
 }
 
 let canvasBoxElement: HTMLDivElement
@@ -67,6 +69,7 @@ let coordinatesMapLocal: ICoordinates[]
 let notesListWidth = 0
 let compositionDuration = 0
 let canvasCtx: CanvasRenderingContext2D | null = null
+let hoveredNote: PlayEvent | null = null
 
 function NotesGridRenderer(): INotesGridRenderer {
 
@@ -76,10 +79,14 @@ function NotesGridRenderer(): INotesGridRenderer {
   const canvasRef = createRef<HTMLCanvasElement>()
   const canvasBoxRef = createRef<HTMLDivElement>()
   const fontSize = useRef<number>(0)
+  const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
   const timers = useRef<Array<number>>([])
   const coordinatesMapRef = useRef<Array<ICoordinates>>([])
-  const { channels, noteDuration, channelColor, notes, gridNotes, controllerState, setControllerState, setMappedEvents } = useContext(AudioStateProviderContext)
-
+  const { channels, noteDuration, channelColor, notes, controllerState, setControllerState, setMappedEvents } = useContext(AudioStateProviderContext)
+  const [channelColorLight, setChannelColorLight] = useState('#fff')
+  useEffect(() => {
+    setChannelColorLight(`${lightenDarkenColor(channelColor, 70)}`)
+  }, [setChannelColorLight, channelColor])
 
   useEffect(() => {
     if (canvasBoxRef.current) {
@@ -95,6 +102,11 @@ function NotesGridRenderer(): INotesGridRenderer {
 
   const getY = (event: MouseEvent) =>  
     event.clientY - (canvasBoxElement.getBoundingClientRect().top)
+
+    const setHoveredNote = useCallback((note: PlayEvent | null)=> {
+      setHoveredNoteState(note)
+      hoveredNote = note
+    }, [ setHoveredNoteState])
     
   const findMappedEvents = useCallback(() => {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
@@ -257,9 +269,16 @@ function NotesGridRenderer(): INotesGridRenderer {
       canvasCtx.fillStyle = event.color ? event.color : channelColor
       canvasCtx.clearRect(x, y, width, rectangleHeight)
       canvasCtx.fillRect(x, y, width, rectangleHeight)
+      if(event.noteId === hoveredNote?.noteId){
+        canvasCtx.fillStyle = channelColorLight
+        canvasCtx.fillRect(hoveredNote.coordX,hoveredNote.coordY,2, rectangleHeight)
+        canvasCtx.fillRect(hoveredNote.coordX,hoveredNote.coordY, width, 2);
+        canvasCtx.fillRect(hoveredNote.coordX,hoveredNote.coordY + rectangleHeight -2 , width, 2);
+        canvasCtx.fillRect(hoveredNote.coordX + width - 2,hoveredNote.coordY , 2, rectangleHeight);
+      }
     })
 
-  }, [canvasTimeUnit, channelColor, channels])
+  }, [canvasTimeUnit, channelColor, channels, hoveredNoteState, width, channelColorLight])
 
   const renderTimerBar = useCallback((timer: number) => {
     if (!canvasCtx) {
@@ -331,7 +350,8 @@ function NotesGridRenderer(): INotesGridRenderer {
     findMappedEvents,
     findNoteByGridCoordinates,
     getX,
-    getY
+    getY,
+    setHoveredNote
   }
 }
 
