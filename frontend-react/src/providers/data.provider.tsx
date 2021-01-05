@@ -1,5 +1,4 @@
 import React, { createContext, useState, useMemo, ReactNode, Dispatch, SetStateAction } from 'react'
-import { JsxElement } from 'typescript'
 
 type TLocation = {
     name: string,

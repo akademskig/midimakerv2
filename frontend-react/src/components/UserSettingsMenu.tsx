@@ -8,29 +8,28 @@ import { Typography } from '@material-ui/core';
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import SettingsIcon from '@material-ui/icons/Settings'
 import UserIcon from '@material-ui/icons/Person'
-import styled from 'styled-components';
 import { AuthCtx } from '../providers/auth.provider'
 
 
-const UserSettingsStyled = styled.div`
-    button{
-        color: ${({ theme }) => theme.palette.getContrastText(theme.palette.primary.main)};
-        p{
-            margin-left: 0.5em;
-        }
-    }
-`
-const MenuStyled = styled(Menu)`
-    li{
-         p{
-            margin-left: 1em;
-        }
-    }
-    a{
-        text-decoration: none;
-        color: inherit;
-    }
-`
+// const UserSettingsStyled = styled.div`
+//     button{
+//         color: ${({ theme }) => theme.palette.getContrastText(theme.palette.primary.main)};
+//         p{
+//             margin-left: 0.5em;
+//         }
+//     }
+// `
+// const MenuStyled = styled(Menu)`
+//     li{
+//          p{
+//             margin-left: 1em;
+//         }
+//     }
+//     a{
+//         text-decoration: none;
+//         color: inherit;
+//     }
+// `
 export default function UserSettingsMenu() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const history = useHistory()
@@ -47,16 +46,15 @@ export default function UserSettingsMenu() {
         history.push("/auth")
     }
 
-
     return (
-        <UserSettingsStyled>
+        <div>
             <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
                 <UserIcon />
                 <Typography>
                     {user && user.username}
                 </Typography>
             </Button>
-            <MenuStyled
+            <Menu
                 id="simple-menu"
                 anchorEl={anchorEl}
                 keepMounted
@@ -77,7 +75,7 @@ export default function UserSettingsMenu() {
                         Logout
                     </Typography>
                 </MenuItem>
-            </MenuStyled>
-        </UserSettingsStyled>
+            </Menu>
+        </div>
     );
 }

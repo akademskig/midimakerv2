@@ -79,10 +79,10 @@ function NotesGrid(): JSX.Element {
     const onMouseMove = useCallback((event) => {
         const note = findNoteInChannel(event)
         if(note){
-            setCurrentNote(note)
+            return setCurrentNote(note)
         }
         return resizing? onResize(event): null
-    }, [resizing, onResize, handleKeyDown, setCurrentNote])
+    }, [resizing, onResize, handleKeyDown, setCurrentNote, findNoteInChannel])
 
     useEffect(() => {
         if(canvasRef.current){

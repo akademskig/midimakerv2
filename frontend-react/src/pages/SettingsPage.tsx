@@ -4,7 +4,6 @@ import { Paper, Tabs, Tab } from '@material-ui/core';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useLocation } from 'react-router-dom';
 import TabPanel from '../components/common/TabPanels';
-import styled from 'styled-components'
 import UserSettings from '../components/userSettings/UserSettings';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -36,12 +35,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     }
 }));
 
-const ContainerStyled = styled(Paper)`
-    .MuiButtonBase-root{
-        /* box-shadow:${({ theme }: { theme: Theme }) => theme.shadows[1]} */
-    }
-`
-
 const SettingsPage = () => {
     const getTabIndex = (hash: string) => {
         switch (hash) {
@@ -55,9 +48,8 @@ const SettingsPage = () => {
     }
     const classes = useStyles()
     const { hash } = useLocation()
-    console.log(hash)
     return (
-        <ContainerStyled className={classes.paperContainer}>
+        <Paper className={classes.paperContainer}>
             <Tabs
                 value={getTabIndex(hash)}
                 indicatorColor="secondary"
@@ -73,7 +65,7 @@ const SettingsPage = () => {
             </TabPanel>
             <TabPanel value={getTabIndex(hash)} index={1}>
             </TabPanel>
-        </ContainerStyled>
+        </Paper>
     );
 };
 

@@ -1,10 +1,8 @@
 
 import { createStyles, IconButton, makeStyles, Snackbar, Theme } from '@material-ui/core';
 import MuiAlert, { AlertProps, Color } from '@material-ui/lab/Alert';
-import React, { createContext, Dispatch, ReactNode, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { createContext, ReactNode,useCallback, useEffect, useMemo, useState } from 'react'
 import CloseIcon from '@material-ui/icons/Close'
-import { clear } from 'console';
-
 interface INotificationsProvider {
     children: ReactNode
 }

@@ -1,6 +1,5 @@
 
 import React, { Fragment } from 'react';
-import styled, { css } from 'styled-components'
 import NavigationDrawer from './navigation/NavigationDrawer';
 import { MainRoutes } from '../../routes';
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
@@ -10,12 +9,25 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'column',
     alignContent: 'center',
-    width: '100%',
-    marginTop: '64px',
+    marginTop: '54px',
     justifyContent: 'flexStart',
-    [theme.breakpoints.down('xs')]: {
-      marginTop: '54px'
-    }
+    marginLeft: '0',
+    transition: theme.transitions.create('marginLeft', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    [theme.breakpoints.up('xs')]: {
+      marginLeft: '57px',
+    },
+    [theme.breakpoints.up('sm')]: {
+      marginTop: '64px',
+      marginLeft: '61px'
+    },
+    [theme.breakpoints.up('md')]: {
+      marginTop: '64px',
+      marginLeft:'220px',
+    },
+   
   },
 }));
 const MainLayout = ({ children }: { children: any }) => {

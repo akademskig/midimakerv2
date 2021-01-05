@@ -1,14 +1,12 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { Theme, makeStyles } from '@material-ui/core/styles';
-import styled from 'styled-components'
+import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import EventIcon from '@material-ui/icons/Event';
 import MailIcon from '@material-ui/icons/Mail';
 import DashboardIcon from '@material-ui/icons/DashboardOutlined';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -90,28 +88,19 @@ const useStyles = makeStyles((theme: any) =>
                 flexShrink: 0,
             },
         },
-    }))
+        navLink: {
+            textDecoration: 'none',
+            color: 'inherit',
+            '& .link-active': {
 
-const NavigationStyled = styled.nav`
-        display: flex;
-    `
+            }
 
-const NavLinkStyled = styled(NavLink)`
-    &{ 
-        text-decoration: none;
-        color: inherit;
-    }
-    &.link-active{
-        div{
-            color: ${({ theme }: { theme: Theme }) => theme.palette.getContrastText(theme.palette.primary.light)};
-            background-color:${({ theme }) => theme.palette.primary.light}
         }
-    }
-`
+    }))
 
 export default function NavigationDrawer({ children, theme }: any) {
     const [open, setOpen] = useState(false)
-    const { isMobile, isTablet, isDesktop  } = useScreenSize()
+    const { isMobile, isDesktop  } = useScreenSize()
     const [mobileOpen, setMobileOpen] = useState(false)
     const classes = useStyles(theme)
 
@@ -137,7 +126,7 @@ export default function NavigationDrawer({ children, theme }: any) {
                 <AppToolbar
                     handleDrawerToggle={handleDrawerToggle}
                     handleMobileToggle={handleMobileToggle} />
-                <NavigationStyled >
+                <div className={classes.root} >
                     {isMobile && 
                         <Drawer
                         anchor='left'
@@ -155,12 +144,12 @@ export default function NavigationDrawer({ children, theme }: any) {
                         <Divider />
                             <List>
                                 {navigationItems.map((item, index) => (
-                                    <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
+                                    <NavLink to={item.link} key={index} activeClassName='link-active' className={classes.navLink}>
                                         <ListItem button >
                                             <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
                                             <ListItemText primary={item.name} />
                                         </ListItem>
-                                    </NavLinkStyled>
+                                    </NavLink>
                                 ))}
                             </List>
                             <Divider />
@@ -183,12 +172,12 @@ export default function NavigationDrawer({ children, theme }: any) {
                     <Divider />
                     <List>
                         {navigationItems.map((item, index) => (
-                            <NavLinkStyled to={item.link} key={index} activeClassName='link-active'>
+                            <NavLink to={item.link} key={index} activeClassName='link-active' className={classes.navLink}>
                                 <ListItem button >
                                     <ListItemIcon>{getIcon(item.icon)}</ListItemIcon>
                                     <ListItemText primary={item.name} />
                                 </ListItem>
-                            </NavLinkStyled>
+                            </NavLink>
                         ))}
                     </List>
                     <Divider />
@@ -197,7 +186,7 @@ export default function NavigationDrawer({ children, theme }: any) {
                     <main className={classes.content}>
                         {children}
                     </main>
-                </NavigationStyled>
+                </div>
             </div>
         );
     }

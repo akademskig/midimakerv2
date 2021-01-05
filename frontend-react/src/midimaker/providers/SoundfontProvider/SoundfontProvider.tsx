@@ -10,6 +10,7 @@ import {
   
 } from './SoundFontProvider.types'
 import { audioContext } from '../../globals'
+import useInstrumentsApi from '../../../api/protected/instruments'
 
 
 const hostname = appConfig.soundfont.hostname
@@ -43,14 +44,35 @@ function SoundfontProvider({
 
   const [currentInstrument, setCurrentInstrument] = useState<TCurrentInstrument | null>(null)
   const [cachedInstruments, setCachedInstruments] = useState<ICachedInstruments>({})
+  const { getInstrument, saveInstrument } = useInstrumentsApi()
   // const activeAudioNodes = useRef<IActiveAudioNodes>({})
   const fetchInstrument = useCallback(async (instrumentName) => {
-    const instrument = await Soundfont.instrument(audioContext, instrumentName, {
-      format,
-      soundfont,
-      nameToUrl: (name: string, soundfont: string, format: string) =>
+    let instrument = null
+    // try {
+    //     instrument = await getInstrument({ name: instrumentName })
+    //     console.log(instrument)
+    //     if(instrument)
+    //       return instrument
+    // }
+    // catch(error){
+    //     console.error(error)
+    // }
+    try {
+      instrument = await Soundfont.instrument(audioContext, instrumentName, {
+        format,
+        soundfont,
+        nameToUrl: (name: string, soundfont: string, format: string) =>
         `${hostname}/${soundfont}/${name}-${format}.js`,
-    })
+        
+      })
+    }
+    catch(error){
+      console.error(error)
+    }
+    // if(instrument){
+    //   saveInstrument({name: instrumentName, player: instrument})
+    //   .catch(error=> console.error(error))
+    // }
     return instrument
   }, [format, soundfont])
 
@@ -65,6 +87,7 @@ function SoundfontProvider({
         name: instrumentName,
         player: instrument
       })
+      if(instrument)
       setCachedInstruments({
         [instrumentName]: instrument,
       })

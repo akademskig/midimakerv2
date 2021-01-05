@@ -73,7 +73,7 @@ let hoveredNote: PlayEvent | null = null
 
 function NotesGridRenderer(): INotesGridRenderer {
 
-  const [lastRectangle, setLastRectangle] = useState(0)
+  const [timer, setTimer] = useState(0)
   const { width } = useScreenSize()
   const [canvasTimeUnit, setCanvasTimeUnit] = useState(RECT_TIME)
   const canvasRef = createRef<HTMLCanvasElement>()
@@ -82,10 +82,10 @@ function NotesGridRenderer(): INotesGridRenderer {
   const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
   const timers = useRef<Array<number>>([])
   const coordinatesMapRef = useRef<Array<ICoordinates>>([])
-  const { channels, noteDuration, channelColor, notes, controllerState, setControllerState, setMappedEvents } = useContext(AudioStateProviderContext)
+  const { channels, setChannels, noteDuration, channelColor, notes, controllerState, setControllerState, setMappedEvents } = useContext(AudioStateProviderContext)
   const [channelColorLight, setChannelColorLight] = useState('#fff')
   useEffect(() => {
-    setChannelColorLight(`${lightenDarkenColor(channelColor, 70)}`)
+    setChannelColorLight(`${lightenDarkenColor(channelColor, 80)}`)
   }, [setChannelColorLight, channelColor])
 
   useEffect(() => {
@@ -126,7 +126,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     })
     setMappedEvents(mappedEvents)
 
-  }, [ channels ])
+  }, [ channels, canvasTimeUnit ])
 
   const findNoteByGridCoordinates = useCallback((event: React.MouseEvent) => {
     if (!canvasBoxElement || !coordinatesMapLocal) {
@@ -247,6 +247,26 @@ function NotesGridRenderer(): INotesGridRenderer {
     })
   }, [notes, canvasSetup])
 
+  // updates channel coordinates
+  const updateChannels = useCallback(
+    () => {
+        const newChannels = channels.map(channel=> {
+            const newNotes = channel.notes.map(note=> {
+               note.coordX = note.time * RECT_WIDTH * canvasTimeUnit +
+            notesListWidth
+            note.coordY =
+              canvasElement.height -
+              ((note.midiNumber - MIDI_OFFSET ) * rectangleHeight +
+                RECT_SPACE * (note.midiNumber - MIDI_OFFSET)) + RECT_SPACE
+              return note
+            })
+            channel.notes = newNotes
+            return channel
+        })
+        setChannels(newChannels)
+    },
+    [ setChannels, canvasTimeUnit],
+)
   const renderNotes = useCallback(() => {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
     channel.notes.map((note) => ({ ...note, color: channel.color }))
@@ -280,17 +300,16 @@ function NotesGridRenderer(): INotesGridRenderer {
 
   }, [canvasTimeUnit, channelColor, channels, hoveredNoteState, width, channelColorLight])
 
-  const renderTimerBar = useCallback((timer: number) => {
+  const renderTimerBar = useCallback(() => {
     if (!canvasCtx) {
       return
     }
     const x =
       Math.floor(timer * RECT_WIDTH * canvasTimeUnit) +
       notesListWidth
-    setLastRectangle(x)
     renderEmptyCanvas()
     renderNotes()
-    if(x && timer <= compositionDuration){
+    if(timer){
       canvasCtx.fillStyle = controllerState.PLAYING
       ? BAR_COLOR
       : RECORDING_BAR_COLOR
@@ -300,45 +319,53 @@ function NotesGridRenderer(): INotesGridRenderer {
         canvasBoxElement.scroll(x + 100, y)
       }
     }
-  }, [canvasTimeUnit, controllerState, lastRectangle, setLastRectangle, renderEmptyCanvas, renderNotes, compositionDuration ])
+  }, [canvasTimeUnit, controllerState, timer, setTimer, renderEmptyCanvas, renderNotes, compositionDuration ])
 
   // stop play rendering
   const stopPlayRender = useCallback(() => {
     timers.current.forEach((t) => clearTimeout(t))
-    setLastRectangle(0)
+    setTimer(0)
     setControllerState({'PLAYING': false})
-  }, [])
+  }, [setTimer, setControllerState])
   // play rendering
   const renderPlay = useCallback(() => {
     if (controllerState.PLAYING) return
-    const frequency =  Number((0.1 / canvasTimeUnit).toFixed(3))
-    for (let i = 0; i < compositionDuration ; i += frequency ) {
+    const frequency =  Number((1 / canvasTimeUnit).toFixed(3))
+    for (let i = 0; i <= compositionDuration + 0.2; i += frequency ) {
       const t = setTimeout(() => {
-        renderTimerBar(i)
+        setTimer(i)
       }, i * 1000)
       timers.current = [...timers.current, t]
     }
-    setTimeout(() => stopPlayRender(), compositionDuration * 1000)
+    setTimeout(() => stopPlayRender(), compositionDuration * 1000 + 500)
   }, [
     canvasTimeUnit,
     controllerState.PLAYING,
     stopPlayRender,
     renderTimerBar,
-    compositionDuration
+    compositionDuration,
+    noteDuration,
+    setTimer
   ])
   useEffect(() => {
     findMappedEvents()
   }, [findMappedEvents, channels, width])
   useEffect(() => {
     setCanvasTimeUnit(1 / noteDuration)
-  }, [noteDuration])
+  }, [noteDuration, setCanvasTimeUnit])
   useEffect(() => {
     renderEmptyCanvas()
   }, [renderEmptyCanvas, canvasSetup])
   useEffect(() => {
     renderNotes()
   }, [renderNotes])
+  useEffect(() => {
+    updateChannels()
+  }, [updateChannels])
 
+  useEffect(() => {
+    renderTimerBar()
+  }, [timer])
   return {
     canvasBoxRef,
     canvasRef,

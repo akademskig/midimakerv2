@@ -1,6 +1,5 @@
 import { Color } from '@material-ui/lab/Alert';
 import { useContext } from 'react';
-import { NotificationManager } from 'react-notifications';
 import { NotificationsCtx } from './Notifications.provider';
 
 function useNotify() {

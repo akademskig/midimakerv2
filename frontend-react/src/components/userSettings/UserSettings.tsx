@@ -15,52 +15,52 @@ import { ChangePasswordForm } from './ChangePassword.form';
 import ChangeUserDataForm from './ChangeUserData.form';
 import { AuthCtx } from '../../providers/auth.provider';
 
-const FormContainer = styled.div`
-    ul{
-        li{
-        max-width: 400px;
+// const FormContainer = styled.div`
+//     ul{
+//         li{
+//         max-width: 400px;
 
-            padding:  1em;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            .buttonEdit{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
-                    svg{
-                        color: white;
-                    }
-                }
-            span.actionButtons{
-                display:inline-flex;
-                padding:0.75em;
-                .buttonSave{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.dark};
-                    & :disabled {
-                        background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
-                    }
-                    svg{
-                        color: white;
-                    }
-                };
-                .buttonCancel{
-                    background-color: ${({ theme }: { theme: Theme }) => theme.palette.error.light};
-                    svg{
-                        color: white;
-                    }
-                };
+//             padding:  1em;
+//             display: flex;
+//             align-items: center;
+//             justify-content: space-between;
+//             .buttonEdit{
+//                     background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
+//                     svg{
+//                         color: white;
+//                     }
+//                 }
+//             span.actionButtons{
+//                 display:inline-flex;
+//                 padding:0.75em;
+//                 .buttonSave{
+//                     background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.dark};
+//                     & :disabled {
+//                         background-color: ${({ theme }: { theme: Theme }) => theme.palette.primary.light};
+//                     }
+//                     svg{
+//                         color: white;
+//                     }
+//                 };
+//                 .buttonCancel{
+//                     background-color: ${({ theme }: { theme: Theme }) => theme.palette.error.light};
+//                     svg{
+//                         color: white;
+//                     }
+//                 };
               
-                >:first-child{
-                    margin-right: 0.2em;
-                }
-            }
-        }
-    }
+//                 >:first-child{
+//                     margin-right: 0.2em;
+//                 }
+//             }
+//         }
+//     }
 
-    .edit-field{
-        display: flex;
-        align-items: center;
-    }
-`
+//     .edit-field{
+//         display: flex;
+//         align-items: center;
+//     }
+// `
 const UserSettings = () => {
     const {user} = useContext(AuthCtx)
     const [usernameEdit, setUsernameEdit] = useState(false);
@@ -91,7 +91,7 @@ const UserSettings = () => {
         }
     }, [ user ])
     return (
-        <FormContainer>
+        <div>
             <List>
                 {
                     usernameEdit ?
@@ -148,7 +148,7 @@ const UserSettings = () => {
                 }
             </List>
 
-        </FormContainer>
+        </div>
     )
 }
 

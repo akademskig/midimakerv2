@@ -4,7 +4,6 @@ import {
 } from "react-router-dom";
 import AppRoutes from './routes';
 import { MuiThemeProvider } from '@material-ui/core';
-import { ThemeProvider } from 'styled-components';
 import theme from './theme';
 import AuthProvider from './providers/auth.provider';
 import DataProvider from './providers/data.provider';
@@ -15,7 +14,6 @@ function App() {
 
   return (
     <div className="App">
-      <ThemeProvider theme={theme}>
         <MuiThemeProvider theme={theme}>
           <NotificationsProvider>
           <AuthProvider>
@@ -27,7 +25,6 @@ function App() {
           </AuthProvider>
         </NotificationsProvider> 
         </MuiThemeProvider>
-      </ThemeProvider>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 
 import React, { createContext, ReactElement, useState, SetStateAction, useMemo, Dispatch, useEffect, useCallback } from 'react'
-import { JsxElement } from 'typescript'
 import { cacheToken, cacheUser, getToken, getUser } from '../api/utils'
 
 interface IAuthProvider  {
