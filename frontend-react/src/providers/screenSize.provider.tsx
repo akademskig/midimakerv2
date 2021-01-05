@@ -11,15 +11,16 @@ export default function useScreenSize(){
     useEffect(() => {
         const setScreenParam = () => {
             setWidth(window.innerWidth)
-            setIsMobile(width < theme.breakpoints.values.xs)
-            setIsTablet(width < theme.breakpoints.values.sm)
-            setIsDesktop(width > theme.breakpoints.values.md)
+            setIsMobile(width <= theme.breakpoints.values.xs)
+            setIsTablet(width <= theme.breakpoints.values.sm)
+            setIsDesktop(width >= theme.breakpoints.values.md)
         }
         window.addEventListener('resize', setScreenParam)
+        setScreenParam()
         return () => {
             window.removeEventListener('resize', setScreenParam)
         }
-    }, [setWidth, setIsMobile, theme, width, setIsTablet ])
+    }, [setWidth, setIsMobile, theme, width, setIsTablet, isTablet ])
 
    return ({ 
         width,

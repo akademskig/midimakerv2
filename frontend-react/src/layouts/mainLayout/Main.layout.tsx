@@ -9,25 +9,12 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     display: 'flex',
     flexDirection: 'column',
     alignContent: 'center',
-    marginTop: '54px',
     justifyContent: 'flexStart',
     marginLeft: '0',
     transition: theme.transitions.create('marginLeft', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    [theme.breakpoints.up('xs')]: {
-      marginLeft: '57px',
-    },
-    [theme.breakpoints.up('sm')]: {
-      marginTop: '64px',
-      marginLeft: '61px'
-    },
-    [theme.breakpoints.up('md')]: {
-      marginTop: '64px',
-      marginLeft:'220px',
-    },
-   
   },
 }));
 const MainLayout = ({ children }: { children: any }) => {
@@ -35,9 +22,7 @@ const MainLayout = ({ children }: { children: any }) => {
   return (
     <Fragment>
       <NavigationDrawer>
-        <div className={classes.container}>
          <MainRoutes></MainRoutes>
-        </div>
       </NavigationDrawer>
     </Fragment>
   )

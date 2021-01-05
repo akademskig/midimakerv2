@@ -107,6 +107,8 @@ function NotesGrid(): JSX.Element {
                     onClick={handleOnClick}
                     onMouseDown={handleMouseDown}
                     onMouseMove={onMouseMove}
+                    onTouchMove={onMouseMove}
+                    onTouchStart={handleMouseDown}
                     onMouseUp={handleMouseUp}
                     onKeyDown={handleKeyDown}
                     onKeyUp={()=> setHoveredNote(null)}

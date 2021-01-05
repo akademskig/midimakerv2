@@ -16,7 +16,7 @@ import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
 import useScreenSize from '../../../providers/screenSize.provider';
 
-const drawerWidth = 220;
+const drawerWidth = 200;
 
 const useStyles = makeStyles((theme: any) =>
     ({
@@ -74,6 +74,34 @@ const useStyles = makeStyles((theme: any) =>
         },
         content: {
             flexGrow: 1,
+            flexDirection: 'column',
+            alignContent: 'center',
+            justifyContent: 'flexStart',
+            marginLeft: '0',
+            marginTop: '56px',
+            transition: theme.transitions.create('margin-left', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            '&.md': {
+                marginLeft: '200px'
+            },
+            '&.xs': {
+                marginLeft: '57px'
+            },
+            '&.sm': {
+                marginLeft: '62px'
+            },
+            [theme.breakpoints.up('xs')]: {
+                marginLeft: '57px',
+            },
+            [theme.breakpoints.up('sm')]: {
+                marginTop: '64px',
+                marginLeft: '61px'
+              },
+              [theme.breakpoints.up('md')]: {
+                marginLeft:'200px',
+              }, display: 'flex',
         },
         drawerPaper: {
             marginTop: '64px',
@@ -94,13 +122,12 @@ const useStyles = makeStyles((theme: any) =>
             '& .link-active': {
 
             }
-
         }
     }))
 
 export default function NavigationDrawer({ children, theme }: any) {
     const [open, setOpen] = useState(false)
-    const { isMobile, isDesktop  } = useScreenSize()
+    const { isMobile, isDesktop, width, isTablet } = useScreenSize()
     const [mobileOpen, setMobileOpen] = useState(false)
     const classes = useStyles(theme)
 
@@ -119,7 +146,8 @@ export default function NavigationDrawer({ children, theme }: any) {
         else if(isDesktop){
             setOpen(true)
         }
-    }, [setOpen, isDesktop])
+    }, [setOpen, isDesktop, width])
+    console.log(open, width)
         
         return (
             <div className={classes.root}>
@@ -182,8 +210,8 @@ export default function NavigationDrawer({ children, theme }: any) {
                     </List>
                     <Divider />
                 </Drawer>
-                   }
-                    <main className={classes.content}>
+                    }
+                <main className={clsx(classes.content, {['md']: open, ['sm']: !open && isDesktop, ['xs']: !open && isTablet && !isMobile })}>
                         {children}
                     </main>
                 </div>

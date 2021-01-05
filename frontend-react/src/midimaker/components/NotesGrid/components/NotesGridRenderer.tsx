@@ -337,7 +337,8 @@ function NotesGridRenderer(): INotesGridRenderer {
       }, i * 1000)
       timers.current = [...timers.current, t]
     }
-    setTimeout(() => stopPlayRender(), compositionDuration * 1000 + 500)
+    setTimeout(() => stopPlayRender(), compositionDuration * 1000 +
+       (compositionDuration * 500 /compositionDuration)) // no lag if duration is 0
   }, [
     canvasTimeUnit,
     controllerState.PLAYING,

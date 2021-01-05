@@ -10,11 +10,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     container: {
       display: 'flex',
       padding: '0.5em',
+      height: '61px',
       ['>:nth-child(1)']:{
         marginRight: '0.5em'
       }
     },
     button: {
+        padding: '0.2em 0.5em',
        '&.active': {
            color: 'red'
        }
