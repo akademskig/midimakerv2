@@ -99,7 +99,7 @@ function NotesGrid(): JSX.Element {
   
     const createCanvas = useCallback(
         () =>
-            <SNotesGrid ref={canvasBoxRef} style={{ height: CANVAS_HEIGHT, background: CANVAS_BACKGROUND, position: 'relative'  }}>
+            <SNotesGrid ref={canvasBoxRef} style={{ height: CANVAS_HEIGHT, background: CANVAS_BACKGROUND, padding: '1px', position: 'relative'  }}>
                 <canvas
                     id="canvas"
                     ref={canvasRef}

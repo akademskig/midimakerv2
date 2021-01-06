@@ -1,8 +1,10 @@
 import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, Paper, Select, Tooltip } from '@material-ui/core'
 import { AccessTime, ColorLens, MusicNote, PlayArrow, Stop } from '@material-ui/icons'
 import{ ChromePicker, ColorResult } from 'react-color'
+import { MidiNumbers } from 'react-piano'
+
 import React, { ReactElement, useCallback, useContext, useState, MouseEvent, ChangeEvent } from 'react'
-import { AudioStateProviderContext } from '../../providers/AudioStateProvider/AudioStateProvider'
+import { AudioStateProviderContext, TNoteRange } from '../../providers/AudioStateProvider/AudioStateProvider'
 
 const useStyles = makeStyles((theme: any) =>
     ({
@@ -31,6 +33,10 @@ const useStyles = makeStyles((theme: any) =>
         formControl: {
             margin: theme.spacing(1),
             minWidth: 120,
+            display: 'block',
+            '& .MuiInputBase-root':{
+                width: '100%'
+            }
           },
         tooltip: {
             marginBottom: 0
@@ -127,11 +133,71 @@ function renderTempoPicker({ value, onChange, classes }: TTempoPickerProps){
         </FormControl>
     )
 }
+type TNoteRangePickerProps = {
+    value: TNoteRange,
+    onChange: React.Dispatch<React.SetStateAction<TNoteRange>>,
+    classes: Record<string,string>
+}
+const noteOptions = MidiNumbers.NATURAL_MIDI_NUMBERS.map((number: number) => MidiNumbers.getAttributes(number))
+function renderNoteRangePicker({ value, onChange, classes }: TNoteRangePickerProps){
+    const onNoteFirstChange = (event: ChangeEvent<{
+        name?: string | undefined;
+        value: unknown;
+    }>)=> {
+
+        onChange({ first: typeof event?.target?.value ==='number' ? 
+            event.target.value : value.first, last: value.last})
+    }
+    const onNoteLastChange = (event: ChangeEvent<{
+        name?: string | undefined;
+        value: unknown;
+    }>)=> {
+        onChange({ first: value.first, last: typeof event?.target?.value ==='number' ? 
+            event.target.value : value.last})
+    }
+    return (
+        <>
+        <FormControl className={classes.formControl}>
+            <InputLabel shrink id="select-tempo">Set first note</InputLabel>
+            <Select
+                labelId="select-range-first"
+                type='select-range-first'
+                id="select-range-first"
+                value={value.first}
+                onChange={onNoteFirstChange}
+                >
+                { 
+                    noteOptions.map(({ midiNumber, note}: {midiNumber: string, note: string}, idx: number)=> {
+                        return  <MenuItem key={idx} value={midiNumber}>{note}</MenuItem>
+                    })
+                }
+            </Select>
+        </FormControl>
+        <FormControl className={classes.formControl}>
+            <InputLabel shrink id="select-tempo">Set last note</InputLabel>
+            <Select
+                labelId="select-range-last"
+                type='select-range-last'
+                id="select-range-last"
+                value={value.last}
+                onChange={onNoteLastChange}
+                >
+                { 
+                    noteOptions.map(({ midiNumber, note}: {midiNumber: string, note: string}, idx: number)=> {
+                        return  <MenuItem key={idx} value={midiNumber}>{note}</MenuItem>
+                    })
+                }
+            </Select>
+    </FormControl>
+    </>
+    )
+}
 type TColorPickerProps = {
     value: string,
     onChange: React.Dispatch<React.SetStateAction<string>>,
     classes: Record<string,string>
 }
+
 function renderColorPicker({ value, onChange, classes }: TColorPickerProps){
     const onColorChange = (color: ColorResult)=> {
         onChange(color.hex)
@@ -144,7 +210,7 @@ function renderColorPicker({ value, onChange, classes }: TColorPickerProps){
     )
 }
 function AudioSettingsController(): ReactElement{
-    const { noteDuration, setNoteDuration, channelColor, setChannelColor } = useContext(AudioStateProviderContext)
+    const { noteDuration, setNoteDuration, channelColor, setChannelColor, noteRange, setNoteRange } = useContext(AudioStateProviderContext)
     const [itemOpened, setItemOpened] = useState<string >('')
     const [anchorEl, setAnchorEl] = useState<{x: number, y: number }>({ x: 0, y: 0})
     const classes = useStyles()
@@ -180,10 +246,13 @@ function AudioSettingsController(): ReactElement{
                                     { 
                                         item.name ==='Channel color' && renderColorPicker({ value: channelColor, onChange: setChannelColor, classes })
                                     }
+                                    { 
+                                        item.name ==='Note range' && renderNoteRangePicker({ value: noteRange, onChange: setNoteRange, classes })
+                                    }
                                 </Paper>
                                 
                                 }
-                                </div>
+                        </div>
                     ))}
                 </List>
             <Divider />

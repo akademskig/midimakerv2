@@ -9,7 +9,7 @@ import {
   MouseEvent
 } from 'react'
 
-import { flatMap } from 'lodash'
+import { flatMap, range } from 'lodash'
 
 import {
   RECT_WIDTH, RECT_SPACE, RECT_TIME, RECORDING_BAR_COLOR, BAR_COLOR,
@@ -22,7 +22,7 @@ import useScreenSize from '../../../../providers/screenSize.provider'
 import { lightenDarkenColor } from './utils'
 
 
-let rectangleHeight = 30
+const RECTANGLE_HEIGHT = 30
 
 export type TMappedEvent = {
   noteId: string,
@@ -76,13 +76,15 @@ function NotesGridRenderer(): INotesGridRenderer {
   const [timer, setTimer] = useState(0)
   const { width } = useScreenSize()
   const [canvasTimeUnit, setCanvasTimeUnit] = useState(RECT_TIME)
+  const [rectangleHeight, setRectangleHeight] = useState(RECTANGLE_HEIGHT)
   const canvasRef = createRef<HTMLCanvasElement>()
   const canvasBoxRef = createRef<HTMLDivElement>()
   const fontSize = useRef<number>(0)
   const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
   const timers = useRef<Array<number>>([])
   const coordinatesMapRef = useRef<Array<ICoordinates>>([])
-  const { channels, setChannels, noteDuration, channelColor, notes, controllerState, setControllerState, setMappedEvents } = useContext(AudioStateProviderContext)
+  const { channels, setChannels, noteDuration, channelColor, notes, controllerState, setControllerState, 
+      setMappedEvents, noteRange } = useContext(AudioStateProviderContext)
   const [channelColorLight, setChannelColorLight] = useState('#fff')
   useEffect(() => {
     setChannelColorLight(`${lightenDarkenColor(channelColor, 80)}`)
@@ -113,11 +115,8 @@ function NotesGridRenderer(): INotesGridRenderer {
       channel.notes.map((note) => ({ ...note, color: channel.color })))
 
     const mappedEvents = joinedEvents.map((event, i) => {
-      const x = event.time * RECT_WIDTH * canvasTimeUnit +
-        notesListWidth 
-      const y = (canvasElement.height -
-          ((event.midiNumber - MIDI_OFFSET ) * rectangleHeight +
-            RECT_SPACE * (event.midiNumber - MIDI_OFFSET)) + RECT_SPACE)
+      const x = event.coordX
+      const y = event.coordY
           
       const width = Math.floor(
         event.duration * RECT_WIDTH * canvasTimeUnit
@@ -126,7 +125,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     })
     setMappedEvents(mappedEvents)
 
-  }, [ channels, canvasTimeUnit ])
+  }, [ channels, canvasTimeUnit, rectangleHeight ])
 
   const findNoteByGridCoordinates = useCallback((event: React.MouseEvent) => {
     if (!canvasBoxElement || !coordinatesMapLocal) {
@@ -158,7 +157,7 @@ function NotesGridRenderer(): INotesGridRenderer {
       coordY: rectangle.y
     }
     return note
-  }, [canvasTimeUnit])
+  }, [canvasTimeUnit, rectangleHeight])
 
 
   const canvasSetup = useCallback((timer?: number) => {
@@ -187,11 +186,9 @@ function NotesGridRenderer(): INotesGridRenderer {
         : compositionDuration * canvasTimeUnit + 5
 
     canvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE) - notesListWidth
-    canvasElement.height = canvasBoxElement.getBoundingClientRect().height - 25
-    rectangleHeight =
-      Math.ceil((canvasElement.height - RECT_SPACE * notes.length) / notes.length)
+    canvasElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE - 2
+    setRectangleHeight((canvasElement.height - RECT_SPACE * notes.length) / notes.length)
     fontSize.current = rectangleHeight * 0.6
-
     notesListWidth = fontSize.current + RECT_WIDTH + 5
     return {
       canvasBoxElement,
@@ -200,7 +197,9 @@ function NotesGridRenderer(): INotesGridRenderer {
       xLength,
     }
 
-  }, [canvasElement, canvasBoxElement, channels, controllerState.RECORDING, canvasTimeUnit, notes.length, width])
+  }, [canvasElement, canvasBoxElement, channels, controllerState.RECORDING, canvasTimeUnit, notes.length, width,
+        rectangleHeight, setRectangleHeight
+  ])
 
   const renderEmptyCanvas = useCallback(() => {
    const settings = canvasSetup()
@@ -222,9 +221,10 @@ function NotesGridRenderer(): INotesGridRenderer {
         return
       }
       for (let j = 0; j < xLength; j++) {
-        const x = ((j - 1)* RECT_WIDTH ) + notesListWidth
+        const x = ((j - 1)* (RECT_WIDTH + RECT_SPACE) ) + notesListWidth
         const y = ((rectangleHeight + RECT_SPACE) * i) 
         if (j === 0) {
+          canvasCtx.fillRect(x, y - RECT_SPACE, RECT_WIDTH, RECT_SPACE)
           canvasCtx.fillStyle = '#fff' //fontColor
           canvasCtx.font = `${fontSize.current}px Comic Sans MS`
           canvasCtx.fillText(
@@ -243,21 +243,23 @@ function NotesGridRenderer(): INotesGridRenderer {
           canvasCtx.fillRect(x,  y - RECT_SPACE, RECT_WIDTH + RECT_SPACE, RECT_SPACE) // fill horizontal spaces
           coordinatesMapLocal = [...coordinatesMapLocal, { noteId: `${note.midiNumber}${x}${y}`, midiNumber: note.midiNumber, x, y }]
         }
+        if(i===notes.length -1){
+          canvasCtx.fillRect(0,  y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
+        }
       }
     })
-  }, [notes, canvasSetup])
+  }, [notes, canvasSetup, rectangleHeight])
 
-  // updates channel coordinates
+  // updates channel coordinates when duration or note range has changed
   const updateChannels = useCallback(
     () => {
+      const notesArray = range(noteRange.first, noteRange.last)
         const newChannels = channels.map(channel=> {
             const newNotes = channel.notes.map(note=> {
-               note.coordX = note.time * RECT_WIDTH * canvasTimeUnit +
-            notesListWidth
-            note.coordY =
-              canvasElement.height -
-              ((note.midiNumber - MIDI_OFFSET ) * rectangleHeight +
-                RECT_SPACE * (note.midiNumber - MIDI_OFFSET)) + RECT_SPACE
+              note.coordX = note.time * RECT_WIDTH * canvasTimeUnit +
+                notesListWidth
+              const noteIdx = notesArray.findIndex(noteA=> noteA === note.midiNumber)
+              note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
               return note
             })
             channel.notes = newNotes
@@ -265,30 +267,23 @@ function NotesGridRenderer(): INotesGridRenderer {
         })
         setChannels(newChannels)
     },
-    [ setChannels, canvasTimeUnit],
+    [ setChannels, canvasTimeUnit, rectangleHeight],
 )
   const renderNotes = useCallback(() => {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
-    channel.notes.map((note) => ({ ...note, color: channel.color }))
+    channel.notes.map((note: PlayEvent) => ({ ...note, color: channel.color }))
     ) // join notes from all channels into a single array, + add a color field
     joinedEvents.forEach((event, i) => {
       if(!canvasCtx){
         return
       }
-      const x = event.time * RECT_WIDTH * canvasTimeUnit +
-        notesListWidth
-      const y =
-          canvasElement.height -
-          ((event.midiNumber - MIDI_OFFSET ) * rectangleHeight +
-            RECT_SPACE * (event.midiNumber - MIDI_OFFSET)) + RECT_SPACE
-        
       const width = Math.floor(
         event.duration * RECT_WIDTH * canvasTimeUnit
       )
 
       canvasCtx.fillStyle = event.color ? event.color : channelColor
-      canvasCtx.clearRect(x, y, width, rectangleHeight)
-      canvasCtx.fillRect(x, y, width, rectangleHeight)
+      canvasCtx.clearRect(event.coordX, event.coordY, width, rectangleHeight)
+      canvasCtx.fillRect(event.coordX, event.coordY, width, rectangleHeight)
       if(event.noteId === hoveredNote?.noteId){
         canvasCtx.fillStyle = channelColorLight
         canvasCtx.fillRect(hoveredNote.coordX,hoveredNote.coordY,2, rectangleHeight)
@@ -298,7 +293,7 @@ function NotesGridRenderer(): INotesGridRenderer {
       }
     })
 
-  }, [canvasTimeUnit, channelColor, channels, hoveredNoteState, width, channelColorLight])
+  }, [canvasTimeUnit, channelColor, channels, hoveredNoteState, width, channelColorLight, rectangleHeight])
 
   const renderTimerBar = useCallback(() => {
     if (!canvasCtx) {

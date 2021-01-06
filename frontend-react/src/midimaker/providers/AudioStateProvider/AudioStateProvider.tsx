@@ -2,7 +2,7 @@ import React, { createContext, ReactElement, useCallback, useMemo, useState } fr
 import { MidiNumbers } from 'react-piano'
 import { range } from 'lodash'
 import { Note, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
-import { TNoteRange, TRecordingGrid } from './AudioStateProvider.types'
+import { TRecordingGrid } from './AudioStateProvider.types'
 import { TMappedEvent } from '../../components/NotesGrid/components/NotesGridRenderer'
 
 const initialNoteRange = {
@@ -21,6 +21,10 @@ interface IControllerState {
     RECORDING_RESET?: boolean
 }
 
+export type TNoteRange = {
+    first: number,
+    last: number
+}
 interface IAudioStateProviderContext {
     currentChannel: TChannel | null;
     setCurrentChannel: React.Dispatch<React.SetStateAction<TChannel | null>>
@@ -37,6 +41,8 @@ interface IAudioStateProviderContext {
     setGridNotes: React.Dispatch<React.SetStateAction<TRecordingGrid>>
     mappedEvents: TMappedEvent[],
     setMappedEvents: React.Dispatch<React.SetStateAction<TMappedEvent[]>>
+    noteRange: TNoteRange,
+    setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>
 }
 
 interface IAudioStateProviderProps { 
@@ -70,6 +76,8 @@ const initialCtxValue = {
         setGridNotes: ((value: React.SetStateAction<TRecordingGrid>) => (value: TRecordingGrid) => value),
         mappedEvents: [],
         setMappedEvents: ((value: React.SetStateAction<TMappedEvent[]>) => (value:TMappedEvent[]) => value),
+        noteRange: initialNoteRange,
+        setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value:TNoteRange) => value),
 }
 
 
@@ -102,9 +110,9 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         [currentChannel, channelColor, setCurrentChannel, channels, setChannels],
     )
     const notes = useMemo(() =>
-        range(noteRange.first, noteRange.last)
-            .map((idx: number) => MidiNumbers.getAttributes(idx))
-            .reverse(), [noteRange.first, noteRange.last])
+    range(noteRange.first, noteRange.last)
+    .map((idx: number) => MidiNumbers.getAttributes(idx))
+    .reverse(), [noteRange.first, noteRange.last])
 
     const ctxValue = useMemo(() => ({
         currentChannel,
@@ -121,6 +129,8 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         gridNotes,
         setGridNotes,
         mappedEvents,
+        noteRange, 
+        setNoteRange,
         setMappedEvents
     }), [channelColor, setChannelColor, channels, controllerState, currentChannel, gridNotes, noteDuration, notes, mappedEvents])
 
