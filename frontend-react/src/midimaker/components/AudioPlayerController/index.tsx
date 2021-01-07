@@ -1,4 +1,4 @@
-import { createStyles, IconButton, makeStyles, Theme } from '@material-ui/core'
+import { createStyles, Divider, IconButton, makeStyles, Theme } from '@material-ui/core'
 import { PlayArrow, Stop } from '@material-ui/icons'
 import React, { ReactElement, useContext, useState } from 'react'
 import classnames from 'classnames'
@@ -11,9 +11,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       display: 'flex',
       padding: '0.5em',
       height: '61px',
-      ['>:nth-child(1)']:{
-        marginRight: '0.5em'
-      }
+      width :'100%'
     },
     button: {
         padding: '0.2em 0.5em',
@@ -23,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
    }
   }))
 
-function AudioPlayerController(): ReactElement{
+function AudioPlayerController({ top = false}): ReactElement{
     const [active, setActive] = useState('')
     const { playAll, stopPlayAll } = useAudioPlayer()
     const { renderPlay, stopPlayRender } = useNotesGridRenderer()
@@ -44,14 +42,22 @@ function AudioPlayerController(): ReactElement{
         setControllerState({'PLAYING': false})
     }
     return(
+        <>
+        <Divider/>
         <div className={classes.container}>
+            {
+                top && 
+                <>
             <IconButton onClick={onPlayButtonClick} className={classnames(classes.button, {active: controllerState.PLAYING})}>
                 <PlayArrow/>
             </IconButton>
             <IconButton onClick={onStopButtonClick} >
                 <Stop/>
             </IconButton>
+            </>
+            }
         </div>
+        </>
 
     )
 }

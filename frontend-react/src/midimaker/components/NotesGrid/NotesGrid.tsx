@@ -8,6 +8,8 @@ import { CANVAS_BACKGROUND, CANVAS_HEIGHT, RECT_WIDTH } from './constants'
 import { PlayEvent, SoundfontProviderContextValue } from '../../providers/SoundfontProvider/SoundFontProvider.types'
 import styled from 'styled-components'
 import { useAudioController } from '../../controllers/AudioController'
+import useScreenSize from '../../../providers/screenSize.provider'
+import { makeStyles } from '@material-ui/core'
 
 export interface ICoordinates {
     noteId: string;
@@ -16,11 +18,34 @@ export interface ICoordinates {
     y: number;
 }
 
-const canvasStyle = {
-    background: 'rgba(4,32,55,0.7)',
-    outline: 'none'
-}
-
+const useStyles = (height: number)=> makeStyles((theme)=> ({
+    canvas: {
+        cursor: 'pointer',
+        background: 'rgba(4,32,55,0.7)',
+        outline: 'none'
+    },
+    notesListCanvas: {
+        background: 'rgba(4,32,55)',
+        outline: 'none',
+        padding: '1px 0', 
+        zIndex: 1,
+        position: 'fixed',
+        borderTop: 'none',
+    },
+    canvasContainer: {
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'row',
+        background: CANVAS_BACKGROUND, 
+    },
+    gridCanvasContainer: {
+        height: `${height - 195}px`, 
+        background: CANVAS_BACKGROUND, 
+        padding: '1px', 
+        position: 'relative',
+        width: 'fit-content',
+    }
+}))
 const SNotesGrid = styled.div`
     cursor: pointer;
 `
@@ -29,14 +54,16 @@ function NotesGrid(): JSX.Element {
     const soundfontCtx = useContext<SoundfontProviderContextValue>(
         SoundfontProviderContext
     )
-    const { canvasRef, canvasBoxRef, canvasTimeUnit, setHoveredNote } = useNotesGridRenderer()
+    const { canvasRef, canvasBoxRef, canvasTimeUnit, setHoveredNote, notesListRef } = useNotesGridRenderer()
     const { updateNote } = useAudioController()
     const { loading } = soundfontCtx
     const { toggleNote, findNoteInChannel } = useNotesGridController()
+    const { height, width } = useScreenSize()
     const [ resizing, setResizing] = useState(false)
     const [updatedNote, setUpdatedNote] = useState<PlayEvent | null>(null)
     const [currentNote, setCurrentNote] = useState<PlayEvent | null>(null)
-
+    
+    const classes = useStyles(height)()
     const onResize = useCallback((event)=> {
         event.persist()
         if(!currentNote || !event.shiftKey){
@@ -99,11 +126,16 @@ function NotesGrid(): JSX.Element {
   
     const createCanvas = useCallback(
         () =>
-            <SNotesGrid ref={canvasBoxRef} style={{ height: CANVAS_HEIGHT, background: CANVAS_BACKGROUND, padding: '1px', position: 'relative'  }}>
+            <div className={classes.canvasContainer}>
+                <div className={classes.notesListCanvas}>
+                    <canvas id="notesList-canvas"ref={notesListRef} />
+                </div>
+            <SNotesGrid ref={canvasBoxRef} className={classes.gridCanvasContainer} >
                 <canvas
                     id="canvas"
                     ref={canvasRef}
-                    style={canvasStyle}
+                    className={classes.canvas}
+                    onMouseOver={()=> canvasRef.current?.focus() }
                     onClick={handleOnClick}
                     onMouseDown={handleMouseDown}
                     onMouseMove={onMouseMove}
@@ -112,13 +144,14 @@ function NotesGrid(): JSX.Element {
                     onMouseUp={handleMouseUp}
                     onKeyDown={handleKeyDown}
                     onKeyUp={()=> setHoveredNote(null)}
-                />
+                    />
             </SNotesGrid>
+                    </div>
         ,
-        [canvasBoxRef, canvasRef, toggleNote]
+        [canvasBoxRef, canvasRef, toggleNote, width]
     )
     return (
-        <div>
+        <div style={{ overflow: 'auto', width: 'inherit'}}>
             {loading ?
                 <Loader />
                 : createCanvas()}

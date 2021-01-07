@@ -8,11 +8,13 @@ const NewMidi = () => {
     return (
         <SoundfontProvider>
             <AudioStateProvider>
-                <AudioPlayerController/>
-                <div style={{display: 'flex', flexDirection: 'row'}}>
-                    <AudioSettingsController/>
+                <AudioPlayerController top/>
+                <div style={{display: 'flex', flexDirection: 'row', width: 'inherit'}}>
+                    <AudioSettingsController left/>
                     <NotesGrid />
+                    <AudioSettingsController/>
                 </div>
+                <AudioPlayerController/>
             </AudioStateProvider>
         </SoundfontProvider>
     )

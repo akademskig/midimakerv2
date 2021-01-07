@@ -18,7 +18,7 @@ import useScreenSize from '../../../providers/screenSize.provider';
 
 const drawerWidth = 200;
 
-const useStyles = makeStyles((theme: any) =>
+const useStyles = (width: number) => makeStyles((theme: any) =>
     ({
         root: {
             display: 'flex',
@@ -79,17 +79,21 @@ const useStyles = makeStyles((theme: any) =>
             justifyContent: 'flexStart',
             marginLeft: '0',
             marginTop: '56px',
+            width: width,
             transition: theme.transitions.create('margin-left', {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
             }),
             '&.md': {
-                marginLeft: '200px'
+                marginLeft: '200px',
+                width: `${width - 201}px`,
             },
             '&.xs': {
-                marginLeft: '57px'
+                marginLeft: '57px',
+                width: `${width - 58}px`,
             },
             '&.sm': {
+                width: `${width - 63}px`,
                 marginLeft: '62px'
             },
             [theme.breakpoints.up('xs')]: {
@@ -129,7 +133,7 @@ export default function NavigationDrawer({ children, theme }: any) {
     const [open, setOpen] = useState(false)
     const { isMobile, isDesktop, width, isTablet } = useScreenSize()
     const [mobileOpen, setMobileOpen] = useState(false)
-    const classes = useStyles(theme)
+    const classes = useStyles(width)()
 
     const handleDrawerToggle = useCallback(() => {
         setOpen(!open)
@@ -147,7 +151,6 @@ export default function NavigationDrawer({ children, theme }: any) {
             setOpen(true)
         }
     }, [setOpen, isDesktop, width])
-    console.log(open, width)
         
         return (
             <div className={classes.root}>

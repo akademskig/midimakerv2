@@ -209,7 +209,7 @@ function renderColorPicker({ value, onChange, classes }: TColorPickerProps){
                 onChange={onColorChange}/>
     )
 }
-function AudioSettingsController(): ReactElement{
+function AudioSettingsController({ left = false}): ReactElement{
     const { noteDuration, setNoteDuration, channelColor, setChannelColor, noteRange, setNoteRange } = useContext(AudioStateProviderContext)
     const [itemOpened, setItemOpened] = useState<string >('')
     const [anchorEl, setAnchorEl] = useState<{x: number, y: number }>({ x: 0, y: 0})
@@ -239,7 +239,7 @@ function AudioSettingsController(): ReactElement{
                                 </ListItem>
                             </Tooltip>
                             { item.name===itemOpened && 
-                                <Paper className={classes.popoverPaper} style={{left: `${anchorEl.x}px`, top: `${anchorEl.y}px`}}>
+                                <Paper className={classes.popoverPaper} style={{left: `${anchorEl.x - (!left ? (item.name==='Channel color' ? 290: 200) : 0)}px`, top: `${anchorEl.y}px`}}>
                                     { 
                                         item.name ==='Tempo' && renderTempoPicker({ value: noteDuration, onChange: setNoteDuration, classes })
                                     }
