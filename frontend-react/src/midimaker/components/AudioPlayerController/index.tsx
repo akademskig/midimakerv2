@@ -15,10 +15,16 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       backgroundColor: theme.palette.primary.main,
     },
     button: {
+        color: theme.palette.primary.contrastText,
         padding: '0.2em 0.5em',
        '&.active': {
            color: 'red'
-       }
+       },
+       '&:hover': {
+        '& svg' : {
+            color: theme.palette.secondary.light
+        }
+    }
    }
   }))
 
@@ -51,7 +57,7 @@ function AudioPlayerController({ top = false}): ReactElement{
             <IconButton onClick={onPlayButtonClick} className={classnames(classes.button, {active: controllerState.PLAYING})}>
                 <PlayArrow/>
             </IconButton>
-            <IconButton onClick={onStopButtonClick} >
+            <IconButton onClick={onStopButtonClick} className={classes.button}>
                 <Stop/>
             </IconButton>
             </>

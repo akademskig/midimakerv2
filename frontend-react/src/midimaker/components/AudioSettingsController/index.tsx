@@ -25,11 +25,23 @@ const useStyles = makeStyles((theme: any) =>
             position: 'relative',
             '& svg':{
                 color: theme.palette.primary.contrastText,
+            },
+            '&.MuiDrawer-paperAnchorDockedRight':{
+                borderLeft: '1px solid rgba(0,0,0, 0.5)'
+            },
+            '&.MuiDrawer-paperAnchorDockedLeft':{
+                borderRight: '1px solid rgba(0,0,0, 0.5)'
             }
         },
         listItemIcon: {
-            minWidth: 'auto'
-
+            minWidth: 'auto',
+        },
+        listItem: {
+            '&:hover': {
+                '& svg' : {
+                    color: theme.palette.secondary.light
+            }
+        }
         },
         popoverPaper: {
             position: 'fixed',
@@ -41,9 +53,9 @@ const useStyles = makeStyles((theme: any) =>
             '& .MuiInputBase-root':{
                 width: '100%'
             }
-          },
+        },
         tooltip: {
-            marginBottom: 0
+            marginBottom: 0,
         },
         colorPicker: {
             'MuiFormControl-root':{
@@ -227,6 +239,7 @@ function AudioSettingsController({ left = false}): ReactElement{
    
     return(
         <Drawer
+            anchor={left ? 'left': 'right'}
             variant="permanent"
             className={classes.drawer}
             classes={{
@@ -238,7 +251,7 @@ function AudioSettingsController({ left = false}): ReactElement{
                     {settingItems.map((item, index) => (
                         <div>
                             <Tooltip title={item.name} placement='top-end' className={classes.tooltip}>
-                                <ListItem button key={index} onClick={(e) => handleClick(e, item.name)}>
+                                <ListItem button className={classes.listItem} key={index} onClick={(e) => handleClick(e, item.name)}>
                                     <ListItemIcon className={classes.listItemIcon}>{getIcon(item.icon)}</ListItemIcon>
                                 </ListItem>
                             </Tooltip>

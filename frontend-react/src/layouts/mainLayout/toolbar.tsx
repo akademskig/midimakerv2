@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: theme.spacing(0, 2),
-        backgroundColor: theme.palette.primary.main
+        backgroundColor: theme.palette.primary.dark
     },
   
 }))

@@ -115,7 +115,7 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
               }, display: 'flex',
         },
         drawerPaper: {
-            backgroundColor: theme.palette.primary.main,
+            backgroundColor: theme.palette.primary.dark,
             color: theme.palette.primary.contrastText,
             marginTop: '64px',
             [theme.breakpoints.down('xs')]: {
@@ -133,16 +133,23 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
             textDecoration: 'none',
             color: theme.palette.primary.contrastText,
             '&:hover': {
-                color: '#eb5bd4',
+                color: theme.palette.secondary.light,
                 '& svg': {
-                    color: '#eb5bd4',
+                    color: theme.palette.secondary.light,
                 },
             },
             '& svg': {
                 color: theme.palette.primary.contrastText,
             },
-            '& .link-active': {
-
+            '&.link-active': {
+                '& .MuiButtonBase-root': {
+                    backgroundColor: theme.palette.primary.main,
+                },
+                // color: theme.palette.secondary.light,
+                '& svg': {
+                    // color: theme.palette.secondary.light,
+                },
+                
             }
         }
     }))
@@ -169,7 +176,7 @@ export default function NavigationDrawer({ children, theme }: any) {
             setOpen(true)
         }
     }, [setOpen, isDesktop, width])
-    
+
         return (
             <div className={classes.root}>
                 <AppToolbar
