@@ -111,7 +111,7 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
                 height: `${height-64}px`,
               },
               [theme.breakpoints.up('md')]: {
-                marginLeft:'200px',
+                // marginLeft:'200px',
               }, display: 'flex',
         },
         drawerPaper: {
@@ -169,7 +169,7 @@ export default function NavigationDrawer({ children, theme }: any) {
             setOpen(true)
         }
     }, [setOpen, isDesktop, width])
-        
+    
         return (
             <div className={classes.root}>
                 <AppToolbar
