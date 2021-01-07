@@ -1,4 +1,4 @@
-import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, Paper, Select, Tooltip } from '@material-ui/core'
+import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, MenuList, Paper, Select, Tooltip } from '@material-ui/core'
 import { AccessTime, ColorLens, MusicNote, PlayArrow, Stop } from '@material-ui/icons'
 import{ ChromePicker, ColorResult } from 'react-color'
 import { MidiNumbers } from 'react-piano'
@@ -45,14 +45,36 @@ const useStyles = makeStyles((theme: any) =>
         },
         popoverPaper: {
             position: 'fixed',
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            boxShadow: theme.shadows[5]
         },
         formControl: {
+            '& .MuiInput-root, .MuiFormLabel-root': {
+                color: theme.palette.primary.contrastText,
+            },
+            '& .MuiInput-underline, .MuiInput-underline:hover':{
+                '&:before':{
+                    borderColor: theme.palette.secondary.light,
+                },
+                '& svg': {
+                    color: theme.palette.secondary.light,
+                }
+            },
             margin: theme.spacing(1),
             minWidth: 120,
             display: 'block',
             '& .MuiInputBase-root':{
                 width: '100%'
             }
+        },
+        selectMenuItem: {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            '&:hover': {
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.secondary.light
+        },
         },
         tooltip: {
             marginBottom: 0,
@@ -142,7 +164,7 @@ function renderTempoPicker({ value, onChange, classes }: TTempoPickerProps){
             >
                 { 
                     durationOptions.map(({ value, label}, idx)=> {
-                       return  <MenuItem key={idx} value={value}>{label}</MenuItem>
+                       return  <MenuItem className={classes.selectMenuItem} key={idx} value={value}>{label}</MenuItem>
                     })
                 }
             </Select>
@@ -181,10 +203,11 @@ function renderNoteRangePicker({ value, onChange, classes }: TNoteRangePickerPro
                 id="select-range-first"
                 value={value.first}
                 onChange={onNoteFirstChange}
+                classes={{root: classes.selectMenuItem}}
                 >
                 { 
                     noteOptions.map(({ midiNumber, note}: {midiNumber: string, note: string}, idx: number)=> {
-                        return  <MenuItem key={idx} value={midiNumber}>{note}</MenuItem>
+                        return  <MenuItem className={classes.selectMenuItem} key={idx} value={midiNumber}>{note}</MenuItem>
                     })
                 }
             </Select>
@@ -200,7 +223,7 @@ function renderNoteRangePicker({ value, onChange, classes }: TNoteRangePickerPro
                 >
                 { 
                     noteOptions.map(({ midiNumber, note}: {midiNumber: string, note: string}, idx: number)=> {
-                        return  <MenuItem key={idx} value={midiNumber}>{note}</MenuItem>
+                        return  <MenuItem className={classes.selectMenuItem} key={idx} value={midiNumber}>{note}</MenuItem>
                     })
                 }
             </Select>
