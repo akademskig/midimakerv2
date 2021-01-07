@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     flexDirection: 'column',
     alignContent: 'center',
     justifyContent: 'flexStart',
+    overflow: 'hidden',
     marginLeft: '0',
     transition: theme.transitions.create('marginLeft', {
       easing: theme.transitions.easing.sharp,

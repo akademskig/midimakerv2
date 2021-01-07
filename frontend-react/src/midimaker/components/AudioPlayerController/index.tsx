@@ -11,7 +11,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       display: 'flex',
       padding: '0.5em',
       height: '61px',
-      width :'100%'
+      width :'100%',
+      backgroundColor: theme.palette.primary.main,
     },
     button: {
         padding: '0.2em 0.5em',
@@ -43,7 +44,6 @@ function AudioPlayerController({ top = false}): ReactElement{
     }
     return(
         <>
-        <Divider/>
         <div className={classes.container}>
             {
                 top && 

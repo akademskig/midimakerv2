@@ -62,6 +62,7 @@ export interface INotesGridRenderer {
   getX: (event: MouseEvent) => number,
   getY: (event: MouseEvent) => number,
   setHoveredNote: (event: PlayEvent | null) => void,
+  renderingDone: boolean
 }
 
 let canvasBoxElement: HTMLDivElement
@@ -80,6 +81,7 @@ function NotesGridRenderer(): INotesGridRenderer {
   const { width } = useScreenSize()
   const [canvasTimeUnit, setCanvasTimeUnit] = useState(RECT_TIME)
   const [rectangleHeight, setRectangleHeight] = useState(RECTANGLE_HEIGHT)
+  const [renderingDone, setRenderingDone] = useState(false)
   const canvasRef = createRef<HTMLCanvasElement>()
   const notesListRef = createRef<HTMLCanvasElement>()
   const canvasBoxRef = createRef<HTMLDivElement>()
@@ -299,6 +301,7 @@ function NotesGridRenderer(): INotesGridRenderer {
         canvasCtx.fillRect(hoveredNote.coordX + width - 2,hoveredNote.coordY , 2, rectangleHeight);
       }
     })
+    setRenderingDone(true)
 
   }, [canvasTimeUnit, channelColor, channels, hoveredNoteState, width, channelColorLight, rectangleHeight])
 
@@ -380,7 +383,8 @@ function NotesGridRenderer(): INotesGridRenderer {
     getX,
     getY,
     setHoveredNote,
-    notesListRef
+    notesListRef,
+    renderingDone
   }
 }
 

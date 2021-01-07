@@ -12,9 +12,11 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
+
         }),
         position: 'fixed',
         maxHeight: '64px',
+        color: theme.palette.primary.contrastText
 
     },
     toggleButton: {
@@ -35,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: theme.spacing(0, 2),
+        backgroundColor: theme.palette.primary.main
     },
   
 }))

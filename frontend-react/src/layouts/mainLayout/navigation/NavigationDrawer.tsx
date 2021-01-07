@@ -15,14 +15,17 @@ import { navigationItems } from './navigationItems';
 import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
 import useScreenSize from '../../../providers/screenSize.provider';
+import { CANVAS_BACKGROUND, RECT_COLOR } from '../../../midimaker/components/NotesGrid/constants';
 
 const drawerWidth = 200;
 
-const useStyles = (width: number) => makeStyles((theme: any) =>
+const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
     ({
         root: {
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            overflow: 'hidden',
+            // backgroundColor: theme.palette.primary.main
         },
         toggleButton: {
             marginRight: 36,
@@ -40,6 +43,7 @@ const useStyles = (width: number) => makeStyles((theme: any) =>
             display: 'none',
         },
         drawer: {
+            backgroundColor: RECT_COLOR,
             width: drawerWidth,
             flexShrink: 0,
             whiteSpace: 'nowrap',
@@ -58,7 +62,7 @@ const useStyles = (width: number) => makeStyles((theme: any) =>
             width: drawerWidth,
             transition: theme.transitions.create('width', {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
+                duration: theme.transitions.duration.leavingScreen,
             }),
         },
         drawerClose: {
@@ -79,35 +83,40 @@ const useStyles = (width: number) => makeStyles((theme: any) =>
             justifyContent: 'flexStart',
             marginLeft: '0',
             marginTop: '56px',
-            width: width,
+            height: `${height-60}px`,
             transition: theme.transitions.create('margin-left', {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
             }),
             '&.md': {
                 marginLeft: '200px',
-                width: `${width - 201}px`,
+                marginRight: 0
+                // width: `${width - 200}px`,
             },
             '&.xs': {
+                height: `${height-56}px`,
                 marginLeft: '57px',
-                width: `${width - 58}px`,
+                width: `${width - 56}px`,
             },
             '&.sm': {
-                width: `${width - 63}px`,
-                marginLeft: '62px'
+                width: `${width - 60}px`,
+                marginLeft: '61px'
             },
             [theme.breakpoints.up('xs')]: {
                 marginLeft: '57px',
             },
             [theme.breakpoints.up('sm')]: {
                 marginTop: '64px',
-                marginLeft: '61px'
+                marginLeft: '61px',
+                height: `${height-64}px`,
               },
               [theme.breakpoints.up('md')]: {
                 marginLeft:'200px',
               }, display: 'flex',
         },
         drawerPaper: {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
             marginTop: '64px',
             [theme.breakpoints.down('xs')]: {
                 marginTop: '56px'
@@ -122,7 +131,16 @@ const useStyles = (width: number) => makeStyles((theme: any) =>
         },
         navLink: {
             textDecoration: 'none',
-            color: 'inherit',
+            color: theme.palette.primary.contrastText,
+            '&:hover': {
+                color: '#eb5bd4',
+                '& svg': {
+                    color: '#eb5bd4',
+                },
+            },
+            '& svg': {
+                color: theme.palette.primary.contrastText,
+            },
             '& .link-active': {
 
             }
@@ -131,9 +149,9 @@ const useStyles = (width: number) => makeStyles((theme: any) =>
 
 export default function NavigationDrawer({ children, theme }: any) {
     const [open, setOpen] = useState(false)
-    const { isMobile, isDesktop, width, isTablet } = useScreenSize()
+    const { isMobile, isDesktop, width, height, isTablet } = useScreenSize()
     const [mobileOpen, setMobileOpen] = useState(false)
-    const classes = useStyles(width)()
+    const classes = useStyles(width, height)()
 
     const handleDrawerToggle = useCallback(() => {
         setOpen(!open)

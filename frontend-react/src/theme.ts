@@ -2,14 +2,14 @@ import { createMuiTheme } from '@material-ui/core/styles';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      light: '#44505f',
-      main: '#1f2233',
-      dark: '00000f'
+      light: '#355975',
+      main: '#003049',
+      dark: '#000722'
     },
     secondary: {
-      light: '#ff8654',
-      main: '#e85428',
-      dark: '#ae1e00'
+      light: '#e551ff',
+      main: '#af00cb',
+      dark: '#7b0099'
     },
   },
   breakpoints: {
@@ -23,3 +23,10 @@ const theme = createMuiTheme({
   },
 });
 export default theme
+
+// //secondary blue
+// secondary: {
+//   light: '#63caff',
+//   main: '#009ae5',
+//   dark: '#006bb2'
+// },

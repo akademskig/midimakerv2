@@ -20,8 +20,12 @@ const useStyles = makeStyles((theme: any) =>
             },
         },
         drawerPaper: {
+            backgroundColor: theme.palette.primary.main,
             overflow: 'hidden',
             position: 'relative',
+            '& svg':{
+                color: theme.palette.primary.contrastText,
+            }
         },
         listItemIcon: {
             minWidth: 'auto'

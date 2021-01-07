@@ -18,7 +18,7 @@ export interface ICoordinates {
     y: number;
 }
 
-const useStyles = (height: number)=> makeStyles((theme)=> ({
+const useStyles = (height: number, renderingDone: boolean)=> makeStyles((theme)=> ({
     canvas: {
         cursor: 'pointer',
         background: 'rgba(4,32,55,0.7)',
@@ -33,10 +33,12 @@ const useStyles = (height: number)=> makeStyles((theme)=> ({
         borderTop: 'none',
     },
     canvasContainer: {
+        visibility: renderingDone ? 'visible': 'hidden',
         position: 'relative',
         display: 'flex',
         flexDirection: 'row',
         background: CANVAS_BACKGROUND, 
+        flexGrow: 1,
     },
     gridCanvasContainer: {
         height: `${height - 195}px`, 
@@ -54,7 +56,7 @@ function NotesGrid(): JSX.Element {
     const soundfontCtx = useContext<SoundfontProviderContextValue>(
         SoundfontProviderContext
     )
-    const { canvasRef, canvasBoxRef, canvasTimeUnit, setHoveredNote, notesListRef } = useNotesGridRenderer()
+    const { canvasRef, canvasBoxRef, canvasTimeUnit, setHoveredNote, notesListRef, renderingDone } = useNotesGridRenderer()
     const { updateNote } = useAudioController()
     const { loading } = soundfontCtx
     const { toggleNote, findNoteInChannel } = useNotesGridController()
@@ -63,14 +65,14 @@ function NotesGrid(): JSX.Element {
     const [updatedNote, setUpdatedNote] = useState<PlayEvent | null>(null)
     const [currentNote, setCurrentNote] = useState<PlayEvent | null>(null)
     
-    const classes = useStyles(height)()
+    const classes = useStyles(height, renderingDone)()
     const onResize = useCallback((event)=> {
         event.persist()
         if(!currentNote || !event.shiftKey){
             return
         }
         const x = event.clientX - (canvasBoxRef?.current?.getBoundingClientRect()?.left  || 0)
-        const duration =( x - currentNote?.coordX) / RECT_WIDTH / canvasTimeUnit
+        const duration =(x - currentNote?.coordX) / RECT_WIDTH / canvasTimeUnit
         const newNote = { ...currentNote, duration }
         updateNote(newNote)
     }, [updateNote, canvasBoxRef, toggleNote, setUpdatedNote, currentNote, setHoveredNote ])
@@ -151,8 +153,8 @@ function NotesGrid(): JSX.Element {
         [canvasBoxRef, canvasRef, toggleNote, width]
     )
     return (
-        <div style={{ overflow: 'auto', width: 'inherit'}}>
-            {loading ?
+        <div style={{ overflow: 'auto', width: 'inherit', display:'flex'}}>
+            {loading?
                 <Loader />
                 : createCanvas()}
         </div>

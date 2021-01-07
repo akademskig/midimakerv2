@@ -4,17 +4,22 @@ import NotesGrid from '../components/NotesGrid/NotesGrid'
 import AudioStateProvider from '../providers/AudioStateProvider/AudioStateProvider'
 import AudioPlayerController from '../components/AudioPlayerController'
 import AudioSettingsController from '../components/AudioSettingsController'
+import useScreenSize from '../../providers/screenSize.provider'
 const NewMidi = () => {
+
+    const { height, width } = useScreenSize()
     return (
         <SoundfontProvider>
             <AudioStateProvider>
+                {/* <div style={{height: `${height}-64`, width: `${width-200}px`}}> */}
                 <AudioPlayerController top/>
-                <div style={{display: 'flex', flexDirection: 'row', width: 'inherit'}}>
+                <div style={{display: 'flex', flexDirection: 'row', width: '100%', flexGrow: 1}}>
                     <AudioSettingsController left/>
                     <NotesGrid />
                     <AudioSettingsController/>
                 </div>
                 <AudioPlayerController/>
+                {/* </div> */}
             </AudioStateProvider>
         </SoundfontProvider>
     )

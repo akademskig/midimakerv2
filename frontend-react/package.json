@@ -40,6 +40,7 @@
     "react-router-dom": "^5.1.2",
     "react-router-guards": "^1.0.1",
     "react-scripts": "3.4.1",
+    "react-spinners": "^0.10.4",
     "redux-devtools-extension": "^2.13.8",
     "redux-persist": "^6.0.0",
     "redux-saga": "^1.1.3",

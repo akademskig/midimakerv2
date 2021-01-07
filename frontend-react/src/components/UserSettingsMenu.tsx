@@ -4,36 +4,22 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { NavLink, useHistory } from 'react-router-dom';
 import { logout } from '../api/auth';
-import { Typography } from '@material-ui/core';
+import { makeStyles, Typography } from '@material-ui/core';
 import LogoutIcon from '@material-ui/icons/ExitToApp'
 import SettingsIcon from '@material-ui/icons/Settings'
 import UserIcon from '@material-ui/icons/Person'
 import { AuthCtx } from '../providers/auth.provider'
 
-
-// const UserSettingsStyled = styled.div`
-//     button{
-//         color: ${({ theme }) => theme.palette.getContrastText(theme.palette.primary.main)};
-//         p{
-//             margin-left: 0.5em;
-//         }
-//     }
-// `
-// const MenuStyled = styled(Menu)`
-//     li{
-//          p{
-//             margin-left: 1em;
-//         }
-//     }
-//     a{
-//         text-decoration: none;
-//         color: inherit;
-//     }
-// `
+const useStyles = makeStyles((theme) => ({
+    item: {
+        color: theme.palette.primary.contrastText
+    }
+}))
 export default function UserSettingsMenu() {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const history = useHistory()
     const { user } = useContext(AuthCtx)
+    const classes = useStyles()
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -47,8 +33,8 @@ export default function UserSettingsMenu() {
     }
 
     return (
-        <div>
-            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+        <div >
+            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick} className={classes.item}>
                 <UserIcon />
                 <Typography>
                     {user && user.username}

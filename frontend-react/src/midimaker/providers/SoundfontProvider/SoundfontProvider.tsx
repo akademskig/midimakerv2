@@ -98,7 +98,7 @@ function SoundfontProvider({
   useEffect(() => {
     loadInstrument(instrumentName)
   }, [loadInstrument, instrumentName])
-
+console.log(currentInstrument)
   const ctxValue = useMemo(
     () => ({
       currentInstrument,
