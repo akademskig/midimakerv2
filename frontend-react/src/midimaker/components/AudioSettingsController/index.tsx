@@ -1,10 +1,12 @@
-import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, MenuList, Paper, Select, Tooltip } from '@material-ui/core'
-import { AccessTime, ColorLens, MusicNote, PlayArrow, Stop } from '@material-ui/icons'
+import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, Paper, Select, Tooltip } from '@material-ui/core'
+import { AccessTime, ColorLens, MusicNote, SettingsEthernet } from '@material-ui/icons'
 import{ ChromePicker, ColorResult } from 'react-color'
 import { MidiNumbers } from 'react-piano'
 
 import React, { ReactElement, useCallback, useContext, useState, MouseEvent, ChangeEvent } from 'react'
 import { AudioStateProviderContext, TNoteRange } from '../../providers/AudioStateProvider/AudioStateProvider'
+import { makeInstrumentList } from './utils'
+import { SoundfontProviderContext } from '../../providers/SoundfontProvider/SoundfontProvider'
 
 const useStyles = makeStyles((theme: any) =>
     ({
@@ -62,7 +64,7 @@ const useStyles = makeStyles((theme: any) =>
                 }
             },
             margin: theme.spacing(1),
-            minWidth: 120,
+            minWidth: 130,
             display: 'block',
             '& .MuiInputBase-root':{
                 width: '100%'
@@ -105,7 +107,11 @@ const useStyles = makeStyles((theme: any) =>
         },
         {
             name: "Note range",
-            icon:'music'
+            icon:'noteRange'
+        },
+        {
+            name: "Instrument",
+            icon:'instrument'
         }
     ]
     const getIcon = (icon: string) => {
@@ -114,8 +120,12 @@ const useStyles = makeStyles((theme: any) =>
                 return <AccessTime/>
             case 'color':
                 return <ColorLens/>
+            case 'noteRange':
+                return <SettingsEthernet/>
+            case 'instrument':
+                return <MusicNote/>
             default:
-                return <MusicNote />
+                return <SettingsEthernet/>
         }
     }
 const durationOptions = [
@@ -237,19 +247,54 @@ type TColorPickerProps = {
     classes: Record<string,string>
 }
 
-function renderColorPicker({ value, onChange, classes }: TColorPickerProps){
+export function renderColorPicker({ value, onChange, classes }: TColorPickerProps){
+    
     const onColorChange = (color: ColorResult)=> {
         onChange(color.hex)
     }
     return (
-            <ChromePicker
-                className={classes.colorPicker}
-                color={value}
-                onChange={onColorChange}/>
+        <ChromePicker
+        className={classes.colorPicker}
+        color={value}
+        onChange={onColorChange}/>
+        )
+    }
+type TInstrumentPickerProps = {
+    value: string,
+    onChange: React.Dispatch<React.SetStateAction<string>>,
+    classes: Record<string,string>
+}
+
+export function renderInstrumentPicker({ value, onChange, classes }: TInstrumentPickerProps){
+  
+    const onInstrumentChange = (event: ChangeEvent<{
+        name?: string | undefined;
+        value: unknown;
+    }>)=> {
+        onChange(event?.target?.value && typeof event?.target?.value === 'string' ? event?.target?.value: '')
+    }
+    return (
+        <FormControl className={classes.formControl}>
+        <InputLabel shrink id="select-tempo">Select Instrument</InputLabel>
+        <Select
+            labelId="select-range-last"
+            type='select-range-last'
+            id="select-range-last"
+            value={value}
+            onChange={onInstrumentChange}
+            >
+            { 
+                makeInstrumentList().map(({ value, label }: {value: string, label: string}, idx: number)=> {
+                    return  <MenuItem className={classes.selectMenuItem} key={idx} value={value}>{label}</MenuItem>
+                })
+            }
+        </Select>
+</FormControl>
     )
 }
 function AudioSettingsController({ left = false}): ReactElement{
     const { noteDuration, setNoteDuration, channelColor, setChannelColor, noteRange, setNoteRange } = useContext(AudioStateProviderContext)
+    const  {currentInstrumentName, setCurrentInstrumentName} = useContext(SoundfontProviderContext)
     const [itemOpened, setItemOpened] = useState<string >('')
     const [anchorEl, setAnchorEl] = useState<{x: number, y: number }>({ x: 0, y: 0})
     const classes = useStyles()
@@ -288,6 +333,9 @@ function AudioSettingsController({ left = false}): ReactElement{
                                     }
                                     { 
                                         item.name ==='Note range' && renderNoteRangePicker({ value: noteRange, onChange: setNoteRange, classes })
+                                    }
+                                    { 
+                                        item.name ==='Instrument' && renderInstrumentPicker({ value: currentInstrumentName, onChange: setCurrentInstrumentName, classes })
                                     }
                                 </Paper>
                                 

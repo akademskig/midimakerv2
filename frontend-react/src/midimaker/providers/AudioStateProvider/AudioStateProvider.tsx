@@ -49,7 +49,7 @@ interface IAudioStateProviderProps {
     children: ReactElement | ReactElement[]
 }
 const initialChannel = {
-    instrumentName: 'acoustic_grand_piano',
+    instrumentName: '',
     notes: [],
     color: initialChannelColor,
     duration: 0
@@ -91,6 +91,8 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [mappedEvents, setMappedEvents ] = useState<TMappedEvent[]>([])
     const [channels, setChannels] = useState<TChannel[]>([])
     const [gridNotes, setGridNotes] = useState(initailGridNotes)
+
+   
     const setController = useCallback((state)=> {
         setControllerState({
             ...controllerState,
@@ -101,18 +103,21 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const setChannelColor = useCallback(
         (color) => {
             updateColor(color)
-            currentChannel && setCurrentChannel({...currentChannel, color})
+            if(!currentChannel){
+                return 
+            }
+            const newChannel = {...currentChannel, color}
             const newChannels = channels.map((channel:TChannel) => 
-                channel.instrumentName === currentChannel?.instrumentName ? currentChannel : channel)
+                channel.instrumentName === currentChannel?.instrumentName ? newChannel : channel)
             setChannels(newChannels)
-           
+            setCurrentChannel(newChannel)
         },
-        [currentChannel, channelColor, setCurrentChannel, channels, setChannels],
-    )
+        [currentChannel, setCurrentChannel, channels, setChannels, updateColor])
+
     const notes = useMemo(() =>
-    range(noteRange.first, noteRange.last)
-    .map((idx: number) => MidiNumbers.getAttributes(idx))
-    .reverse(), [noteRange.first, noteRange.last])
+        range(noteRange.first, noteRange.last)
+        .map((idx: number) => MidiNumbers.getAttributes(idx))
+        .reverse(), [noteRange.first, noteRange.last])
 
     const ctxValue = useMemo(() => ({
         currentChannel,
@@ -131,8 +136,8 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         mappedEvents,
         noteRange, 
         setNoteRange,
-        setMappedEvents
-    }), [channelColor, setChannelColor, channels, controllerState, currentChannel, gridNotes, noteDuration, notes, mappedEvents])
+        setMappedEvents,
+    }), [currentChannel, channelColor, setChannelColor, noteDuration, channels, notes, controllerState, setController, gridNotes, mappedEvents, noteRange])
 
     return (
         <AudioStateProviderContext.Provider value={ctxValue}>

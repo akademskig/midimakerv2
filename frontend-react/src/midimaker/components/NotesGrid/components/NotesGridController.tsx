@@ -21,7 +21,7 @@ export interface INotesGridController {
 
 function NotesGridController(): INotesGridController {
   const { playNote } = useAudioPlayer()
-  const { findNoteByGridCoordinates, canvasBoxRef, getX, getY, rectangleHeight } = useNotesGridRenderer()
+  const { findNoteByGridCoordinates, getX, getY, rectangleHeight } = useNotesGridRenderer()
   const { handleToggleNote } = useAudioController()
   const { currentChannel, mappedEvents } = useContext(AudioStateProviderContext)
 
@@ -30,7 +30,7 @@ function NotesGridController(): INotesGridController {
      (getY(event) >= mappedEvent.y && getY(event)<= mappedEvent.y + rectangleHeight))
 
     return currentChannel?.notes.find(note=> note.noteId === currentNote?.noteId)
-  }, [ currentChannel, canvasBoxRef, mappedEvents ])
+  }, [mappedEvents, currentChannel, getX, getY, rectangleHeight])
   
   const toggleNote = useCallback(
     (event) => {

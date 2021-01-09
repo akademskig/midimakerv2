@@ -4,7 +4,7 @@ import Loader from '../shared/loader/Loader'
 import { SoundfontProviderContext } from '../../providers/SoundfontProvider/SoundfontProvider'
 import { useNotesGridController } from './components/NotesGridController'
 import { useNotesGridRenderer } from './components/NotesGridRenderer'
-import { CANVAS_BACKGROUND, CANVAS_HEIGHT, RECT_WIDTH } from './constants'
+import { CANVAS_BACKGROUND, RECT_WIDTH } from './constants'
 import { PlayEvent, SoundfontProviderContextValue } from '../../providers/SoundfontProvider/SoundFontProvider.types'
 import styled from 'styled-components'
 import { useAudioController } from '../../controllers/AudioController'
@@ -60,9 +60,8 @@ function NotesGrid(): JSX.Element {
     const { updateNote } = useAudioController()
     const { loading } = soundfontCtx
     const { toggleNote, findNoteInChannel } = useNotesGridController()
-    const { height, width } = useScreenSize()
+    const { height } = useScreenSize()
     const [ resizing, setResizing] = useState(false)
-    const [updatedNote, setUpdatedNote] = useState<PlayEvent | null>(null)
     const [currentNote, setCurrentNote] = useState<PlayEvent | null>(null)
     
     const classes = useStyles(height, renderingDone)()
@@ -75,7 +74,7 @@ function NotesGrid(): JSX.Element {
         const duration =(x - currentNote?.coordX) / RECT_WIDTH / canvasTimeUnit
         const newNote = { ...currentNote, duration }
         updateNote(newNote)
-    }, [updateNote, canvasBoxRef, toggleNote, setUpdatedNote, currentNote, setHoveredNote ])
+    }, [currentNote, canvasBoxRef, canvasTimeUnit, updateNote])
 
     const handleOnClick = useCallback((event) => {
         event.persist()
@@ -83,7 +82,6 @@ function NotesGrid(): JSX.Element {
         if(note){
             setCurrentNote(note)
         }
-      
     }, [ toggleNote])
 
     const handleMouseDown = useCallback((event)=> {
@@ -91,11 +89,11 @@ function NotesGrid(): JSX.Element {
         note && setCurrentNote(note)
         note && setResizing(true)
         
-    }, [ currentNote, setCurrentNote, setResizing, findNoteInChannel ])
+    }, [setCurrentNote, setResizing, findNoteInChannel])
 
     const handleMouseUp = useCallback(()=> {
         setResizing(false)
-    }, [ updateNote, updatedNote, setResizing ])
+    }, [setResizing])
 
     const handleKeyDown = useCallback((event) => {
         event.persist()
@@ -103,29 +101,29 @@ function NotesGrid(): JSX.Element {
             return
         }
         setHoveredNote(currentNote)
-    }, [ setHoveredNote, findNoteInChannel, currentNote ])
+    }, [setHoveredNote, currentNote])
 
     const onMouseMove = useCallback((event) => {
         const note = findNoteInChannel(event)
         if(note){
-            return setCurrentNote(note)
+            setCurrentNote(note)
         }
         return resizing? onResize(event): null
-    }, [resizing, onResize, handleKeyDown, setCurrentNote, findNoteInChannel])
+    }, [resizing, onResize, setCurrentNote, findNoteInChannel])
 
     useEffect(() => {
         if(canvasRef.current){
-            canvasRef.current.tabIndex = 1000
-            canvasRef.current?.addEventListener('onKeydown',
+            const canvasRefElement = canvasRef.current
+            canvasRefElement.tabIndex = 1000
+            canvasRefElement.addEventListener('onKeydown',
             handleKeyDown)
             return () => {
-                canvasRef.current?.removeEventListener('onKeydown',
+                canvasRefElement?.removeEventListener('onKeydown',
             handleKeyDown)
         } 
             
         }
-    }, [canvasRef])
-  
+    }, [canvasRef, handleKeyDown])
     const createCanvas = useCallback(
         () =>
             <div className={classes.canvasContainer}>
@@ -150,7 +148,7 @@ function NotesGrid(): JSX.Element {
             </SNotesGrid>
                     </div>
         ,
-        [canvasBoxRef, canvasRef, toggleNote, width]
+        [canvasBoxRef, canvasRef, classes.canvas, classes.canvasContainer, classes.gridCanvasContainer, classes.notesListCanvas, handleKeyDown, handleMouseDown, handleMouseUp, handleOnClick, notesListRef, onMouseMove, setHoveredNote]
     )
     return (
         <div style={{ overflow: 'auto', width: 'inherit', display:'flex'}}>

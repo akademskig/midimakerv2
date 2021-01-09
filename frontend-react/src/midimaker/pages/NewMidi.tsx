@@ -5,6 +5,7 @@ import AudioStateProvider from '../providers/AudioStateProvider/AudioStateProvid
 import AudioPlayerController from '../components/AudioPlayerController'
 import AudioSettingsController from '../components/AudioSettingsController'
 import useScreenSize from '../../providers/screenSize.provider'
+import ChannelsController from '../components/ChannelsController'
 const NewMidi = () => {
 
     const { height, width } = useScreenSize()
@@ -16,7 +17,7 @@ const NewMidi = () => {
                 <div style={{display: 'flex', flexDirection: 'row', width: '100%', flexGrow: 1}}>
                     <AudioSettingsController left/>
                     <NotesGrid />
-                    <AudioSettingsController/>
+                    <ChannelsController/>
                 </div>
                 <AudioPlayerController/>
                 {/* </div> */}

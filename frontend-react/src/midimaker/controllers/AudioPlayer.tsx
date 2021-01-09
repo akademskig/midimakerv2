@@ -42,6 +42,7 @@ function AudioPlayer(): IAudioPlayer {
   const startNote = useCallback(
     (midiNumber, instrumentName?: string) => {
       return audioContext.resume().then(() => {
+        console.log(instrumentName)
         const audioNode = instrumentName
           ? cachedInstruments?.[instrumentName]?.play(midiNumber)
           : currentInstrument?.player?.play(midiNumber)

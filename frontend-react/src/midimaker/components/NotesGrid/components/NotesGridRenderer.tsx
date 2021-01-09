@@ -13,7 +13,7 @@ import { flatMap, range } from 'lodash'
 
 import {
   RECT_WIDTH, RECT_SPACE, RECT_TIME, RECORDING_BAR_COLOR, BAR_COLOR,
-  BAR_WIDTH, RECT_COLOR, CANVAS_BACKGROUND, MIDI_OFFSET
+  BAR_WIDTH, RECT_COLOR, CANVAS_BACKGROUND
 } from '../constants'
 import { ICoordinates } from '../NotesGrid'
 import { Note, PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
@@ -90,11 +90,11 @@ function NotesGridRenderer(): INotesGridRenderer {
   const timers = useRef<Array<number>>([])
   const coordinatesMapRef = useRef<Array<ICoordinates>>([])
   const { channels, setChannels, noteDuration, channelColor, notes, controllerState, setControllerState, 
-      setMappedEvents, noteRange } = useContext(AudioStateProviderContext)
+      setMappedEvents, noteRange, currentChannel } = useContext(AudioStateProviderContext)
   const [channelColorLight, setChannelColorLight] = useState('#fff')
   useEffect(() => {
-    setChannelColorLight(`${lightenDarkenColor(channelColor, 80)}`)
-  }, [setChannelColorLight, channelColor])
+    setChannelColorLight(`${lightenDarkenColor(currentChannel?.color || '', 80)}`)
+  }, [setChannelColorLight, currentChannel])
 
   useEffect(() => {
     if (canvasBoxRef.current) {
@@ -106,7 +106,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     if(notesListRef.current){
       notesListElement = notesListRef.current
     }
-  }, [canvasBoxRef, canvasRef])
+  }, [canvasBoxRef, canvasRef, notesListRef])
 
   const getX = (event: MouseEvent) => 
     event.clientX - canvasBoxElement.getBoundingClientRect().left 
@@ -134,7 +134,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     })
     setMappedEvents(mappedEvents)
 
-  }, [ channels, canvasTimeUnit, rectangleHeight ])
+  }, [ channels, canvasTimeUnit, setMappedEvents ])
 
   const findNoteByGridCoordinates = useCallback((event: React.MouseEvent) => {
     if (!canvasBoxElement || !coordinatesMapLocal) {
@@ -208,7 +208,8 @@ function NotesGridRenderer(): INotesGridRenderer {
       xLength,
     }
 
-  }, [canvasElement, canvasBoxElement, channels, controllerState.RECORDING, canvasTimeUnit, notes.length, width,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasElement, channels, controllerState.RECORDING, canvasTimeUnit, notes.length, width,
         rectangleHeight, setRectangleHeight
   ])
 
@@ -229,7 +230,7 @@ function NotesGridRenderer(): INotesGridRenderer {
     // eslint-disable-next-line array-callback-return
     notes.filter((note: Note, i: number): void => {
       if(!canvasCtx || !notesListCtx){
-        return
+        return undefined
       }
       for (let j = 0; j < xLength; j++) {
         const x = ((j - 1)* (RECT_WIDTH + RECT_SPACE) ) + notesListWidth
@@ -252,7 +253,7 @@ function NotesGridRenderer(): INotesGridRenderer {
           canvasCtx.fillStyle = CANVAS_BACKGROUND
           canvasCtx.fillRect(x - RECT_SPACE, y, RECT_SPACE, rectangleHeight) // fill vertical spaces
           canvasCtx.fillRect(x,  y - RECT_SPACE, RECT_WIDTH + RECT_SPACE, RECT_SPACE) // fill horizontal spaces
-          coordinatesMapLocal = [...coordinatesMapLocal, { noteId: `${note.midiNumber}${x}${y}`, midiNumber: note.midiNumber, x, y }]
+          coordinatesMapLocal = [...coordinatesMapLocal, { noteId: `${note.midiNumber}`, midiNumber: note.midiNumber, x, y }]
         }
         if(i===notes.length -1){
           // canvasCtx.fillRect(0,  y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
@@ -276,6 +277,7 @@ function NotesGridRenderer(): INotesGridRenderer {
         })
         setChannels(newChannels)
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [ setChannels, canvasTimeUnit, rectangleHeight, noteRange],
 )
   const renderNotes = useCallback(() => {
@@ -303,7 +305,8 @@ function NotesGridRenderer(): INotesGridRenderer {
     })
     setRenderingDone(true)
 
-  }, [canvasTimeUnit, channelColor, channels, hoveredNoteState, width, channelColorLight, rectangleHeight])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasTimeUnit, channelColor, channels, channelColorLight, rectangleHeight, hoveredNoteState ])
 
   const renderTimerBar = useCallback(() => {
     if (!canvasCtx) {
@@ -322,7 +325,7 @@ function NotesGridRenderer(): INotesGridRenderer {
         canvasBoxElement.scroll(x + 100, y)
       }
     }
-  }, [canvasTimeUnit, controllerState, timer, setTimer, renderEmptyCanvas, renderNotes, compositionDuration ])
+  }, [canvasTimeUnit, controllerState, timer, renderEmptyCanvas, renderNotes ])
 
   // stop play rendering
   const stopPlayRender = useCallback(() => {
@@ -333,7 +336,6 @@ function NotesGridRenderer(): INotesGridRenderer {
   // play rendering
   const renderPlay = useCallback(() => {
     if (controllerState.PLAYING) return
-    const frequency =  Number((noteDuration).toFixed(3))
     for (let i = 0; i <= compositionDuration + noteDuration; i += noteDuration ) {
       const t = setTimeout(() => {
         setTimer(i)
@@ -343,11 +345,8 @@ function NotesGridRenderer(): INotesGridRenderer {
     setTimeout(() => stopPlayRender(), compositionDuration * 1000 +
        (compositionDuration * 500 /compositionDuration)) // no lag if duration is 0
   }, [
-    canvasTimeUnit,
     controllerState.PLAYING,
     stopPlayRender,
-    renderTimerBar,
-    compositionDuration,
     noteDuration,
     setTimer
   ])
@@ -359,7 +358,8 @@ function NotesGridRenderer(): INotesGridRenderer {
   }, [noteDuration, setCanvasTimeUnit])
   useEffect(() => {
     renderEmptyCanvas()
-  }, [renderEmptyCanvas, canvasSetup])
+    renderNotes()
+  }, [renderEmptyCanvas, renderNotes])
   useEffect(() => {
     renderNotes()
   }, [renderNotes])
@@ -369,7 +369,7 @@ function NotesGridRenderer(): INotesGridRenderer {
 
   useEffect(() => {
     renderTimerBar()
-  }, [timer])
+  }, [ renderTimerBar ])
   return {
     canvasBoxRef,
     canvasRef,

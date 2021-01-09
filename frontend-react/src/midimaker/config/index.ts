@@ -4,7 +4,6 @@ const appConfig = {
     },
 
     soundFontDefaults: {
-        instrumentName : 'acoustic_grand_piano', 
         format: 'mp3', 
         soundfont:'MusyngKite' 
     }

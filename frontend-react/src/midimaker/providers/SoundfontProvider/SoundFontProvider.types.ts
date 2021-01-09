@@ -18,6 +18,8 @@ export type SoundfontProviderContextValue = {
   loadInstrument: (instrumentName: string) => Promise<unknown>;
   loading: boolean;
   cachedInstruments: ICachedInstruments;
+  currentInstrumentName: string,
+  setCurrentInstrumentName: React.Dispatch<React.SetStateAction<string>>
 };
 
 export type TCurrentInstrument = {
