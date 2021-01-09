@@ -1,5 +1,6 @@
 import React, { ReactElement, useCallback, useContext } from 'react'
 import { Divider, Drawer, List, ListItem, makeStyles, Tooltip } from '@material-ui/core'
+import classnames from 'classnames'
 import { AudioStateProviderContext } from '../../providers/AudioStateProvider/AudioStateProvider'
 import { getInstrumentLabel } from '../AudioSettingsController/utils'
 import { TChannel } from '../../providers/SoundfontProvider/SoundFontProvider.types'
@@ -33,9 +34,15 @@ const useStyles = makeStyles((theme: any) =>
             }
         },
         listItem: {
+            paddingTop: '0.75em', 
+            paddingBottom: '0.75em', 
             '&:hover': {
                 cursor: 'pointer'
+            },
+            '&.active': {
+                backgroundColor: theme.palette.primary.light
             }
+
         },
         listItemDiv: {
             width: 28, 
@@ -53,28 +60,30 @@ const useStyles = makeStyles((theme: any) =>
 type TChannelListProps = {
     channels: TChannel[],
     classes: Record<string, string>,
-    onClick: ((selectedItem: string) => void) 
+    onClick: ((selectedItem: string) => void),
+    currentInstrumentName: string
 }
-const renderChannelList = ({ channels, classes, onClick }: TChannelListProps) => {
+const renderChannelList = ({ channels, classes, onClick, currentInstrumentName }: TChannelListProps) => {
 
     return(
-        channels.map((channel: TChannel)=> {
+        <List>
+       { channels.map((channel: TChannel)=> {
             return(
-                <List>
+               
                      <Tooltip title={getInstrumentLabel(channel.instrumentName)} placement='top-end' className={classes.tooltip}>
-                        <ListItem className={classes.listItem} onClick={() => onClick(channel.instrumentName)} value={channel.instrumentName}>
+                        <ListItem className={classnames(classes.listItem, {active: currentInstrumentName === channel.instrumentName})} onClick={() => onClick(channel.instrumentName)} value={channel.instrumentName}>
                             <div className={classes.listItemDiv}style={{backgroundColor: channel.color }}></div>
                         </ListItem>
                     </Tooltip>
-                </List>
             )
-        })
+        })}
+        </List>
     )
 }
 
 function ChannelsController({ left = false}): ReactElement{
     const { channels } = useContext(AudioStateProviderContext)
-    const { setCurrentInstrumentName } = useContext(SoundfontProviderContext)
+    const { setCurrentInstrumentName, currentInstrumentName } = useContext(SoundfontProviderContext)
     const classes = useStyles()
     const handleClick = useCallback((selectedChannelInstrumentName: string)=> {
         setCurrentInstrumentName(selectedChannelInstrumentName)
@@ -90,7 +99,7 @@ function ChannelsController({ left = false}): ReactElement{
             }}
             >
             <Divider />
-                    { !!channels.length && renderChannelList({channels, classes, onClick:handleClick})}
+                    { !!channels.length && renderChannelList({channels, classes, onClick:handleClick, currentInstrumentName})}
             <Divider />
         </Drawer>
     )
