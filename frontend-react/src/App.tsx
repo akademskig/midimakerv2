@@ -10,8 +10,6 @@ import DataProvider from './providers/data.provider';
 import NotificationsProvider from './components/common/notifications/Notifications.provider';
 
 function App() {
-
-
   return (
     <div className="App">
         <MuiThemeProvider theme={theme}>
@@ -19,7 +17,7 @@ function App() {
           <AuthProvider>
             <DataProvider>
             <Router>
-              <AppRoutes />
+                <AppRoutes />
             </Router>
             </DataProvider>
           </AuthProvider>

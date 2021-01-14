@@ -1,9 +1,8 @@
-import React, { createContext, ReactElement, useCallback, useMemo, useState } from 'react'
+import React, { createContext, ReactElement, useCallback, useEffect, useState } from 'react'
 import { MidiNumbers } from 'react-piano'
 import { range } from 'lodash'
-import { Note, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
+import { Note, PlayEvent, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
 import { TRecordingGrid } from './AudioStateProvider.types'
-import { TMappedEvent } from '../../components/NotesGrid/components/NotesGridRenderer'
 
 const initialNoteRange = {
     first: 43,
@@ -11,10 +10,7 @@ const initialNoteRange = {
 }
 const initialNoteDuration = 0.125
 const initialChannelColor = '#008080'
-const initailGridNotes: TRecordingGrid = {
-    events: [],
-    currentTime: 0
-}
+
 interface IControllerState {
     PLAYING?: boolean
     RECORDING?:boolean,
@@ -32,15 +28,12 @@ interface IAudioStateProviderContext {
     channels: TChannel[];
     setChannels: React.Dispatch<React.SetStateAction<TChannel[]>>
     notes: Note[];
+    setNotes: React.Dispatch<React.SetStateAction<Note[]>>
     noteDuration: number,
     setNoteDuration: React.Dispatch<React.SetStateAction<number>>
     channelColor: string,
     controllerState: IControllerState,
     setControllerState: (state: IControllerState) => void,
-    gridNotes: TRecordingGrid,
-    setGridNotes: React.Dispatch<React.SetStateAction<TRecordingGrid>>
-    mappedEvents: TMappedEvent[],
-    setMappedEvents: React.Dispatch<React.SetStateAction<TMappedEvent[]>>
     noteRange: TNoteRange,
     setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>
 }
@@ -72,10 +65,7 @@ const initialCtxValue = {
         notes: [],
         controllerState: initialControllerState,
         setControllerState: (state: IControllerState) => {},
-        gridNotes: initailGridNotes,
-        setGridNotes: ((value: React.SetStateAction<TRecordingGrid>) => (value: TRecordingGrid) => value),
-        mappedEvents: [],
-        setMappedEvents: ((value: React.SetStateAction<TMappedEvent[]>) => (value:TMappedEvent[]) => value),
+        setNotes: ((value: React.SetStateAction<Note[]>) => (value: Note[]) => value),
         noteRange: initialNoteRange,
         setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value:TNoteRange) => value),
 }
@@ -88,11 +78,18 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [channelColor, updateColor] = useState<string>(initialChannelColor)
     const [currentChannel, setCurrentChannel] = useState<TChannel | null>(initialChannel)
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
-    const [mappedEvents, setMappedEvents ] = useState<TMappedEvent[]>([])
     const [channels, setChannels] = useState<TChannel[]>([])
-    const [gridNotes, setGridNotes] = useState(initailGridNotes)
+    const [ notes, setNotes] = useState(  
+        range(noteRange.first, noteRange.last)
+        .map((idx: number) => MidiNumbers.getAttributes(idx))
+        .reverse())
 
-   
+    useEffect(() => {
+        setNotes( range(noteRange.first, noteRange.last)
+        .map((idx: number) => MidiNumbers.getAttributes(idx))
+        .reverse())
+    }, [noteRange])
+
     const setController = useCallback((state)=> {
         setControllerState({
             ...controllerState,
@@ -114,12 +111,7 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         },
         [currentChannel, setCurrentChannel, channels, setChannels, updateColor])
 
-    const notes = useMemo(() =>
-        range(noteRange.first, noteRange.last)
-        .map((idx: number) => MidiNumbers.getAttributes(idx))
-        .reverse(), [noteRange.first, noteRange.last])
-
-    const ctxValue = useMemo(() => ({
+    const ctxValue = {
         currentChannel,
         setCurrentChannel,
         channelColor,
@@ -131,13 +123,10 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         notes,
         controllerState,
         setControllerState: setController,
-        gridNotes,
-        setGridNotes,
-        mappedEvents,
+        setNotes,
         noteRange, 
         setNoteRange,
-        setMappedEvents,
-    }), [currentChannel, channelColor, setChannelColor, noteDuration, channels, notes, controllerState, setController, gridNotes, mappedEvents, noteRange])
+    }
 
     return (
         <AudioStateProviderContext.Provider value={ctxValue}>

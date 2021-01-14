@@ -98,7 +98,7 @@ function SoundfontProvider({
         
       }
     },
-    [setCurrentInstrument, setCachedInstruments, cachedInstruments, fetchInstrument, setCurrentInstrument]
+    [setCurrentInstrument, setCachedInstruments, cachedInstruments, fetchInstrument]
   )
 
   useEffect(() => {
@@ -114,7 +114,7 @@ function SoundfontProvider({
       currentInstrumentName,
       loading: !currentInstrument,
     }),
-    [currentInstrument, cachedInstruments, loadInstrument]
+    [currentInstrument, cachedInstruments, loadInstrument, currentInstrumentName]
   )
   return (
     <SoundfontProviderContext.Provider value= { ctxValue } >

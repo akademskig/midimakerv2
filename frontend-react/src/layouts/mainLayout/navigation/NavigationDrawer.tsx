@@ -84,6 +84,7 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
             marginLeft: '0',
             marginTop: '56px',
             height: `${height-60}px`,
+            width: `${width-200}px`,
             transition: theme.transitions.create('margin-left', {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,

@@ -69,6 +69,7 @@ function AudioPlayer(): IAudioPlayer {
 
   const playNote = useCallback((lastEvent: PlayEvent, instrumentName?: string) => {
     startNote(lastEvent.midiNumber, instrumentName)
+    console.log(lastEvent.time, 'time')
     setTimeout(() => {
       stopNote(lastEvent.midiNumber)
     }, lastEvent.duration * 1000)
@@ -106,7 +107,7 @@ function AudioPlayer(): IAudioPlayer {
         )
       })
     },
-    [channels, playNote, scheduledEvents]
+    [channels, controllerState.PLAYING, playNote]
   )
 
   // Clear any residual notes that don't get called with stopNote
@@ -129,7 +130,7 @@ function AudioPlayer(): IAudioPlayer {
       clearTimeout(scheduledEventId)
     })
     stopAllNotes()
-  }, [scheduledEvents, stopAllNotes])
+  }, [stopAllNotes])
 
   // channelsToPlaylist = async (channels) => {
   //   channels.forEach(async c => {

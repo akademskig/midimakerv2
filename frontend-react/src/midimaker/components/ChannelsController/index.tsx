@@ -18,6 +18,11 @@ const useStyles = makeStyles((theme: any) =>
             [theme.breakpoints.up('sm')]: {
                 width: theme.spacing(7.5) + 1,
             },
+            // position: 'fixed',
+            // right: 0,
+            // top: '125px',
+            // display: 'flex',
+            // bottom: '61px'
         },
         drawerPaper: {
             backgroundColor: theme.palette.primary.main,
@@ -40,14 +45,17 @@ const useStyles = makeStyles((theme: any) =>
                 cursor: 'pointer'
             },
             '&.active': {
-                backgroundColor: theme.palette.primary.light
+                // backgroundColor: theme.palette.primary.light,
+                '& div': {
+                    border: '2px groove #d9e9fb'
+                }
             }
 
         },
         listItemDiv: {
             width: 28, 
             height: 28,
-            borderRadius: '2px'
+            borderRadius: '3px',
         }
     }))
 

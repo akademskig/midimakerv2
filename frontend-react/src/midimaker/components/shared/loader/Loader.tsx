@@ -11,16 +11,21 @@ const useStyles = makeStyles((theme: Theme) =>  ({
     root: {
         display: 'flex',
         justifyContent: 'center',
+        position: 'absolute',
+        top:0,
+        right:0,
+        left:0,
+        bottom:0,
         alignItems: 'center',
         height: 'inherit',
         flexGrow: 1,
+        zIndex:10,
         backgroundColor: RECT_COLOR
     }
 }))
 function Loader() {
 
     const classes = useStyles()
-    const theme = useTheme()
 
     return (
         <div className={classes.root}>
