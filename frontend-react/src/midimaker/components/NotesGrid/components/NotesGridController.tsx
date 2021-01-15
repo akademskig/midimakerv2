@@ -67,9 +67,8 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
       return  (canvasElement.height - RECT_SPACE * notes.length) / notes.length
     }, [canvasElement, notes.length])
   const findNoteInChannel = useCallback((event: MouseEvent)=> {
-    const currentNote = mappedEvents.find(mappedEvent => (getX(event) < mappedEvent.x + mappedEvent.width && getX(event) >= mappedEvent.x) &&
+    const currentNote = mappedEvents.find(mappedEvent => mappedEvent.instrumentName === currentChannel?.instrumentName && (getX(event) < mappedEvent.x + mappedEvent.width && getX(event) >= mappedEvent.x) &&
      (getY(event) >= mappedEvent.y && getY(event)<= mappedEvent.y + getRectangleHeight()))
-
     return currentChannel?.notes.find(note=> note.noteId === currentNote?.noteId)
   }, [mappedEvents, currentChannel, getX, getY, getRectangleHeight])
 
@@ -85,7 +84,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
  
   const findMappedEvents = useCallback(() => {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
-      channel.notes.map((note) => ({ ...note, color: channel.color })))
+      channel.notes.map((note) => ({ ...note, color: channel.color, instrumentName: channel.instrumentName })))
 
     const mappedEvents = joinedEvents.map((event, i) => {
       const x = event.coordX
@@ -93,7 +92,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
       const width = Math.floor(
         event.duration * RECT_WIDTH * 1/noteDuration
       )
-      return {x, y, width, noteId: event.noteId }
+      return {x, y, width, noteId: event.noteId, instrumentName: event.instrumentName }
     })
     setMappedEvents(mappedEvents)
 
@@ -128,6 +127,10 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     const toggleNote = useCallback(
       (event) => {
         event.stopPropagation()
+        let channelNote = findNoteInChannel(event)
+        if(channelNote){
+          return 
+        }
         const note = findNoteByGridCoordinates(event)
         if(!note){
           return
@@ -135,7 +138,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
         playNote(note)
         return handleToggleNote(note)
       },
-      [findNoteByGridCoordinates, handleToggleNote, playNote]
+      [findNoteByGridCoordinates, handleToggleNote, playNote, findNoteInChannel]
     )
 
   const renderPlay = useCallback(() => {

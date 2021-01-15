@@ -35,9 +35,10 @@ export interface ICoordinates {
 
 export const CanvasContext = createContext<any>(null)
 export type TMappedEvent = {
+  instrumentName: string,
   noteId: string,
-  y:number,
-  x:number,
+  y: number,
+  x: number,
   width: number
 }
 interface IController {
@@ -79,11 +80,11 @@ export interface INotesGridRendererProps {
   classes: Record<string, string>,
 }
 
-const useStyles = (height: number, width: number, playing: boolean)=> makeStyles((theme)=> ({
+const useStyles = (height: number, width: number, playing: boolean) => makeStyles((theme) => ({
   canvas: {
-      cursor: 'pointer',
-      background: RECT_COLOR,
-      outline: 'none',
+    cursor: 'pointer',
+    background: RECT_COLOR,
+    outline: 'none',
   },
   timerCanvas: {
     position: 'absolute',
@@ -92,7 +93,7 @@ const useStyles = (height: number, width: number, playing: boolean)=> makeStyles
     left: 0,
     right: 0,
     zIndex: !playing ? -1 : 2,
-    background: 'transparent', 
+    background: 'transparent',
   },
   notesCanvas: {
     outline: 'none',
@@ -101,29 +102,29 @@ const useStyles = (height: number, width: number, playing: boolean)=> makeStyles
     bottom: 0,
     left: 0,
     right: 0,
-    background: 'transparent', 
+    background: 'transparent',
     cursor: 'pointer',
   },
   notesListCanvas: {
-      background: 'rgba(4,32,55)',
-      outline: 'none',
-      padding: '1px 0', 
-      zIndex: 1,
-      borderTop: 'none',
+    background: 'rgba(4,32,55)',
+    outline: 'none',
+    padding: '1px 0',
+    zIndex: 1,
+    borderTop: 'none',
   },
   canvasContainer: {
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'row',
-      background: RECT_COLOR, 
-      flexGrow: 1,
-      width: '200px'
+    position: 'relative',
+    display: 'flex',
+    flexDirection: 'row',
+    background: RECT_COLOR,
+    flexGrow: 1,
+    width: '200px'
   },
   gridCanvasContainer: {
-      height: `${height - 195}px`, 
-      background: CANVAS_BACKGROUND, 
-      padding: '1px', 
-      position: 'relative',
+    height: `${height - 195}px`,
+    background: CANVAS_BACKGROUND,
+    padding: '1px',
+    position: 'relative',
   }
 }))
 
@@ -137,8 +138,8 @@ let notesCanvasCtx: CanvasRenderingContext2D | null = null
 let hoveredNote: PlayEvent | null = null
 let previousHoveredNote: PlayEvent | null = null
 function NotesGridRenderer() {
-  const {height, width} = useScreenSize()
-  
+  const { height, width } = useScreenSize()
+
   const [renderingDone, setRenderingDone] = useState(false)
   const [canvasDuration, setCanvasDuration] = useState(90)
   const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null)
@@ -146,7 +147,7 @@ function NotesGridRenderer() {
   const [notesListElement, setNotesListElement] = useState<HTMLCanvasElement | null>(null)
   const [canvasTimerElement, setCanvasTimerElement] = useState<HTMLCanvasElement | null>(null)
   const [notesCanvasElement, setNotesCanvasElement] = useState<HTMLCanvasElement | null>(null)
-  const [ resizing, setResizing] = useState(false)
+  const [resizing, setResizing] = useState(false)
   const [currentNote, setCurrentNote] = useState<PlayEvent | null>(null)
   const notesListRef = createRef<HTMLCanvasElement>()
   const canvasBoxRef = createRef<HTMLDivElement>()
@@ -155,42 +156,41 @@ function NotesGridRenderer() {
   const notesCanvasRef = createRef<HTMLCanvasElement>()
   const canvasWrapperRef = createRef<HTMLDivElement>()
   const [lastTimerPosition, setLastTimerPosition] = useState(0)
-  
+
   const fontSize = useRef<number>(0)
   const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
   // const timers = useRef<Array<number>>([])
-  const { channels, setChannels, noteDuration, channelColor, notes, controllerState, 
+  const { channels, setChannels, noteDuration, channelColor, notes, controllerState,
     currentChannel } = useContext(AudioStateProviderContext)
-    const { loading } = useContext(SoundfontProviderContext)
-    
-    const { toggleNote, findNoteInChannel, timer, setNotesCoordinates, initCtx } = useContext(NotesGridControllerCtx)
-    const { updateNote } = useAudioController()
-    const [channelColorLight, setChannelColorLight] = useState('#fff')
-    const classes = useStyles(height, width, controllerState.PLAYING || false)()
+  const { loading } = useContext(SoundfontProviderContext)
+  const { toggleNote, findNoteInChannel, timer, setNotesCoordinates, initCtx } = useContext(NotesGridControllerCtx)
+  const { updateNote } = useAudioController()
+  const [channelColorLight, setChannelColorLight] = useState('#fff')
+  const classes = useStyles(height, width, controllerState.PLAYING || false)()
   useEffect(() => {
     setChannelColorLight(`${lightenDarkenColor(currentChannel?.color || '', 80)}`)
   }, [setChannelColorLight, currentChannel])
 
   useEffect(() => {
-    if(canvasBoxRef.current){
+    if (canvasBoxRef.current) {
       setCanvasBoxElement(canvasBoxRef.current)
     }
-    if(canvasRef.current){
+    if (canvasRef.current) {
       setCanvasElement(canvasRef.current)
     }
-    if(notesListRef.current){
+    if (notesListRef.current) {
       setNotesListElement(notesListRef.current)
     }
-    if(canvasTimerRef.current){
-    setCanvasTimerElement(canvasTimerRef.current)
+    if (canvasTimerRef.current) {
+      setCanvasTimerElement(canvasTimerRef.current)
     }
-    if(notesCanvasRef.current){
+    if (notesCanvasRef.current) {
       setNotesCanvasElement(notesCanvasRef.current)
     }
   }, [canvasBoxRef, canvasRef, notesListRef, canvasTimerRef, notesCanvasRef])
 
-  useEffect(()=> {
-    if(canvasBoxElement && canvasElement && notesListElement && canvasTimerElement){
+  useEffect(() => {
+    if (canvasBoxElement && canvasElement && notesListElement && canvasTimerElement) {
       initCtx(canvasElement, canvasBoxElement, notesListElement, canvasTimerElement)
     }
   }, [canvasBoxElement, canvasElement, notesListElement, initCtx, canvasTimerElement])
@@ -199,29 +199,29 @@ function NotesGridRenderer() {
     if (!canvasBoxElement || !canvasTimerCtx || !canvasElement) {
       return
     }
-    canvasTimerCtx.clearRect(0,0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
+    canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
     const x = (timer / noteDuration) * (RECT_WIDTH + RECT_SPACE)
     canvasWrapperRef?.current?.scroll(x - (canvasBoxElement.getBoundingClientRect().width / 2), 0)
-    if(timer){
+    if (timer) {
       canvasTimerCtx.fillStyle = BAR_COLOR
       setLastTimerPosition(x)
-      canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1 , canvasTimerElement?.height || 0)
+      canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasTimerElement?.height || 0)
       canvasTimerCtx.fillRect(x, 0, BAR_WIDTH, canvasTimerElement?.height || 0)
     }
-    if(!timer){
+    if (!timer) {
       canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasElement?.height || 0)
       setLastTimerPosition(0)
     }
   }, [canvasBoxElement, canvasElement, canvasTimerElement, canvasWrapperRef, lastTimerPosition, noteDuration, timer])
- 
 
-    const setHoveredNote = useCallback((note: PlayEvent | null)=> {
-      setHoveredNoteState(note)
-      hoveredNote = note
-    }, [ setHoveredNoteState])
+
+  const setHoveredNote = useCallback((note: PlayEvent | null) => {
+    setHoveredNoteState(note)
+    hoveredNote = note
+  }, [setHoveredNoteState])
 
   const canvasSetup = useCallback((timer?: number) => {
-    if (!canvasElement|| !canvasBoxElement || !notesListElement || !canvasTimerElement || !notesCanvasElement) {
+    if (!canvasElement || !canvasBoxElement || !notesListElement || !canvasTimerElement || !notesCanvasElement) {
       return
     }
     canvasCtx = canvasElement?.getContext('2d')
@@ -232,30 +232,30 @@ function NotesGridRenderer() {
       return
     }
     const xLength =
-      Math.floor(canvasDuration * 1/noteDuration)
-    canvasElement.width = xLength * (RECT_WIDTH) 
+      Math.floor(canvasDuration * 1 / noteDuration)
+    canvasElement.width = xLength * (RECT_WIDTH)
     canvasElement.height = canvasBoxElement.getBoundingClientRect().height + 1
-    canvasTimerElement.width=xLength * (RECT_WIDTH) 
-    canvasTimerElement.height=canvasBoxElement.getBoundingClientRect().height -  RECT_SPACE * 2
-    notesCanvasElement.width=xLength * (RECT_WIDTH) 
-    notesCanvasElement.height=canvasBoxElement.getBoundingClientRect().height -  RECT_SPACE * 2
-    notesListElement.height = canvasBoxElement.getBoundingClientRect().height -  RECT_SPACE * 2
+    canvasTimerElement.width = xLength * (RECT_WIDTH)
+    canvasTimerElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
+    notesCanvasElement.width = xLength * (RECT_WIDTH)
+    notesCanvasElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
+    notesListElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
     // fontSize.current = rectangleHeight * 0.6
     notesListWidth = Math.ceil(fontSize.current + RECT_WIDTH * 2.7 + 5)
-    notesListElement.width=notesListWidth
+    notesListElement.width = notesListWidth
     return xLength
 
-  }, [canvasBoxElement, canvasDuration, canvasElement, canvasTimerElement, 
-      noteDuration, notesCanvasElement, notesListElement])
+  }, [canvasBoxElement, canvasDuration, canvasElement, canvasTimerElement,
+    noteDuration, notesCanvasElement, notesListElement])
 
   const renderEmptyCanvas = useCallback(() => {
-    if (!canvasElement|| !canvasBoxElement || !notesListElement || renderingDone) {
+    if (!canvasElement || !canvasBoxElement || !notesListElement || renderingDone) {
       return
     }
     const xLength = canvasSetup()
-   if(!xLength){
-     return 
-   }
+    if (!xLength) {
+      return
+    }
     const rectangleHeight = (canvasElement.height - RECT_SPACE * notes.length) / notes.length
     coordinatesMapLocal = []
     // draw notes to canvas
@@ -264,11 +264,11 @@ function NotesGridRenderer() {
     }
     // eslint-disable-next-line array-callback-return
     notes.filter((note: Note, i: number): void => {
-      if(!canvasCtx || !notesListCtx){
+      if (!canvasCtx || !notesListCtx) {
         return undefined
       }
       for (let j = 0; j < xLength; j++) {
-        const x = Math.floor((j - 1)* (RECT_WIDTH + RECT_SPACE) ) 
+        const x = Math.floor((j - 1) * (RECT_WIDTH + RECT_SPACE))
         const y = Math.floor((rectangleHeight + RECT_SPACE) * i)
         if (j === 0) {
           const fontSize = rectangleHeight * 0.6
@@ -284,13 +284,13 @@ function NotesGridRenderer() {
           notesListCtx.fillRect(0, y - RECT_SPACE, notesListWidth, RECT_SPACE) // horizontal border
           notesListCtx.fillRect(RECT_WIDTH + notesListWidth, i * (rectangleHeight + RECT_SPACE), RECT_SPACE, rectangleHeight + RECT_SPACE) // vertical border
         } else {
-          canvasCtx.fillStyle =  CANVAS_BACKGROUND
+          canvasCtx.fillStyle = CANVAS_BACKGROUND
           canvasCtx.fillRect(x - RECT_SPACE, y, RECT_SPACE, rectangleHeight) // fill vertical spaces
-          canvasCtx.fillRect(x,  y - RECT_SPACE, RECT_WIDTH + RECT_SPACE, RECT_SPACE) // fill horizontal spaces
+          canvasCtx.fillRect(x, y - RECT_SPACE, RECT_WIDTH + RECT_SPACE, RECT_SPACE) // fill horizontal spaces
           coordinatesMapLocal = [...coordinatesMapLocal, { noteId: `${note.midiNumber}`, midiNumber: note.midiNumber, x, y }]
         }
-        if(i===notes.length -1){
-          canvasCtx.fillRect(0,  y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
+        if (i === notes.length - 1) {
+          canvasCtx.fillRect(0, y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
         }
       }
     })
@@ -301,165 +301,166 @@ function NotesGridRenderer() {
   // updates channel coordinates when duration or note range has changed
   const updateChannels = useCallback(
     () => {
-      if(!canvasElement){
-         return
+      if (!canvasElement) {
+        return
       }
       const rectangleHeight = (canvasElement.height - RECT_SPACE * notes.length) / notes.length
-        const newChannels = channels.map(channel=> {
-            const newNotes = channel.notes.map(note=> {
-              note.coordX = note.time * RECT_WIDTH *( 1/noteDuration) + notesListWidth
-              const noteIdx = notes.findIndex(noteA=> Number(noteA.midiNumber) === note.midiNumber)
-              note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
-              return note
-            })
-            channel.notes = newNotes
-            return channel
+      const newChannels = channels.map(channel => {
+        const newNotes = channel.notes.map(note => {
+          note.coordX = note.time * (RECT_WIDTH + RECT_SPACE) / noteDuration
+          console.log(note.coordX, note.time)
+          const noteIdx = notes.findIndex(noteA => Number(noteA.midiNumber) === note.midiNumber)
+          note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
+          return note
         })
-        setChannels(newChannels)
+        channel.notes = newNotes
+        return channel
+      })
+      setChannels(newChannels)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ setChannels, noteDuration, notes, canvasElement],
-)
+    [setChannels, noteDuration, notes, canvasElement],
+  )
   const renderNotes = useCallback(() => {
-    if(!notesCanvasElement){
+    if (!notesCanvasElement) {
       return
     }
     const rectangleHeight = (notesCanvasElement.height - RECT_SPACE * notes.length) / notes.length
-    notesCanvasCtx?.clearRect(previousHoveredNote?.coordX || 0 + 1,previousHoveredNote?.coordY || 0 + 1, width, rectangleHeight + 5)
+    notesCanvasCtx?.clearRect(previousHoveredNote?.coordX || 0 + 1, previousHoveredNote?.coordY || 0 + 1, width, rectangleHeight + 5)
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
-    channel.notes.map((note: PlayEvent) => ({ ...note, color: channel.color }))
+      channel.notes.map((note: PlayEvent) => ({ ...note, color: channel.color }))
     ) // join notes from all channels into a single array, + add a color field
     joinedEvents.forEach((event, i) => {
-      if(!notesCanvasCtx){
+      if (!notesCanvasCtx) {
         return
       }
       const width = Math.floor(
-        event.duration * (RECT_WIDTH) * 1/noteDuration
+        event.duration * (RECT_WIDTH) * 1 / noteDuration
       )
       notesCanvasCtx.fillStyle = event.color ? event.color : channelColor
-      notesCanvasCtx.fillRect(event.coordX +  RECT_SPACE, event.coordY  +  RECT_SPACE, width, rectangleHeight)
-      if(event.noteId === hoveredNote?.noteId){
+      notesCanvasCtx.fillRect(event.coordX + RECT_SPACE, event.coordY + RECT_SPACE, width, rectangleHeight)
+      if (event.noteId === hoveredNote?.noteId) {
         notesCanvasCtx.strokeStyle = channelColorLight
-        notesCanvasCtx.strokeRect(hoveredNote.coordX + RECT_SPACE,hoveredNote.coordY+RECT_SPACE, width, rectangleHeight)
+        notesCanvasCtx.strokeRect(hoveredNote.coordX + RECT_SPACE, hoveredNote.coordY + RECT_SPACE, width, rectangleHeight)
         previousHoveredNote = hoveredNote
       }
-     
+
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [noteDuration, canvasElement, channelColor, channels, channelColorLight, hoveredNoteState, notes, renderEmptyCanvas ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteDuration, canvasElement, channelColor, channels, channelColorLight, hoveredNoteState, notes, renderEmptyCanvas])
   // stop play rendering
-  const onResize = useCallback((event)=> {
+  const onResize = useCallback((event) => {
     event.persist()
-    if(!currentNote || !event.shiftKey){
-        return
+    if (!currentNote || !event.shiftKey) {
+      return
     }
-    const x = event.clientX - (canvasBoxRef?.current?.getBoundingClientRect()?.left  || 0)
+    const x = event.clientX - (canvasBoxRef?.current?.getBoundingClientRect()?.left || 0)
     const duration = (x - currentNote?.coordX) / RECT_WIDTH * noteDuration
     const newNote = { ...currentNote, duration }
     updateNote(newNote)
-}, [currentNote, canvasBoxRef, noteDuration, updateNote])
+  }, [currentNote, canvasBoxRef, noteDuration, updateNote])
 
-const handleOnClick = useCallback((event) => {
+  const handleOnClick = useCallback((event) => {
     event.persist()
     const note = !event.shiftKey && toggleNote(event)
-    if(note){
-        setCurrentNote(note)
+    if (note) {
+      setCurrentNote(note)
     }
-}, [ toggleNote])
+  }, [toggleNote])
 
-const handleMouseDown = useCallback((event)=> {
+  const handleMouseDown = useCallback((event) => {
     const note = findNoteInChannel(event)
     note && setCurrentNote(note)
     note && setResizing(true)
-    
-}, [setCurrentNote, setResizing, findNoteInChannel])
 
-const handleMouseUp = useCallback(()=> {
+  }, [setCurrentNote, setResizing, findNoteInChannel])
+
+  const handleMouseUp = useCallback(() => {
     setResizing(false)
-}, [setResizing])
+  }, [setResizing])
 
-const handleKeyDown = useCallback((event) => {
+  const handleKeyDown = useCallback((event) => {
     event.persist()
-    if(!event.shiftKey || !currentNote){
-        return
+    if (!event.shiftKey || !currentNote) {
+      return
     }
     setHoveredNote(currentNote)
-}, [setHoveredNote, currentNote])
+  }, [setHoveredNote, currentNote])
 
-const onMouseMove = useCallback((event) => {
+  const onMouseMove = useCallback((event) => {
     const note = findNoteInChannel(event)
-    if(note){
-        setCurrentNote(note)
+    if (note) {
+      setCurrentNote(note)
     }
-    return resizing? onResize(event): null
-}, [resizing, onResize, setCurrentNote, findNoteInChannel])
- 
-  useEffect(()=> {
+    return resizing ? onResize(event) : null
+  }, [resizing, onResize, setCurrentNote, findNoteInChannel])
+
+  useEffect(() => {
     setRenderingDone(false)
   }, [setRenderingDone, noteDuration, notes])
   useEffect(() => {
     renderEmptyCanvas()
   }, [renderEmptyCanvas])
   useEffect(() => {
-      renderNotes()
+    renderNotes()
   }, [renderNotes])
   useEffect(() => {
     updateChannels()
   }, [updateChannels])
-  useEffect(()=> {
+  useEffect(() => {
     renderTimerBar()
-  }, [timer])
+  }, [renderTimerBar, timer])
 
   useEffect(() => {
-    if(notesCanvasElement){
-        notesCanvasElement.tabIndex = 1000
-        notesCanvasElement.addEventListener('onKeydown',
+    if (notesCanvasElement) {
+      notesCanvasElement.tabIndex = 1000
+      notesCanvasElement.addEventListener('onKeydown',
         handleKeyDown)
-        return () => {
-          notesCanvasElement?.removeEventListener('onKeydown',
-        handleKeyDown)
-    } 
+      return () => {
+        notesCanvasElement?.removeEventListener('onKeydown',
+          handleKeyDown)
+      }
     }
-}, [canvasRef, canvasBoxRef, notesListRef, handleKeyDown, notesCanvasElement])
-return (
-        <div className={classes.canvasContainer} >
-           {(loading || !renderingDone) && <Loader />} 
-            <div className={classes.notesListCanvas}>
-                <canvas id="notesList-canvas"ref={notesListRef} />
-            </div>
-           <div ref={canvasWrapperRef}style={{overflow: 'auto', overflowY: 'hidden'}} >
-            <div ref={canvasBoxRef}  className={classes.gridCanvasContainer} >
-                <canvas
-                    className={classes.canvas}
-                    id="canvas"
-                    ref={canvasRef}
-                    />
-                    <canvas
-                      ref={canvasTimerRef}
-                      className={classes.timerCanvas}
-                      >
+  }, [canvasRef, canvasBoxRef, notesListRef, handleKeyDown, notesCanvasElement])
+  return (
+    <div className={classes.canvasContainer} >
+      {(loading || !renderingDone) && <Loader />}
+      <div className={classes.notesListCanvas}>
+        <canvas id="notesList-canvas" ref={notesListRef} />
+      </div>
+      <div ref={canvasWrapperRef} style={{ overflow: 'auto', overflowY: 'hidden' }} >
+        <div ref={canvasBoxRef} className={classes.gridCanvasContainer} >
+          <canvas
+            className={classes.canvas}
+            id="canvas"
+            ref={canvasRef}
+          />
+          <canvas
+            ref={canvasTimerRef}
+            className={classes.timerCanvas}
+          >
 
-                    </canvas>
-                    <canvas
-                      onMouseOver={()=> notesCanvasRef.current?.focus() }
-                      onClick={handleOnClick}
-                      onMouseDown={handleMouseDown}
-                      onMouseMove={onMouseMove}
-                      onTouchMove={onMouseMove}
-                      onTouchStart={handleMouseDown}
-                      onMouseUp={handleMouseUp}
-                      onKeyDown={handleKeyDown}
-                      onKeyUp={()=> setHoveredNote(null)}
-                      ref={notesCanvasRef}
-                      className={classes.notesCanvas}
-                    />
+          </canvas>
+          <canvas
+            onMouseOver={() => notesCanvasRef.current?.focus()}
+            onClick={handleOnClick}
+            onMouseDown={handleMouseDown}
+            onMouseMove={onMouseMove}
+            onTouchMove={onMouseMove}
+            onTouchStart={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onKeyDown={handleKeyDown}
+            onKeyUp={() => setHoveredNote(null)}
+            ref={notesCanvasRef}
+            className={classes.notesCanvas}
+          />
 
-            </div>
         </div>
-        <div >
+      </div>
+      <div >
       </div>
     </div>
-)
+  )
 }
 
 export default NotesGridRenderer
