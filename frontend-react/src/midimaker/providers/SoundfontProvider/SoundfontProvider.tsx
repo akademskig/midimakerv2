@@ -7,10 +7,11 @@ import {
   SoundfontType,
   ICachedInstruments,
   TCurrentInstrument,
-  
+
 } from './SoundFontProvider.types'
 import { audioContext } from '../../globals'
 import { instrumentList } from './soundfontInstruments'
+import { useAudioController } from '../../controllers/AudioController'
 
 
 const hostname = appConfig.soundfont.hostname
@@ -39,16 +40,18 @@ function SoundfontProvider({
   format = SoundfontFormat.mp3,
   soundfont = SoundfontType.MusingKyte,
   children,
-}: SoundfontProviderProps) : JSX.Element {
+}: SoundfontProviderProps): JSX.Element {
   const [currentInstrumentName, setCurrentInstrumentName] = useState(instrumentList[2])
   const [currentInstrument, setCurrentInstrument] = useState<TCurrentInstrument | null>(null)
   const [cachedInstruments, setCachedInstruments] = useState<ICachedInstruments>({})
   // const activeAudioNodes = useRef<IActiveAudioNodes>({})
-  const fetchInstrumentsList = async() => {
+  const fetchInstrumentsList = async () => {
     const instrumentList = await fetch(`${hostname}/${soundfont}/names.json`)
-        .then((response) => response.json())
-        .then((data) =>console.log(data));
-};
+      .then((response) => response.json())
+      .then((data) => console.log(data));
+  };
+
+
   const fetchInstrument = useCallback(async (instrumentName) => {
     let instrument = null
     // try {
@@ -65,11 +68,11 @@ function SoundfontProvider({
         format,
         soundfont,
         nameToUrl: (name: string, soundfont: string, format: string) =>
-        `${hostname}/${soundfont}/${name}-${format}.js`,
-        
+          `${hostname}/${soundfont}/${name}-${format}.js`,
+
       })
     }
-    catch(error){
+    catch (error) {
       console.error(error)
     }
     // if(instrument){
@@ -83,19 +86,19 @@ function SoundfontProvider({
     async (instrumentName) => {
       setCurrentInstrument(null)
       if (cachedInstruments?.[instrumentName]) {
-        return setCurrentInstrument({name: instrumentName, player: cachedInstruments?.[instrumentName] })
+        return setCurrentInstrument({ name: instrumentName, player: cachedInstruments?.[instrumentName] })
       }
       const instrument = await fetchInstrument(instrumentName)
       setCurrentInstrument({
         name: instrumentName,
         player: instrument
       })
-      if(instrument){
+      if (instrument) {
         setCachedInstruments({
           ...cachedInstruments,
           [instrumentName]: instrument,
         })
-        
+
       }
     },
     [setCurrentInstrument, setCachedInstruments, cachedInstruments, fetchInstrument]
@@ -117,8 +120,8 @@ function SoundfontProvider({
     [currentInstrument, cachedInstruments, loadInstrument, currentInstrumentName]
   )
   return (
-    <SoundfontProviderContext.Provider value= { ctxValue } >
-    { children }
+    <SoundfontProviderContext.Provider value={ctxValue} >
+      { children}
     </SoundfontProviderContext.Provider>
   )
 }

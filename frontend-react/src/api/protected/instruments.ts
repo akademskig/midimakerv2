@@ -22,7 +22,6 @@ export default function useInstrumentsApi() {
     const parseError = (error: AxiosError) => error?.response?.data || fakeError
     const saveInstrument = async ({ name, player }: { name: string, player: Player }) => {
         const body = {name, player }
-        console.log(body)
         return axios.post(`${baseUrl}/instruments`, body)
         .catch(error=> {throw parseError(error)})
         

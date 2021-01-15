@@ -7,6 +7,8 @@ import React, { ReactElement, useCallback, useContext, useState, MouseEvent, Cha
 import { AudioStateProviderContext, TNoteRange } from '../../providers/AudioStateProvider/AudioStateProvider'
 import { makeInstrumentList } from './utils'
 import { SoundfontProviderContext } from '../../providers/SoundfontProvider/SoundfontProvider'
+import { useAudioController } from '../../controllers/AudioController'
+import { InstrumentName } from 'soundfont-player'
 
 const useStyles = makeStyles((theme: any) =>
     ({
@@ -261,7 +263,7 @@ export function renderColorPicker({ value, onChange, classes }: TColorPickerProp
     }
 type TInstrumentPickerProps = {
     value: string,
-    onChange: React.Dispatch<React.SetStateAction<string>>,
+    onChange: (InstrumentName: string) => void
     classes: Record<string,string>
 }
 
@@ -294,7 +296,8 @@ export function renderInstrumentPicker({ value, onChange, classes }: TInstrument
 }
 function AudioSettingsController({ left = false}): ReactElement{
     const { noteDuration, setNoteDuration, channelColor, setChannelColor, noteRange, setNoteRange } = useContext(AudioStateProviderContext)
-    const  {currentInstrumentName, setCurrentInstrumentName} = useContext(SoundfontProviderContext)
+    const  {currentInstrumentName} = useContext(SoundfontProviderContext)
+    const  {selectInstrument} = useAudioController()
     const [itemOpened, setItemOpened] = useState<string >('')
     const [anchorEl, setAnchorEl] = useState<{x: number, y: number }>({ x: 0, y: 0})
     const classes = useStyles()
@@ -335,7 +338,7 @@ function AudioSettingsController({ left = false}): ReactElement{
                                         item.name ==='Note range' && renderNoteRangePicker({ value: noteRange, onChange: setNoteRange, classes })
                                     }
                                     { 
-                                        item.name ==='Instrument' && renderInstrumentPicker({ value: currentInstrumentName, onChange: setCurrentInstrumentName, classes })
+                                        item.name ==='Instrument' && renderInstrumentPicker({ value: currentInstrumentName, onChange: selectInstrument, classes })
                                     }
                                 </Paper>
                                 

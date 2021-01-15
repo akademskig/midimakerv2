@@ -196,8 +196,12 @@ function NotesGridRenderer() {
   }, [canvasBoxElement, canvasElement, notesListElement, initCtx, canvasTimerElement])
 
   const renderTimerBar = useCallback(() => {
-    if (!canvasBoxElement || !canvasTimerCtx || !canvasElement) {
+    if (!canvasBoxElement || !canvasTimerCtx || !canvasElement ) {
       return
+    }
+    if (!timer) {
+      canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasElement?.height || 0)
+      return setLastTimerPosition(0)
     }
     canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
     const x = (timer / noteDuration) * (RECT_WIDTH + RECT_SPACE)
@@ -207,10 +211,6 @@ function NotesGridRenderer() {
       setLastTimerPosition(x)
       canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasTimerElement?.height || 0)
       canvasTimerCtx.fillRect(x, 0, BAR_WIDTH, canvasTimerElement?.height || 0)
-    }
-    if (!timer) {
-      canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasElement?.height || 0)
-      setLastTimerPosition(0)
     }
   }, [canvasBoxElement, canvasElement, canvasTimerElement, canvasWrapperRef, lastTimerPosition, noteDuration, timer])
 
@@ -308,7 +308,6 @@ function NotesGridRenderer() {
       const newChannels = channels.map(channel => {
         const newNotes = channel.notes.map(note => {
           note.coordX = note.time * (RECT_WIDTH + RECT_SPACE) / noteDuration
-          console.log(note.coordX, note.time)
           const noteIdx = notes.findIndex(noteA => Number(noteA.midiNumber) === note.midiNumber)
           note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
           return note
@@ -326,7 +325,8 @@ function NotesGridRenderer() {
       return
     }
     const rectangleHeight = (notesCanvasElement.height - RECT_SPACE * notes.length) / notes.length
-    notesCanvasCtx?.clearRect(previousHoveredNote?.coordX || 0 + 1, previousHoveredNote?.coordY || 0 + 1, width, rectangleHeight + 5)
+    // notesCanvasCtx?.clearRect(previousHoveredNote?.coordX || 0 + 1, previousHoveredNote?.coordY || 0 + 1, width, rectangleHeight + 5)
+    notesCanvasCtx?.clearRect(0, 0, notesCanvasElement.width, notesCanvasElement.height)
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
       channel.notes.map((note: PlayEvent) => ({ ...note, color: channel.color }))
     ) // join notes from all channels into a single array, + add a color field
