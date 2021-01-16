@@ -11,8 +11,6 @@ import {
 } from './SoundFontProvider.types'
 import { audioContext } from '../../globals'
 import { instrumentList } from './soundfontInstruments'
-import { useAudioController } from '../../controllers/AudioController'
-
 
 const hostname = appConfig.soundfont.hostname
 

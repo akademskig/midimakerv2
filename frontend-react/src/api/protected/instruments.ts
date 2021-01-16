@@ -2,7 +2,6 @@ import React, { useContext, useMemo } from 'react'
 import Axios, { AxiosError } from 'axios'
 import { AuthCtx } from '../../providers/auth.provider';
 import { Player } from 'soundfont-player';
-import { parseJsonConfigFileContent, parseJsonText } from 'typescript';
 
 const baseUrl = `http://localhost:4000`
 

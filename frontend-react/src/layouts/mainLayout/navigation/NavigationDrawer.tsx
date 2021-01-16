@@ -15,7 +15,7 @@ import { navigationItems } from './navigationItems';
 import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
 import useScreenSize from '../../../providers/screenSize.provider';
-import { CANVAS_BACKGROUND, RECT_COLOR } from '../../../midimaker/components/NotesGrid/constants';
+import { RECT_COLOR } from '../../../midimaker/components/NotesGrid/constants';
 
 const drawerWidth = 200;
 
@@ -240,7 +240,7 @@ export default function NavigationDrawer({ children, theme }: any) {
                     <Divider />
                 </Drawer>
                     }
-                <main className={clsx(classes.content, {['md']: open, ['sm']: !open && isDesktop, ['xs']: !open && isTablet && !isMobile })}>
+                <main className={clsx(classes.content, {'md': open, 'sm': !open && isDesktop, 'xs': !open && isTablet && !isMobile })}>
                         {children}
                     </main>
                 </div>

@@ -9,4 +9,12 @@ export const REC_TIME = 180
 export const CANVAS_HEIGHT = 600
 export const CANVAS_BACKGROUND = '#5d1c55'
 export const MIDI_OFFSET = 42
-export const defaultColors = ['#008080', '#C01CCE', '#1C3FCE', '#E45C38', '#9F74D6' ]
+export const defaultColors = [
+    '#bb60e6', 
+    '#C01CCE', 
+    '#73ebb3', 
+    '#d5f159', 
+    '#d43d95', 
+    '#32E2E2',
+    '#41e232',
+]

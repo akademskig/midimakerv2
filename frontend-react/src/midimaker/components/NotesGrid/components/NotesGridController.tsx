@@ -18,6 +18,7 @@ export interface INotesGridController {
   renderPlay: ()=> void,
   stopPlayRender: ()=> void,
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => void
+ 
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimerElement: HTMLCanvasElement)=> void
 }
 
@@ -28,17 +29,15 @@ const initialCtxValues = {
   renderPlay: ()=> {},
   stopPlayRender: ()=> {},
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => {},
-  initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimer: HTMLCanvasElement)=> {}
+  initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimer: HTMLCanvasElement)=> {},
 }
-let notesListWidth = 0
-let canvasTimerCtx: CanvasRenderingContext2D | null = null
 
 export const NotesGridControllerCtx= createContext<INotesGridController>(initialCtxValues)
 function NotesGridControllerProvider({ children }: INotesGridControllerProps): JSX.Element {
   const { playNote } = useAudioPlayer()
   // const { findNoteByGridCoordinates, getX, getY, rectangleHeight } = useContext(CanvasContext)
   const { handleToggleNote } = useAudioController()
-  const { currentChannel, channels,  controllerState, setControllerState, noteDuration, notes } = useContext(AudioStateProviderContext)
+  const { currentChannel, channels,  setControllerState, noteDuration, notes } = useContext(AudioStateProviderContext)
   const [mappedEvents, setMappedEvents ] = useState<TMappedEvent[]>([])
 
   const [timer, setTimer] = useState(0)
@@ -145,7 +144,6 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     if(!canvasTimerElement){
       return 
     }
-    canvasTimerCtx = canvasTimerElement?.getContext('2d')
     const compositionDuration = channels.reduce(
       (acc, curr) => (curr.duration > acc ? curr.duration : acc),
       0)
@@ -169,7 +167,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     timer,
     renderPlay,
     stopPlayRender,
-    setNotesCoordinates
+    setNotesCoordinates,
   }
   return(
     <NotesGridControllerCtx.Provider value={ctxValue}>

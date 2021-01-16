@@ -1,10 +1,9 @@
-import { createStyles, Divider, IconButton, makeStyles, Theme } from '@material-ui/core'
+import { createStyles, IconButton, makeStyles, Theme } from '@material-ui/core'
 import { PlayArrow, Stop } from '@material-ui/icons'
-import React, { ReactElement, useContext, useState } from 'react'
+import React, { ReactElement, useContext } from 'react'
 import classnames from 'classnames'
 import { useAudioPlayer } from '../../controllers/AudioPlayer'
 import { AudioStateProviderContext } from '../../providers/AudioStateProvider/AudioStateProvider'
-import { CanvasContext } from '../NotesGrid/components/NotesGridRenderer'
 import { NotesGridControllerCtx } from '../NotesGrid/components/NotesGridController'
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
@@ -30,7 +29,6 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   }))
 
 function AudioPlayerController({ top = false}): ReactElement{
-    const [active, setActive] = useState('')
     const { playAll, stopPlayAll } = useAudioPlayer()
     // const { renderPlay, stopPlayRender } = useContext(CanvasContext)
     const { setControllerState, controllerState } = useContext(AudioStateProviderContext)

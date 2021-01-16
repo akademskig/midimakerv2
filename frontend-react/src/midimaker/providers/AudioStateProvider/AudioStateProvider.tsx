@@ -1,8 +1,7 @@
 import React, { createContext, ReactElement, useCallback, useEffect, useState } from 'react'
 import { MidiNumbers } from 'react-piano'
 import { range } from 'lodash'
-import { Note, PlayEvent, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
-import { TRecordingGrid } from './AudioStateProvider.types'
+import { Note, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
 
 const initialNoteRange = {
     first: 43,
@@ -35,7 +34,10 @@ interface IAudioStateProviderContext {
     controllerState: IControllerState,
     setControllerState: (state: IControllerState) => void,
     noteRange: TNoteRange,
-    setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>
+    setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>,
+    compositionDuration: number,
+    setCompositionDuration: React.Dispatch<React.SetStateAction<number>>,
+   
 }
 
 interface IAudioStateProviderProps { 
@@ -68,6 +70,8 @@ const initialCtxValue = {
         setNotes: ((value: React.SetStateAction<Note[]>) => (value: Note[]) => value),
         noteRange: initialNoteRange,
         setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value:TNoteRange) => value),
+        compositionDuration: 0,
+        setCompositionDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
 }
 
 
@@ -79,6 +83,8 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [currentChannel, setCurrentChannel] = useState<TChannel | null>(initialChannel)
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
     const [channels, setChannels] = useState<TChannel[]>([])
+    const [compositionDuration, setCompositionDuration] = useState(90)
+console.log(compositionDuration, 'duraiton')
     const [ notes, setNotes] = useState(  
         range(noteRange.first, noteRange.last)
         .map((idx: number) => MidiNumbers.getAttributes(idx))
@@ -126,6 +132,8 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         setNotes,
         noteRange, 
         setNoteRange,
+        compositionDuration,
+        setCompositionDuration
     }
 
     return (
