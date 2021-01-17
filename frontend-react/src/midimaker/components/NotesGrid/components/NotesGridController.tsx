@@ -45,7 +45,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
   const canvasNotesCoordinates = useRef<Array<ICoordinates>>([])
   const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null)
   const [canvasBoxElement, setCanvasBoxElement] = useState<HTMLDivElement | null>(null)
-  const [notesListElement, setNotesListElement] = useState<HTMLCanvasElement | null>(null)
+  const [ notesListElement, setNotesListElement] = useState<HTMLCanvasElement | null>(null)
   const [canvasTimerElement, setCanvasTimerElement] = useState<HTMLCanvasElement | null>(null)
 
   const initCtx = useCallback((canvasElement, canvasBoxElement, notesListElement, canvasTimerElement)=> {

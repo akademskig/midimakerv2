@@ -10,7 +10,7 @@ import React, {
   createContext
 } from 'react'
 
-import { flatMap } from 'lodash'
+import { flatMap, range } from 'lodash'
 
 import {
   RECT_WIDTH, RECT_SPACE, BAR_COLOR,
@@ -19,7 +19,7 @@ import {
 import { Note, PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
 import { AudioStateProviderContext } from '../../../providers/AudioStateProvider/AudioStateProvider'
 import { lightenDarkenColor } from './utils'
-import { makeStyles } from '@material-ui/core'
+import { makeStyles, Slider } from '@material-ui/core'
 import { useAudioController } from '../../../controllers/AudioController'
 import { NotesGridControllerCtx } from './NotesGridController'
 import { SoundfontProviderContext } from '../../../providers/SoundfontProvider/SoundfontProvider'
@@ -121,10 +121,28 @@ const useStyles = (height: number, width: number, playing: boolean) => makeStyle
     width: '200px'
   },
   gridCanvasContainer: {
-    height: `${height - 195}px`,
+    height: `${height - 220}px`,
     background: CANVAS_BACKGROUND,
     padding: '1px',
     position: 'relative',
+  },
+  timerSlider: {
+    color: theme.palette.primary.light,
+    height: '4px',
+    marginTop: '-2px',
+    padding: `${theme.spacing(0)}px  0`,
+    // marginLeft: `${-RECT_SPACE}px`,
+    '& .MuiSlider-markLabel': {
+      top: '2px',
+      color: theme.palette.primary.light
+    },
+    // '&.MuiSlider-marked':{
+    //   marginBottom: '11px'
+    // }
+  },
+  canvasAndTimerContainer: {
+    width: 'fit-content',
+
   }
 }))
 
@@ -230,13 +248,12 @@ function NotesGridRenderer() {
     if (!canvasCtx) {
       return
     }
-    const xLength =
-      Math.floor(compositionDuration * 1 / noteDuration)
-    canvasElement.width = xLength * (RECT_WIDTH)
-    canvasElement.height = canvasBoxElement.getBoundingClientRect().height + 1
-    canvasTimerElement.width = xLength * (RECT_WIDTH)
+    const xLength = Math.ceil(compositionDuration / noteDuration)
+    canvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
+    canvasElement.height = canvasBoxElement.getBoundingClientRect().height
+    canvasTimerElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
     canvasTimerElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
-    notesCanvasElement.width = xLength * (RECT_WIDTH)
+    notesCanvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
     notesCanvasElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
     notesListElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
     notesListWidth = Math.ceil(fontSize.current + RECT_WIDTH * 2.7 + 5)
@@ -264,7 +281,7 @@ function NotesGridRenderer() {
       if (!canvasCtx || !notesListCtx) {
         return undefined
       }
-      for (let j = 0; j < xLength; j++) {
+      for (let j = 0; j < xLength + 1; j++) {
         const x = Math.floor((j - 1) * (RECT_WIDTH + RECT_SPACE))
         const y = Math.floor((rectangleHeight + RECT_SPACE) * i)
         if (j === 0) {
@@ -282,12 +299,15 @@ function NotesGridRenderer() {
           notesListCtx.fillRect(RECT_WIDTH + notesListWidth, i * (rectangleHeight + RECT_SPACE), RECT_SPACE, rectangleHeight + RECT_SPACE) // vertical border
         } else {
           canvasCtx.fillStyle = CANVAS_BACKGROUND
-          canvasCtx.fillRect(x - RECT_SPACE, y, RECT_SPACE, rectangleHeight) // fill vertical spaces
+          canvasCtx.fillRect(x, y, RECT_SPACE, rectangleHeight) // fill vertical spaces
           canvasCtx.fillRect(x, y - RECT_SPACE, RECT_WIDTH + RECT_SPACE, RECT_SPACE) // fill horizontal spaces
           coordinatesMapLocal = [...coordinatesMapLocal, { noteId: `${note.midiNumber}`, midiNumber: note.midiNumber, x, y }]
         }
         if (i === notes.length - 1) {
           canvasCtx.fillRect(0, y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
+        }
+        if(j === xLength){
+          canvasCtx.fillRect(x + RECT_WIDTH, y, RECT_SPACE, rectangleHeight) 
         }
       }
     })
@@ -334,10 +354,10 @@ function NotesGridRenderer() {
         event.duration * (RECT_WIDTH) * 1 / noteDuration
       )
       notesCanvasCtx.fillStyle = event.color ? event.color : channelColor
-      notesCanvasCtx.fillRect(event.coordX + RECT_SPACE, event.coordY + RECT_SPACE, width, rectangleHeight)
+      notesCanvasCtx.fillRect(event.coordX + + RECT_SPACE * 2, event.coordY + RECT_SPACE, width, rectangleHeight)
       if (event.noteId === hoveredNote?.noteId) {
         notesCanvasCtx.strokeStyle = channelColorLight
-        notesCanvasCtx.strokeRect(hoveredNote.coordX + RECT_SPACE, hoveredNote.coordY + RECT_SPACE, width, rectangleHeight)
+        notesCanvasCtx.strokeRect(hoveredNote.coordX + RECT_SPACE * 2, hoveredNote.coordY + RECT_SPACE, width, rectangleHeight)
       }
 
     })
@@ -405,7 +425,6 @@ function NotesGridRenderer() {
   useEffect(() => {
     renderTimerBar()
   }, [renderTimerBar, timer])
-
   useEffect(() => {
     if (notesCanvasElement) {
       notesCanvasElement.tabIndex = 1000
@@ -425,11 +444,23 @@ function NotesGridRenderer() {
       </div>
       <div ref={canvasWrapperRef} style={{ overflow: 'auto', overflowY: 'hidden' }} >
         <div ref={canvasBoxRef} className={classes.gridCanvasContainer} >
+          <div className={classes.canvasAndTimerContainer}>
           <canvas
             className={classes.canvas}
             id="canvas"
             ref={canvasRef}
           />
+          <Slider
+           id="timer-slider"
+           value={timer}
+           className={classes.timerSlider}
+           marks={range(0, compositionDuration + 1).filter((n, idx)=> 1 / noteDuration >= 4 ? idx: idx % 5 ===0  ).map((n)=> ({value: n, 
+            label: n < 60 ?`00:${n<10 ? 0: ''}${n}`:`${Math.floor(n / 60) < 10 ? 0: ''}${Math.floor(n / 60)}:${n % 60 < 10 ? 0: ''}${n % 60}`}))}
+           aria-labelledby="timer-slider"
+           max={compositionDuration}
+           min={0}
+            />
+            </div>
           <canvas
             ref={canvasTimerRef}
             className={classes.timerCanvas}
