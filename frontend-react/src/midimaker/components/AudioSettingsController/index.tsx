@@ -1,8 +1,8 @@
-import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, Paper, Select, Slider, Theme, Tooltip } from '@material-ui/core'
+import React, { ReactElement, useCallback, useContext, useState, MouseEvent, ChangeEvent } from 'react'
+import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, Paper, Select, Slider, Theme } from '@material-ui/core'
 import { AccessTime, SettingsEthernet, Timelapse } from '@material-ui/icons'
 import { MidiNumbers } from 'react-piano'
-
-import React, { ReactElement, useCallback, useContext, useState, MouseEvent, ChangeEvent } from 'react'
+import { CustomTooltip } from '../shared/loader/CustomTooltip'
 import { AudioStateProviderContext, TNoteRange } from '../../providers/AudioStateProvider/AudioStateProvider'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -46,7 +46,8 @@ const useStyles = makeStyles((theme: Theme) =>
         position: 'fixed',
         backgroundColor: theme.palette.primary.main,
         color: theme.palette.primary.contrastText,
-        boxShadow: theme.shadows[5]
+        boxShadow: theme.shadows[5],
+        fontFamily: 'Fira Code !important',
     },
     formControl: {
         '& .MuiInput-root, .MuiFormLabel-root': {
@@ -265,7 +266,7 @@ export function renderCompositionDurationPicker({ value, onChange, classes }: TC
                 id="set-composition-duration"
                 className={classes.durationSlider}
                 value={value}
-                aria-labelledby="label"
+                aria-labelledby="set-composition-duration"
                 onChange={onDurationChange}
                 max={200}
                 min={10}
@@ -301,11 +302,11 @@ function AudioSettingsController({ left = false }): ReactElement {
             <List>
                 {settingItems.map((item, index) => (
                     <div>
-                        <Tooltip title={item.label} placement='top-end' className={classes.tooltip}>
+                        <CustomTooltip title={item.label} placement='top-end' className={classes.tooltip}>
                             <ListItem button className={classes.listItem} key={index} onClick={(e) => handleClick(e, item.value)}>
                                 <ListItemIcon className={classes.listItemIcon}>{getIcon(item.icon)}</ListItemIcon>
                             </ListItem>
-                        </Tooltip>
+                        </CustomTooltip>
                         { item.value === itemOpened &&
                             <Paper className={classes.popoverPaper} style={{ left: `${anchorEl.x - (!left ? (item.value === 'color' ? 290 : 200) : 0)}px`, top: `${anchorEl.y}px` }}>
                                 {

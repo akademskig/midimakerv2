@@ -111,6 +111,7 @@ const useStyles = (height: number, width: number, playing: boolean) => makeStyle
     padding: '1px 0',
     zIndex: 1,
     borderTop: 'none',
+    fontFamily: 'Fira Code'
   },
   canvasContainer: {
     position: 'relative',
@@ -252,10 +253,10 @@ function NotesGridRenderer() {
     canvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
     canvasElement.height = canvasBoxElement.getBoundingClientRect().height
     canvasTimerElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
-    canvasTimerElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
+    canvasTimerElement.height = canvasBoxElement.getBoundingClientRect().height 
     notesCanvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
-    notesCanvasElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
-    notesListElement.height = canvasBoxElement.getBoundingClientRect().height - RECT_SPACE * 2
+    notesCanvasElement.height = canvasBoxElement.getBoundingClientRect().height
+    notesListElement.height = canvasBoxElement.getBoundingClientRect().height
     notesListWidth = Math.ceil(fontSize.current + RECT_WIDTH * 2.7 + 5)
     notesListElement.width = notesListWidth
     return xLength
@@ -274,7 +275,7 @@ function NotesGridRenderer() {
     coordinatesMapLocal = []
     // draw notes to canvas
     const calculateFontYPosition = (i: number) => {
-      return (rectangleHeight / 1.4) + (i * (rectangleHeight + RECT_SPACE))
+      return (rectangleHeight / 1.5) + (i * (rectangleHeight + RECT_SPACE))
     }
     // eslint-disable-next-line array-callback-return
     notes.filter((note: Note, i: number): void => {
@@ -288,13 +289,13 @@ function NotesGridRenderer() {
           const fontSize = rectangleHeight * 0.6
           notesListCtx.fillRect(x, y, RECT_WIDTH, RECT_SPACE)
           notesListCtx.fillStyle = '#fff' //fontColor
-          notesListCtx.font = `${fontSize}px Comic Sans MS`
+          notesListCtx.font = `${fontSize}px 'Fira Code'`
           notesListCtx.fillText(
             note.note,
             5,
             calculateFontYPosition(i)
           )
-          notesListCtx.fillStyle = '#1c6dd6'
+          notesListCtx.fillStyle = '#4973ac'
           notesListCtx.fillRect(0, y - RECT_SPACE, notesListWidth, RECT_SPACE) // horizontal border
           notesListCtx.fillRect(RECT_WIDTH + notesListWidth, i * (rectangleHeight + RECT_SPACE), RECT_SPACE, rectangleHeight + RECT_SPACE) // vertical border
         } else {
@@ -305,6 +306,7 @@ function NotesGridRenderer() {
         }
         if (i === notes.length - 1) {
           canvasCtx.fillRect(0, y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
+          notesListCtx.fillRect(0, y + rectangleHeight, notesListWidth, RECT_SPACE) 
         }
         if(j === xLength){
           canvasCtx.fillRect(x + RECT_WIDTH, y, RECT_SPACE, rectangleHeight) 

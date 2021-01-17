@@ -5,7 +5,6 @@ import 'react-notifications/lib/notifications.css';
 import './index.scss';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { Provider } from 'react-redux';
 
 ReactDOM.render(
       <App />,

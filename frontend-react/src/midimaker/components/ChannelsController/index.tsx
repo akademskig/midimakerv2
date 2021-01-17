@@ -1,16 +1,17 @@
 import React, { ReactElement, useCallback, useContext, MouseEvent, useState, ChangeEvent } from 'react'
-import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, makeStyles, Paper, Theme, Tooltip, useTheme,FormControl, InputLabel,MenuItem,Select  } from '@material-ui/core'
+import { Divider, Drawer, IconButton, List, ListItem, ListItemIcon, makeStyles, Paper, Theme, useTheme, FormControl, InputLabel, MenuItem, Select } from '@material-ui/core'
 import classnames from 'classnames'
 import { AudioStateProviderContext } from '../../providers/AudioStateProvider/AudioStateProvider'
 import { getInstrumentLabel } from '../AudioSettingsController/utils'
 import { TChannel } from '../../providers/SoundfontProvider/SoundFontProvider.types'
 import { SoundfontProviderContext } from '../../providers/SoundfontProvider/SoundfontProvider'
 import { useAudioController } from '../../controllers/AudioController'
-import { Delete,ColorLens, LibraryMusic, SettingsEthernet } from '@material-ui/icons'
+import { Delete, ColorLens, LibraryMusic, SettingsEthernet, FiberManualRecord } from '@material-ui/icons'
 import { ChromePicker, ColorResult } from 'react-color'
 import { makeInstrumentList } from '../AudioSettingsController/utils'
+import { CustomTooltip } from '../shared/loader/CustomTooltip'
 
-const useStyles = makeStyles((theme: any) =>
+const useStyles = makeStyles((theme: Theme) =>
 ({
     drawer: {
         transition: theme.transitions.create('width', {
@@ -38,8 +39,8 @@ const useStyles = makeStyles((theme: any) =>
         }
     },
     listItem: {
-        paddingTop: '0.75em',
-        paddingBottom: '0.75em',
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
         '&:hover': {
             cursor: 'pointer',
             '& svg': {
@@ -48,23 +49,17 @@ const useStyles = makeStyles((theme: any) =>
         },
     },
     listItemChannel: {
-        paddingTop:theme.spacing(0.5),
+        paddingTop: theme.spacing(0.5),
         paddingBottom: theme.spacing(0.5),
+
         display: 'flex',
         justifyContent: 'center',
         '&:hover': {
             cursor: 'pointer',
-            '& svg': {
-                color: theme.palette.secondary.light
-            },
-            '& div': {
-                border: '2px solid #ffffff'
-            }
+            backgroundColor: '#32517d',
         },
         '&.active': {
-            '& div': {
-                border: '2px solid #ffffff'
-            }
+            backgroundColor: '#32517d',
         }
     },
     popoverPaper: {
@@ -72,12 +67,13 @@ const useStyles = makeStyles((theme: any) =>
         backgroundColor: theme.palette.primary.main,
         color: theme.palette.primary.contrastText,
         boxShadow: theme.shadows[5],
+        fontFamily: 'Fira Code',
     },
     listItemDiv: {
-        width: 32,
-        height: 20,
+        width: 25,
+        height: 25,
         boxSizing: 'content-box',
-        borderRadius: '2px',
+        borderRadius: '1px',
     },
     deleteButton: {
         '& :hover': {
@@ -89,6 +85,7 @@ const useStyles = makeStyles((theme: any) =>
     },
     tooltip: {
         marginBottom: 0,
+        fontSize: theme.spacing(1)
     },
     formControl: {
         '& .MuiInput-root, .MuiFormLabel-root': {
@@ -122,7 +119,7 @@ const useStyles = makeStyles((theme: any) =>
         },
     },
     channelsList: {
-        padding: theme.spacing(0.75)
+        padding: `${theme.spacing(0.75)}px 0`
     }
 }))
 
@@ -174,7 +171,12 @@ const ChannelList = ({ channels, classes, onClick, currentInstrumentName }: TCha
             { channels.map((channel: TChannel, idx: number) => {
                 return (
                     <div key={idx}>
-                        <Tooltip title={getInstrumentLabel(channel.instrumentName)} placement='top-end' className={classes.tooltip}>
+                        <CustomTooltip
+                            title={getInstrumentLabel(channel.instrumentName)}
+                            placement='top-end'
+                            className={classes.tooltip}
+
+                        >
                             <ListItem
                                 disableGutters
                                 className={classnames(classes.listItemChannel, { active: currentInstrumentName === channel.instrumentName })}
@@ -182,9 +184,9 @@ const ChannelList = ({ channels, classes, onClick, currentInstrumentName }: TCha
                                 value={channel.instrumentName}
                                 onContextMenu={(e) => onChannelRightClick(e, idx)}
                             >
-                                <div className={classes.listItemDiv} style={{ backgroundColor: channel.color }}></div>
+                                <FiberManualRecord fontSize='large' className={classes.listItemDiv} style={{ color: channel.color }} />
                             </ListItem>
-                        </Tooltip>
+                        </CustomTooltip>
                         <Paper className={classes.popoverPaper} style={{ left: `${anchorEl.x - 110}px`, top: `${anchorEl.y + 6}px` }}>
                             {
                                 opened === idx && renderChannelEditor({ classes, theme, key: idx, onClick: (e) => onRemoveClick(e, idx) })
@@ -208,7 +210,7 @@ export const settingItems = [
         value: 'color',
         icon: 'color'
     },
-   
+
 ]
 const getIcon = (icon: string) => {
     switch (icon) {
@@ -299,15 +301,16 @@ function ChannelsController({ left = false }): ReactElement {
                 paper: classes.drawerPaper,
             }}
         >
-            <Divider/>
-            {settingItems.map((item, index) => (
-                    <div>
-                        <Tooltip title={item.label} placement='top-end' className={classes.tooltip}>
+            <Divider />
+            <List>
+                {settingItems.map((item, index) => (
+                    <>
+                        <CustomTooltip title={item.label} placement='top-end' className={classes.tooltip}>
                             <ListItem button className={classes.listItem} key={index} onClick={(e) => handleChannelRightClick(e, item.value)}>
                                 <ListItemIcon className={classes.listItemIcon}>{getIcon(item.icon)}</ListItemIcon>
                             </ListItem>
-                        </Tooltip>
-                        { item.value === itemOpened &&
+                        </CustomTooltip>
+                        {item.value === itemOpened &&
                             <Paper className={classes.popoverPaper} style={{ left: `${anchorEl.x - (!left ? (item.value === 'color' ? 290 : 258) : 0)}px`, top: `${anchorEl.y}px` }}>
                                 {
                                     item.value === 'color' && renderColorPicker({ value: channelColor, onChange: setChannelColor, classes })
@@ -317,8 +320,10 @@ function ChannelsController({ left = false }): ReactElement {
                                 }
                             </Paper>
                         }
-                    </div>
+                    </>
                 ))}
+
+            </List>
             <Divider />
             { !!channels.length && <ChannelList {...{ channels, classes, onClick: handleChannelClick, currentInstrumentName }} />}
             <Divider />
