@@ -173,7 +173,7 @@ function NotesGridRenderer() {
   const canvasTimerRef = createRef<HTMLCanvasElement>()
   const notesCanvasRef = createRef<HTMLCanvasElement>()
   const canvasWrapperRef = createRef<HTMLDivElement>()
-  const [lastTimerPosition, setLastTimerPosition] = useState(0)
+  const lastTimerPosition = useRef(0)
 
   const fontSize = useRef<number>(0)
   const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
@@ -217,19 +217,19 @@ function NotesGridRenderer() {
       return
     }
     // canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
-    const x = (timer / noteDuration) * (RECT_WIDTH + RECT_SPACE)
+    const x =(timer / noteDuration) * (RECT_WIDTH + RECT_SPACE)
     if (controllerState.PLAYING) {
       canvasWrapperRef?.current?.scroll(x - (canvasBoxElement.getBoundingClientRect().width / 2), 0)
     }
     if (timer) {
       canvasTimerCtx.fillStyle = BAR_COLOR
-      setLastTimerPosition(x)
-      canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasTimerElement?.height || 0)
+      canvasTimerCtx.clearRect(lastTimerPosition.current, 0, BAR_WIDTH + 1, canvasTimerElement?.height || 0)
       canvasTimerCtx.fillRect(x, 0, BAR_WIDTH, canvasTimerElement?.height || 0)
+      lastTimerPosition.current = x
     }
     if (!timer) {
       canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
-      return setLastTimerPosition(0)
+      lastTimerPosition.current = 0
     }
   }, [canvasBoxElement, canvasElement, canvasTimerElement, canvasWrapperRef,
     controllerState.PLAYING, lastTimerPosition, noteDuration, timer])
@@ -248,7 +248,7 @@ function NotesGridRenderer() {
     canvasTimerCtx = canvasTimerElement?.getContext('2d')
     notesListCtx = notesListElement?.getContext('2d')
     notesCanvasCtx = notesCanvasElement?.getContext('2d')
-    if (!canvasCtx) {
+    if (!canvasCtx || !canvasTimerCtx) {
       return
     }
     const xLength = Math.ceil(compositionDuration / noteDuration)
@@ -259,7 +259,7 @@ function NotesGridRenderer() {
     notesCanvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
     notesCanvasElement.height = canvasBoxElement.getBoundingClientRect().height
     notesListElement.height = canvasBoxElement.getBoundingClientRect().height
-    notesListWidth = Math.ceil(fontSize.current + RECT_WIDTH * 2.7 + 5)
+    notesListWidth = Math.ceil(fontSize.current + 45)
     notesListElement.width = notesListWidth
     return xLength
 
@@ -349,7 +349,8 @@ function NotesGridRenderer() {
     notesCanvasCtx?.clearRect(0, 0, notesCanvasElement.width, notesCanvasElement.height)
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
       channel.notes.map((note: PlayEvent) => ({ ...note, color: channel.color }))
-    ) // join notes from all channels into a single array, + add a color field
+    ) 
+    // join notes from all channels into a single array, + add a color field
     joinedEvents.forEach((event, i) => {
       if (!notesCanvasCtx) {
         return
@@ -414,8 +415,14 @@ function NotesGridRenderer() {
     return resizing ? onResize(event) : null
   }, [resizing, onResize, setCurrentNote, findNoteInChannel])
   const onSliderMove = useCallback((event, value) => {
+    const compositionDuration = channels.reduce(
+      (acc, curr) => (curr.duration > acc ? curr.duration : acc),
+      0)
+    if(value > compositionDuration){
+      return 
+    }
     setTimer(value)
-  }, [setTimer])
+  }, [channels, setTimer])
 
   useEffect(() => {
     setRenderingDone(false)

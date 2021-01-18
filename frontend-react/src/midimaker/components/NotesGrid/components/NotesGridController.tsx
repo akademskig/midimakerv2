@@ -152,7 +152,8 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     const compositionDuration = channels.reduce(
       (acc, curr) => (curr.duration > acc ? curr.duration : acc),
       0)
-      for (let i = timer; i <= compositionDuration + noteDuration; i += noteDuration ) {
+      const freq = noteDuration < 0.125 ? noteDuration * 2: noteDuration
+      for (let i = timer; i <= compositionDuration + noteDuration; i += freq) {
         const offsetted = i - timer
       const t = setTimeout(() => {
         setTimer(i)

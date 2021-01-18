@@ -1,4 +1,4 @@
-export const RECT_WIDTH = 15
+export const RECT_WIDTH = 12
 export const RECT_SPACE = 1
 export const RECT_COLOR = '#1f2236'
 export const RECT_TIME = 10
