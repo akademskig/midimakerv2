@@ -12,7 +12,8 @@ const initialChannelColor = '#008080'
 
 interface IControllerState {
     PLAYING?: boolean
-    RECORDING?:boolean,
+    RECORDING?: boolean,
+    PAUSED?: boolean,
     RECORDING_RESET?: boolean
 }
 
@@ -37,10 +38,10 @@ interface IAudioStateProviderContext {
     setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>,
     compositionDuration: number,
     setCompositionDuration: React.Dispatch<React.SetStateAction<number>>,
-   
+
 }
 
-interface IAudioStateProviderProps { 
+interface IAudioStateProviderProps {
     children: ReactElement | ReactElement[]
 }
 const initialChannel = {
@@ -51,27 +52,28 @@ const initialChannel = {
 }
 const initialControllerState = {
     PLAYING: false,
+    PAUSED: false,
     RECORDING: false,
     RECORDING_RESET: false
 }
 
 const initialCtxValue = {
-        currentChannel: null,
-        setCurrentChannel: ((value: React.SetStateAction<TChannel | null>) => (value: TChannel) => value),
-        channelColor: '#008080',
-        setChannelColor: ((value: React.SetStateAction<string>) => (value: string) => value),
-        noteDuration: 0.125,
-        setNoteDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
-        channels: [],
-        setChannels: ((value: React.SetStateAction<TChannel[] | []>) => (value: TChannel[]) => value),
-        notes: [],
-        controllerState: initialControllerState,
-        setControllerState: (state: IControllerState) => {},
-        setNotes: ((value: React.SetStateAction<Note[]>) => (value: Note[]) => value),
-        noteRange: initialNoteRange,
-        setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value:TNoteRange) => value),
-        compositionDuration: 0,
-        setCompositionDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
+    currentChannel: null,
+    setCurrentChannel: ((value: React.SetStateAction<TChannel | null>) => (value: TChannel) => value),
+    channelColor: '#008080',
+    setChannelColor: ((value: React.SetStateAction<string>) => (value: string) => value),
+    noteDuration: 0.125,
+    setNoteDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
+    channels: [],
+    setChannels: ((value: React.SetStateAction<TChannel[] | []>) => (value: TChannel[]) => value),
+    notes: [],
+    controllerState: initialControllerState,
+    setControllerState: (state: IControllerState) => { },
+    setNotes: ((value: React.SetStateAction<Note[]>) => (value: Note[]) => value),
+    noteRange: initialNoteRange,
+    setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value: TNoteRange) => value),
+    compositionDuration: 0,
+    setCompositionDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
 }
 
 
@@ -84,19 +86,19 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
     const [channels, setChannels] = useState<TChannel[]>([])
     const [compositionDuration, setCompositionDuration] = useState(90)
-console.log(compositionDuration, 'duraiton')
-    const [ notes, setNotes] = useState(  
+
+    const [notes, setNotes] = useState(
         range(noteRange.first, noteRange.last)
-        .map((idx: number) => MidiNumbers.getAttributes(idx))
-        .reverse())
+            .map((idx: number) => MidiNumbers.getAttributes(idx))
+            .reverse())
 
     useEffect(() => {
-        setNotes( range(noteRange.first, noteRange.last)
-        .map((idx: number) => MidiNumbers.getAttributes(idx))
-        .reverse())
+        setNotes(range(noteRange.first, noteRange.last)
+            .map((idx: number) => MidiNumbers.getAttributes(idx))
+            .reverse())
     }, [noteRange])
 
-    const setController = useCallback((state)=> {
+    const setController = useCallback((state) => {
         setControllerState({
             ...controllerState,
             ...state
@@ -106,11 +108,11 @@ console.log(compositionDuration, 'duraiton')
     const setChannelColor = useCallback(
         (color) => {
             updateColor(color)
-            if(!currentChannel){
-                return 
+            if (!currentChannel) {
+                return
             }
-            const newChannel = {...currentChannel, color}
-            const newChannels = channels.map((channel:TChannel) => 
+            const newChannel = { ...currentChannel, color }
+            const newChannels = channels.map((channel: TChannel) =>
                 channel.instrumentName === currentChannel?.instrumentName ? newChannel : channel)
             setChannels(newChannels)
             setCurrentChannel(newChannel)
@@ -130,7 +132,7 @@ console.log(compositionDuration, 'duraiton')
         controllerState,
         setControllerState: setController,
         setNotes,
-        noteRange, 
+        noteRange,
         setNoteRange,
         compositionDuration,
         setCompositionDuration
@@ -138,7 +140,7 @@ console.log(compositionDuration, 'duraiton')
 
     return (
         <AudioStateProviderContext.Provider value={ctxValue}>
-            { children }
+            { children}
         </AudioStateProviderContext.Provider>
     )
 }

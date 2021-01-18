@@ -100,11 +100,12 @@ const useStyles = makeStyles((theme: Theme) =>
             }
         },
         margin: theme.spacing(1),
-        minWidth: 178,
+        minWidth: 220,
         display: 'block',
         '& .MuiInputBase-root': {
             width: '100%',
-            marginTop: theme.spacing(0.5)
+            marginTop: theme.spacing(0.5),
+            fontSize: '0.95em'
         },
         '& .MuiFormLabel-root': {
             position: 'relative'
@@ -311,7 +312,7 @@ function ChannelsController({ left = false }): ReactElement {
                             </ListItem>
                         </CustomTooltip>
                         {item.value === itemOpened &&
-                            <Paper className={classes.popoverPaper} style={{ left: `${anchorEl.x - (!left ? (item.value === 'color' ? 290 : 258) : 0)}px`, top: `${anchorEl.y}px` }}>
+                            <Paper className={classes.popoverPaper} style={{ left: `${anchorEl.x - (!left ? (item.value === 'color' ? 286 : 296) : 0)}px`, top: `${anchorEl.y}px` }}>
                                 {
                                     item.value === 'color' && renderColorPicker({ value: channelColor, onChange: setChannelColor, classes })
                                 }

@@ -15,10 +15,11 @@ export interface INotesGridController {
   toggleNote: (event: MouseEvent<HTMLDivElement | HTMLCanvasElement, globalThis.MouseEvent>) => void
   findNoteInChannel: (event: MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>) => PlayEvent | undefined,
   timer: number,
+  setTimer: React.Dispatch<React.SetStateAction<number>>,
   renderPlay: ()=> void,
+  pausePlayRender: ()=> void,
   stopPlayRender: ()=> void,
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => void
- 
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimerElement: HTMLCanvasElement)=> void
 }
 
@@ -26,9 +27,11 @@ const initialCtxValues = {
   toggleNote: (e: MouseEvent<HTMLDivElement | HTMLCanvasElement, globalThis.MouseEvent>) => {},
   findNoteInChannel: (event: MouseEvent<HTMLCanvasElement, globalThis.MouseEvent>) => undefined,
   timer: 0,
+  setTimer: ((value: React.SetStateAction<number>) => (value: number) => value),
   renderPlay: ()=> {},
   stopPlayRender: ()=> {},
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => {},
+  pausePlayRender: ()=> {},
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimer: HTMLCanvasElement)=> {},
 }
 
@@ -42,6 +45,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
 
   const [timer, setTimer] = useState(0)
   const timers = useRef<Array<number>>([])
+  const stopTimer = useRef<number>(0)
   const canvasNotesCoordinates = useRef<Array<ICoordinates>>([])
   const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null)
   const [canvasBoxElement, setCanvasBoxElement] = useState<HTMLDivElement | null>(null)
@@ -76,10 +80,11 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
   }, [])
   // stop play rendering
   const stopPlayRender = useCallback(() => {
+    clearTimeout(stopTimer.current)
     timers.current.forEach((t) => clearTimeout(t))
     setTimer(0)
-    setControllerState({'PLAYING': false})
-  }, [setTimer, setControllerState])
+    setControllerState({'PLAYING': false, 'PAUSED': false})
+  }, [setControllerState])
  
   const findMappedEvents = useCallback(() => {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
@@ -147,15 +152,22 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     const compositionDuration = channels.reduce(
       (acc, curr) => (curr.duration > acc ? curr.duration : acc),
       0)
-    for (let i = 0; i <= compositionDuration + noteDuration; i += noteDuration ) {
+      for (let i = timer; i <= compositionDuration + noteDuration; i += noteDuration ) {
+        const offsetted = i - timer
       const t = setTimeout(() => {
         setTimer(i)
-      }, i * 1000)
+      }, offsetted * 1000)
       timers.current = [...timers.current, t]
     }
-    setTimeout(() => stopPlayRender(), compositionDuration * 1000 +
+    stopTimer.current = setTimeout(() => stopPlayRender(), (compositionDuration - timer) * 1000 +
        (compositionDuration * 500 /compositionDuration)) // no lag if duration is 0
-  }, [canvasTimerElement, channels, noteDuration, stopPlayRender])
+  }, [canvasTimerElement, channels, noteDuration, stopPlayRender, timer, setTimer])
+
+  const pausePlayRender = useCallback(()=> {
+    clearTimeout(stopTimer.current)
+    timers.current.forEach((t) => clearTimeout(t))
+    setControllerState({'PLAYING': false})
+  }, [setControllerState])
 
   useEffect(() => {
     findMappedEvents()
@@ -165,9 +177,11 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     toggleNote,
     findNoteInChannel,
     timer,
+    setTimer,
     renderPlay,
     stopPlayRender,
     setNotesCoordinates,
+    pausePlayRender
   }
   return(
     <NotesGridControllerCtx.Provider value={ctxValue}>

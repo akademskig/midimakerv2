@@ -8,7 +8,7 @@ import {
 } from '../providers/SoundfontProvider/SoundFontProvider.types'
 import { WindowExtended } from '../globals'
 import { AudioStateProviderContext } from '../providers/AudioStateProvider/AudioStateProvider'
-
+import { NotesGridControllerCtx } from '../components/NotesGrid/components/NotesGridController'
 
 
 interface IAudioNode {
@@ -37,12 +37,12 @@ function AudioPlayer(): IAudioPlayer {
   const { cachedInstruments, currentInstrument } = useContext(SoundfontProviderContext)
   const { controllerState } = useContext(AudioStateProviderContext)
   const { channels } = useContext(AudioStateProviderContext)
+  const { timer } = useContext(NotesGridControllerCtx)
 
 
   const startNote = useCallback(
     (midiNumber, instrumentName?: string) => {
       return audioContext.resume().then(() => {
-        console.log(instrumentName)
         const audioNode = instrumentName
           ? cachedInstruments?.[instrumentName]?.play(midiNumber)
           : currentInstrument?.player?.play(midiNumber)
@@ -69,7 +69,6 @@ function AudioPlayer(): IAudioPlayer {
 
   const playNote = useCallback((lastEvent: PlayEvent, instrumentName?: string) => {
     startNote(lastEvent.midiNumber, instrumentName)
-    console.log(lastEvent.time, 'time')
     setTimeout(() => {
       stopNote(lastEvent.midiNumber)
     }, lastEvent.duration * 1000)
@@ -77,7 +76,7 @@ function AudioPlayer(): IAudioPlayer {
 
   const playAll = useCallback(
     async () => {
-      if(controllerState.PLAYING){
+      if (controllerState.PLAYING) {
         return
       }
       let joinedEvents: PlayChannelEvent[] = []
@@ -90,15 +89,15 @@ function AudioPlayer(): IAudioPlayer {
       }
       const startAndEndTimes = uniq(
         flatMap(joinedEvents, (event) => [
-          event.time,
-          Math.floor(event.time + event.duration),
-        ])
+          event.time -= timer,
+          Math.floor(event.time + event.duration - timer),
+        ]).filter(time => time >= 0)
       )
       startAndEndTimes.forEach((time, i) => {
         scheduledEvents.push(
           setTimeout(() => {
             const currentEvents = joinedEvents.filter((event: PlayEvent) => {
-              return event.time <= time && event.time + event.duration > time
+              return (event.time <= time && event.time + event.duration > time)
             })
             currentEvents.forEach((currentEvent: PlayChannelEvent) => {
               playNote(currentEvent, currentEvent.instrumentName)
@@ -107,7 +106,7 @@ function AudioPlayer(): IAudioPlayer {
         )
       })
     },
-    [channels, controllerState.PLAYING, playNote]
+    [channels, controllerState.PLAYING, playNote, timer]
   )
 
   // Clear any residual notes that don't get called with stopNote

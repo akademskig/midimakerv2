@@ -18,7 +18,7 @@ import {
 } from '../constants'
 import { Note, PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundFontProvider.types'
 import { AudioStateProviderContext } from '../../../providers/AudioStateProvider/AudioStateProvider'
-import { lightenDarkenColor } from './utils'
+import { lightenDarkenColor, generateMarks } from './utils'
 import { makeStyles, Slider } from '@material-ui/core'
 import { useAudioController } from '../../../controllers/AudioController'
 import { NotesGridControllerCtx } from './NotesGridController'
@@ -80,7 +80,7 @@ export interface INotesGridRendererProps {
   classes: Record<string, string>,
 }
 
-const useStyles = (height: number, width: number, playing: boolean) => makeStyles((theme) => ({
+const useStyles = (height: number, width: number, playing: boolean, paused: boolean) => makeStyles((theme) => ({
   canvas: {
     cursor: 'pointer',
     background: RECT_COLOR,
@@ -92,7 +92,7 @@ const useStyles = (height: number, width: number, playing: boolean) => makeStyle
     bottom: 0,
     left: 0,
     right: 0,
-    zIndex: !playing ? -1 : 2,
+    zIndex: !playing && !paused ? -1 : 2,
     background: 'transparent',
   },
   notesCanvas: {
@@ -181,10 +181,10 @@ function NotesGridRenderer() {
   const { channels, setChannels, noteDuration, channelColor, notes, controllerState,
     currentChannel, compositionDuration } = useContext(AudioStateProviderContext)
   const { loading } = useContext(SoundfontProviderContext)
-  const { toggleNote, findNoteInChannel, timer, setNotesCoordinates, initCtx } = useContext(NotesGridControllerCtx)
+  const { toggleNote, findNoteInChannel, timer, setTimer, setNotesCoordinates, initCtx } = useContext(NotesGridControllerCtx)
   const { updateNote } = useAudioController()
   const [channelColorLight, setChannelColorLight] = useState('#fff')
-  const classes = useStyles(height, width, controllerState.PLAYING || false)()
+  const classes = useStyles(height, width, controllerState.PLAYING || false, controllerState.PAUSED || false)()
   useEffect(() => {
     setChannelColorLight(`${lightenDarkenColor(currentChannel?.color || '', 90)}`)
   }, [setChannelColorLight, currentChannel])
@@ -212,14 +212,15 @@ function NotesGridRenderer() {
       initCtx(canvasElement, canvasBoxElement, notesListElement, canvasTimerElement)
     }
   }, [canvasBoxElement, canvasElement, notesListElement, initCtx, canvasTimerElement])
-
   const renderTimerBar = useCallback(() => {
-    if (!canvasBoxElement || !canvasTimerCtx || !canvasElement || !controllerState.PLAYING) {
+    if (!canvasBoxElement || !canvasTimerCtx || !canvasElement) {
       return
     }
-    canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
+    // canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
     const x = (timer / noteDuration) * (RECT_WIDTH + RECT_SPACE)
-    canvasWrapperRef?.current?.scroll(x - (canvasBoxElement.getBoundingClientRect().width / 2), 0)
+    if (controllerState.PLAYING) {
+      canvasWrapperRef?.current?.scroll(x - (canvasBoxElement.getBoundingClientRect().width / 2), 0)
+    }
     if (timer) {
       canvasTimerCtx.fillStyle = BAR_COLOR
       setLastTimerPosition(x)
@@ -227,10 +228,11 @@ function NotesGridRenderer() {
       canvasTimerCtx.fillRect(x, 0, BAR_WIDTH, canvasTimerElement?.height || 0)
     }
     if (!timer) {
-      canvasTimerCtx.clearRect(lastTimerPosition, 0, BAR_WIDTH + 1, canvasElement?.height || 0)
+      canvasTimerCtx.clearRect(0, 0, canvasTimerElement?.width || 0, canvasTimerElement?.height || 0)
       return setLastTimerPosition(0)
     }
-  }, [canvasBoxElement, canvasElement, canvasTimerElement, canvasWrapperRef, controllerState.PLAYING, lastTimerPosition, noteDuration, timer])
+  }, [canvasBoxElement, canvasElement, canvasTimerElement, canvasWrapperRef,
+    controllerState.PLAYING, lastTimerPosition, noteDuration, timer])
 
 
   const setHoveredNote = useCallback((note: PlayEvent | null) => {
@@ -253,7 +255,7 @@ function NotesGridRenderer() {
     canvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
     canvasElement.height = canvasBoxElement.getBoundingClientRect().height
     canvasTimerElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
-    canvasTimerElement.height = canvasBoxElement.getBoundingClientRect().height 
+    canvasTimerElement.height = canvasBoxElement.getBoundingClientRect().height
     notesCanvasElement.width = xLength * (RECT_WIDTH + RECT_SPACE)
     notesCanvasElement.height = canvasBoxElement.getBoundingClientRect().height
     notesListElement.height = canvasBoxElement.getBoundingClientRect().height
@@ -306,10 +308,10 @@ function NotesGridRenderer() {
         }
         if (i === notes.length - 1) {
           canvasCtx.fillRect(0, y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
-          notesListCtx.fillRect(0, y + rectangleHeight, notesListWidth, RECT_SPACE) 
+          notesListCtx.fillRect(0, y + rectangleHeight, notesListWidth, RECT_SPACE)
         }
-        if(j === xLength){
-          canvasCtx.fillRect(x + RECT_WIDTH, y, RECT_SPACE, rectangleHeight) 
+        if (j === xLength) {
+          canvasCtx.fillRect(x + RECT_WIDTH, y, RECT_SPACE, rectangleHeight)
         }
       }
     })
@@ -411,6 +413,9 @@ function NotesGridRenderer() {
     }
     return resizing ? onResize(event) : null
   }, [resizing, onResize, setCurrentNote, findNoteInChannel])
+  const onSliderMove = useCallback((event, value) => {
+    setTimer(value)
+  }, [setTimer])
 
   useEffect(() => {
     setRenderingDone(false)
@@ -447,22 +452,23 @@ function NotesGridRenderer() {
       <div ref={canvasWrapperRef} style={{ overflow: 'auto', overflowY: 'hidden' }} >
         <div ref={canvasBoxRef} className={classes.gridCanvasContainer} >
           <div className={classes.canvasAndTimerContainer}>
-          <canvas
-            className={classes.canvas}
-            id="canvas"
-            ref={canvasRef}
-          />
-          <Slider
-           id="timer-slider"
-           value={timer}
-           className={classes.timerSlider}
-           marks={range(0, compositionDuration + 1).filter((n, idx)=> 1 / noteDuration >= 4 ? idx: idx % 5 ===0  ).map((n)=> ({value: n, 
-            label: n < 60 ?`00:${n<10 ? 0: ''}${n}`:`${Math.floor(n / 60) < 10 ? 0: ''}${Math.floor(n / 60)}:${n % 60 < 10 ? 0: ''}${n % 60}`}))}
-           aria-labelledby="timer-slider"
-           max={compositionDuration}
-           min={0}
+            <canvas
+              className={classes.canvas}
+              id="canvas"
+              ref={canvasRef}
             />
-            </div>
+            <Slider
+              id="timer-slider"
+              value={timer}
+              onChange={onSliderMove}
+              step={noteDuration > 0.075 ? 1 : 0.5}
+              className={classes.timerSlider}
+              marks={generateMarks(compositionDuration, noteDuration, noteDuration > 0.075 ? 1 : 0.5)}
+              aria-labelledby="timer-slider"
+              max={compositionDuration}
+              min={0}
+            />
+          </div>
           <canvas
             ref={canvasTimerRef}
             className={classes.timerCanvas}

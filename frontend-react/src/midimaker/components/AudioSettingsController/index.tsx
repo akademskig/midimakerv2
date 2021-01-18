@@ -52,6 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
     formControl: {
         '& .MuiInput-root, .MuiFormLabel-root': {
             color: theme.palette.primary.contrastText,
+            fontSize: '1em',
         },
         '& .MuiInput-underline, .MuiInput-underline:hover': {
             '&:before': {
