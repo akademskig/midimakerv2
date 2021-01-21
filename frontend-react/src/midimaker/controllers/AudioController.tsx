@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react'
+import { useCallback, useContext, useEffect } from 'react'
 import { PlayEvent, TChannel } from '../providers/SoundfontProvider/SoundFontProvider.types'
 import { SoundfontProviderContext } from '../providers/SoundfontProvider/SoundfontProvider'
 import { AudioStateProviderContext } from '../providers/AudioStateProvider/AudioStateProvider'
@@ -32,7 +32,7 @@ interface IAudioController {
 
 function AudioController(): IAudioController {
     const { currentChannel, setChannels, channels, setCurrentChannel } = useContext(AudioStateProviderContext)
-    const { currentInstrument, setCurrentInstrumentName } = useContext(SoundfontProviderContext)
+    const { currentInstrument, setCurrentInstrumentName, cachedInstruments, loadInstrument } = useContext(SoundfontProviderContext)
    
     
     const addNewChannel = useCallback((instrumentName) => {
@@ -144,6 +144,18 @@ function AudioController(): IAudioController {
         switchChannel(newChannels[newChannels.length-1]?.instrumentName)
         setChannels(newChannels)
     }, [channels, setChannels, switchChannel])
+
+    const loadInstruments = useCallback(()=> {
+        channels.map(({instrumentName})=> {
+            if(!cachedInstruments[instrumentName]){
+                loadInstrument(instrumentName)
+            }
+        })
+    }, [cachedInstruments, loadInstrument ])
+
+    useEffect(() => {
+        loadInstruments()
+    }, [loadInstruments])
 
     return ({
         handleToggleNote,

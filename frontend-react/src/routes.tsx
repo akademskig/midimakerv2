@@ -12,6 +12,7 @@ import { GuardProvider, GuardedRoute } from "react-router-guards"
 import SettingsPage from './pages/SettingsPage';
 import { AuthCtx } from './providers/auth.provider';
 import NewMidi from './midimaker/pages/NewMidi';
+import MidiCollections from './midimaker/pages/MidiCollections';
 
 const AppRoutes = () => {
   return (
@@ -29,9 +30,11 @@ export const MainRoutes = () => {
     <GuardProvider guards={[(to, from, next )=> isAuth ? next(): next.redirect("/auth")]}>
       <Switch>
         <GuardedRoute path="/dashboard" component={MainPage} />
-        <GuardedRoute path="/newmidi" component={NewMidi}/>
+        <GuardedRoute path="/midimaker" component={NewMidi}/>
         <GuardedRoute path="/settings" component={SettingsPage} />
-        <GuardedRoute path="/" component={() => <Redirect to="/dashboard"></Redirect>} />
+        <GuardedRoute path="/collections" component={MidiCollections} />
+        <GuardedRoute exact path="/" component={() => <Redirect to="/dashboard"></Redirect>} />
+        <GuardedRoute path="*" component={() => <div>Not found</div>} />
       </Switch>
     </GuardProvider>
   )

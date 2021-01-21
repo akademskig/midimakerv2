@@ -16,6 +16,7 @@ import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
 import useScreenSize from '../../../providers/screenSize.provider';
 import { RECT_COLOR } from '../../../midimaker/components/NotesGrid/constants';
+import { Collections, InfoOutlined, MusicNote, MusicNoteTwoTone, NoteRounded } from '@material-ui/icons';
 
 const drawerWidth = 200;
 
@@ -254,6 +255,12 @@ const getIcon = (icon: string) => {
             return <DashboardIcon></DashboardIcon>
         case 'settings':
             return <SettingsIcon></SettingsIcon>
+        case 'midimaker':
+            return <MusicNote></MusicNote>
+        case 'collections':
+            return <Collections></Collections>
+        case 'info':
+            return <InfoOutlined></InfoOutlined>
         default:
             return <MailIcon />
     }

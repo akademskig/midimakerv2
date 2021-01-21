@@ -39,7 +39,7 @@ export class QueryBuilderService {
         fields = ['email', 'username'];
         break;
       }
-      case 'Event':
+      case 'MidiFile':
         fields = ['name'];
         break;
     }

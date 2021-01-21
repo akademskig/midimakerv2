@@ -5,13 +5,23 @@ export const navigationItems = [
         icon:'dashboard'
     },
     {
+        name: "Midimaker",
+        link: "/midimaker",
+        icon: 'midimaker'
+    },
+    {
+        name: "Collections",
+        link: "/collections",
+        icon:'collections'
+    },
+    {
         name: "Settings",
         link: "/settings",
         icon:'settings'
     },
     {
-        name: "New Midi",
-        link: "/newmidi",
-        icon:'music'
-    }
+        name: "Info",
+        link: "/info",
+        icon:'info'
+    },
 ]

@@ -8,6 +8,7 @@ export class OwnerGuard implements CanActivate {
     ): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest();
         const { user, params } = request;
+        console.log(user, params)
         return this.isOwner(user.userId, params.id);
     }
     isOwner(userId, paramsId) {

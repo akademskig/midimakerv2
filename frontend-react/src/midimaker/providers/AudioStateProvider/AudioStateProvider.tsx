@@ -85,7 +85,7 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [currentChannel, setCurrentChannel] = useState<TChannel | null>(initialChannel)
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
     const [channels, setChannels] = useState<TChannel[]>([])
-    const [compositionDuration, setCompositionDuration] = useState(45)
+    const [compositionDuration, setCompositionDuration] = useState(90)
 
     const [notes, setNotes] = useState(
         range(noteRange.first, noteRange.last)

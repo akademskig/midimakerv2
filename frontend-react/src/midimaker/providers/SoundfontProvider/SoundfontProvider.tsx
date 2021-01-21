@@ -42,6 +42,7 @@ function SoundfontProvider({
   const [currentInstrumentName, setCurrentInstrumentName] = useState(instrumentList[2])
   const [currentInstrument, setCurrentInstrument] = useState<TCurrentInstrument | null>(null)
   const [cachedInstruments, setCachedInstruments] = useState<ICachedInstruments>({})
+  const [loading, setLoading] = useState<boolean>(false)
   // const activeAudioNodes = useRef<IActiveAudioNodes>({})
   const fetchInstrumentsList = async () => {
     const instrumentList = await fetch(`${hostname}/${soundfont}/names.json`)
@@ -51,6 +52,7 @@ function SoundfontProvider({
 
 
   const fetchInstrument = useCallback(async (instrumentName) => {
+   
     let instrument = null
     // try {
     //     instrument = await getInstrument({ name: instrumentName })
@@ -82,8 +84,10 @@ function SoundfontProvider({
 
   const loadInstrument = useCallback(
     async (instrumentName) => {
+      setLoading(true)
       setCurrentInstrument(null)
       if (cachedInstruments?.[instrumentName]) {
+        setLoading(false)
         return setCurrentInstrument({ name: instrumentName, player: cachedInstruments?.[instrumentName] })
       }
       const instrument = await fetchInstrument(instrumentName)
@@ -96,8 +100,8 @@ function SoundfontProvider({
           ...cachedInstruments,
           [instrumentName]: instrument,
         })
-
       }
+      setLoading(false)
     },
     [setCurrentInstrument, setCachedInstruments, cachedInstruments, fetchInstrument]
   )
@@ -113,7 +117,7 @@ function SoundfontProvider({
       loadInstrument,
       setCurrentInstrumentName,
       currentInstrumentName,
-      loading: !currentInstrument,
+      loading: !currentInstrument || loading,
     }),
     [currentInstrument, cachedInstruments, loadInstrument, currentInstrumentName]
   )
