@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import MidiFile from 'src/database/entity/midiFile.entity';
-import { getConnection } from 'typeorm';
+import { AdvancedConsoleLogger, getConnection } from 'typeorm';
 import MidiFileDto from './midiFileDto';
 import { QueryBuilderService } from '../utils/queryBuilder.service'
 
@@ -15,12 +15,13 @@ export class MidiFileService {
       .findOne(query)
   }
 
-  async createNew({ name, midiChannels }: MidiFileDto, userId: string): Promise<MidiFile> {
+  async createNew({ name, midiChannels, canvasImgBlob }: MidiFileDto, userId: string): Promise<MidiFile> {
     const existingMidiFile = await this.findOne({ name });
     if (existingMidiFile) {
       throw new BadRequestException(`Midi with name ${existingMidiFile.name} already exists!`);
     }
-    const midiFileDto = new MidiFile({ name, midiChannels, userId });
+    const midiFileDto = new MidiFile({ name, midiChannels, canvasImgBlob, userId });
+    console.log(midiFileDto, 'miditto')
     const qR = getConnection().createQueryRunner();
     if (qR) {
       return qR.manager.save(midiFileDto);
@@ -36,6 +37,7 @@ export class MidiFileService {
     const midiFiles = await getConnection()
       .getRepository(MidiFile)
       .find({ where: { user: userId } })
+      console.log(midiFiles)
     return midiFiles
   }
 
@@ -48,5 +50,11 @@ export class MidiFileService {
     return await getConnection()
       .getRepository(MidiFile)
       .delete({ id })
+  }
+  async saveImage(id, file){
+    console.log(file)
+    return await getConnection()
+      .getRepository(MidiFile)
+      .update({ id }, { canvasImgBlob: file.buffer})
   }
 }

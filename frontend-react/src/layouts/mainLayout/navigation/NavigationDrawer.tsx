@@ -25,7 +25,6 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
         root: {
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden',
             // backgroundColor: theme.palette.primary.main
         },
         toggleButton: {
@@ -78,6 +77,7 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
             },
         },
         content: {
+            position: 'relative',
             flexGrow: 1,
             flexDirection: 'column',
             alignContent: 'center',

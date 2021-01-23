@@ -19,7 +19,8 @@ export interface INotesGridController {
   renderPlay: ()=> void,
   pausePlayRender: ()=> void,
   stopPlayRender: ()=> void,
-  setNotesCoordinates: (coordinates: Array<ICoordinates>) => void
+  setNotesCoordinates: (coordinates: Array<ICoordinates>) => void,
+  getBlobFromCanvas: () => Promise<Blob | null>,
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimerElement: HTMLCanvasElement)=> void
 }
 
@@ -32,9 +33,11 @@ const initialCtxValues = {
   stopPlayRender: ()=> {},
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => {},
   pausePlayRender: ()=> {},
+  getBlobFromCanvas: async () => null,
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimer: HTMLCanvasElement)=> {},
 }
-
+let canvasElementLocal: HTMLCanvasElement | null = null
+let notesListElementLocal: HTMLCanvasElement | null = null
 export const NotesGridControllerCtx= createContext<INotesGridController>(initialCtxValues)
 function NotesGridControllerProvider({ children }: INotesGridControllerProps): JSX.Element {
   const { playNote } = useAudioPlayer()
@@ -53,6 +56,8 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
   const [canvasTimerElement, setCanvasTimerElement] = useState<HTMLCanvasElement | null>(null)
 
   const initCtx = useCallback((canvasElement, canvasBoxElement, notesListElement, canvasTimerElement)=> {
+    canvasElementLocal = canvasElement
+    notesListElementLocal = notesListElement
     setCanvasElement(canvasElement)
     setCanvasBoxElement(canvasBoxElement)
     setNotesListElement(notesListElement)
@@ -170,6 +175,19 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     setControllerState({'PLAYING': false})
   }, [setControllerState])
 
+    const getBlobFromCanvas = useCallback((): Promise<Blob | null> => {
+      return new Promise((resolve, reject)=> {
+          return canvasElementLocal?.toBlob((blob) => {
+              if(blob){
+                  return resolve(blob)
+              }
+              else{
+                  return reject(null)
+              }
+          })
+      })
+  }, [ canvasElement ])
+
   useEffect(() => {
     findMappedEvents()
   }, [findMappedEvents])
@@ -182,7 +200,8 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     renderPlay,
     stopPlayRender,
     setNotesCoordinates,
-    pausePlayRender
+    pausePlayRender,
+    getBlobFromCanvas
   }
   return(
     <NotesGridControllerCtx.Provider value={ctxValue}>

@@ -20,6 +20,9 @@ export default class MidiFile {
     @Column('json')
     midiChannels: JSON[] ;
 
+    @Column({name: 'imageData',type: 'bytea', nullable: true})
+    canvasImgBlob?: Buffer ;
+
     @ManyToOne(type => User)
     @JoinColumn()
     owner: User;
@@ -35,10 +38,11 @@ export default class MidiFile {
             return this
         }
 
-        const { name, midiChannels, midiFile, userId} = midiFileInput
+        const { name, midiChannels, midiFile, userId, canvasImgBlob} = midiFileInput
         this.name = name
         this.midiChannels = midiChannels
         this.owner = userId
         this.midiFile = midiFile && midiFile
+        this.canvasImgBlob = canvasImgBlob &&canvasImgBlob
     }
 }

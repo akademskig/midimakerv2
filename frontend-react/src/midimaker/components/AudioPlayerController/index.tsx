@@ -49,7 +49,7 @@ function AudioPlayerController({ top = false}): ReactElement{
     const { playAll, stopPlayAll } = useAudioPlayer()
     // const { renderPlay, stopPlayRender } = useContext(CanvasContext)
     const { setControllerState, controllerState, channels, setChannels } = useContext(AudioStateProviderContext)
-    const { renderPlay, stopPlayRender, pausePlayRender } = useContext(NotesGridControllerCtx)
+    const { renderPlay, stopPlayRender, pausePlayRender, getBlobFromCanvas } = useContext(NotesGridControllerCtx)
     const { saveMidiFile, getFilenames, getMidiFile, updateMidiFile } = useMidiFileApi()
     const notify = useNotify()
     const classes = useStyles()
@@ -58,7 +58,7 @@ function AudioPlayerController({ top = false}): ReactElement{
     const [selectedFile, setSelectedFile] = useState<TMidiFile | null>(null)
     const [files, setFiles ] = useState<TMidiFile[]>([])
     const [midiName, setMidiName] = useState('test')
-
+    const [canvasBlob, setCanvasBlob ] = useState<Blob | null>(null)
     const onPlayButtonClick = () => {
         if(controllerState.PLAYING){
             return
@@ -80,10 +80,12 @@ function AudioPlayerController({ top = false}): ReactElement{
         stopPlayAll()
         setControllerState({'PLAYING': false, 'PAUSED': true })
     }
-    const onSaveClick = useCallback(() => {
-        console.log(selectedFile)
+
+   
+    const onSaveClick = useCallback(async() => {
         if(selectedFile){
-            updateMidiFile({...selectedFile, midiChannels: channels})
+            const blob = await getBlobFromCanvas()
+            updateMidiFile({...selectedFile, midiChannels: channels, canvasImgBlob: blob })
                 .then(res=> notify('success', 'Midi saved.'))
                 .catch(error => notify('error', 'An error occurred.'))
         }
@@ -93,16 +95,17 @@ function AudioPlayerController({ top = false}): ReactElement{
     }, [selectedFile, channels])
     console.log(channels)
 
-    const onNameSetClick = () => {
-        saveMidiFile({ name: midiName, midiChannels: channels})
-        .then(({data: {id, name, midiChannels}}) => {
+    const onNameSetClick = useCallback(async () => {
+        const blob = await getBlobFromCanvas()
+        saveMidiFile({ name: midiName, midiChannels: channels, canvasImgBlob: blob })
+        .then(({id, name, midiChannels}) => {
             setSelectedFile({ id, name})
             setChannels(midiChannels)
             notify('success', 'Midi saved.')
                 setOpen(false)
             } )
         .catch(error=>notify('info', error.message))
-    }
+    }, [ midiName, channels ])
     const onSelectFileClick = useCallback(
         async() => {
             const files = await getFilenames()

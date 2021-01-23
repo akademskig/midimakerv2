@@ -131,6 +131,8 @@ function AudioPlayer(): IAudioPlayer {
     stopAllNotes()
   }, [stopAllNotes])
 
+  
+
   // channelsToPlaylist = async (channels) => {
   //   channels.forEach(async c => {
   //     this.instruments[c.instrumentName] = await this.loadChannelInstrument(c.instrumentName)

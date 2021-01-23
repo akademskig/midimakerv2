@@ -1,5 +1,5 @@
 import { range } from "lodash";
-
+import moment from 'moment'
 export function lightenDarkenColor(col: string, amt: number) {
     var usePound = true;
     if (col[0] === "#") {
@@ -27,8 +27,14 @@ export function lightenDarkenColor(col: string, amt: number) {
     return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
 }
 
+const getCsec = (n: number) => `${(n) - (n % 1)}:${(n % 1 * 60) > 0 ? (Math.round(n % 1 * 60) < 10?`0${(Math.round(n % 1 * 60))}`:Math.round(n % 1 * 60) ) : '00'}`
+export const formatDuration = (d: number)=> {
+  
+   return  d < 60 ? `00:${d < 10 ? 0 : ''}${getCsec(d)}` :
+            `${Math.floor(d / 60) < 10 ? 0 : ''}${Math.floor(d / 60)}:${d % 60 < 10 ? 0 : ''}${getCsec(d % 60)}`
+}
+
 export const generateMarks = (compositionDuration: number, noteDuration: number, step: number) => {
-    const getCsec = (n: number) => `${(n / 1) - (n % 1)}:${(n % 1 * 60) > 0 ? (n % 1 * 60) : '00'}`
     return range(0, compositionDuration + step, step).filter((n, idx) => 1 / noteDuration >= 4 ? idx : noteDuration === 1 ? (idx % 5) === 0 : (idx % 3) === 0).map((n) => ({
         value: n,
         label: n < 60 ? `00:${n < 10 ? 0 : ''}${step < 1 ? getCsec(n) : n}` :

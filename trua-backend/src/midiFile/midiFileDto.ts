@@ -10,13 +10,16 @@ export default class MidiFileDto {
     @IsNotEmpty()
     midiChannels: JSON ;
 
+    canvasImgBlob: Blob ;
+
     constructor(midiFileDto){
         if(!midiFileDto){
             return this
         }
-        const { name, midiChannels, midiFile} = midiFileDto
+        const { name, midiChannels, midiFile, canvasImgBlob } = midiFileDto
         this.name = name
         this.midiChannels = midiChannels
         this.midiFile = midiFile && midiFile
+        this.canvasImgBlob = canvasImgBlob
     }
 }

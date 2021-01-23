@@ -284,6 +284,8 @@ function NotesGridRenderer() {
       if (!canvasCtx || !notesListCtx) {
         return undefined
       }
+      canvasElement.toBlob((blob)=> 
+      console.log(blob))
       for (let j = 0; j < xLength + 1; j++) {
         const x = Math.floor((j - 1) * (RECT_WIDTH + RECT_SPACE))
         const y = Math.floor((rectangleHeight + RECT_SPACE) * i)
@@ -380,6 +382,20 @@ function NotesGridRenderer() {
     updateNote(newNote)
   }, [currentNote, canvasBoxRef, noteDuration, updateNote])
 
+  const getBlobFromCanvas = useCallback((): Promise<Blob> => {
+    return new Promise((resolve, reject)=> {
+        console.log(canvasElement)
+        return canvasElement?.toBlob((blob) => {
+            console.log(blob)
+            if(blob){
+                return resolve(blob)
+            }
+            else{
+                return reject(blob)
+            }
+        })
+    })
+}, [ canvasElement ])
   const handleOnClick = useCallback((event) => {
     event.persist()
     const note = !event.shiftKey && toggleNote(event)

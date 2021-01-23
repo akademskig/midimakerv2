@@ -13,19 +13,39 @@ export default function useMidiFileApi() {
             'Content-Type': 'application/json'
         }
     }), [accessToken])
+    const axiosFiles = useMemo(() => Axios.create({
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'multipart/form-data'
+        }
+    }), [accessToken])
     const fakeError = { 
         statusCode: 400,
         message: 'Unknown error',
         error: 'Unknown'
     }
     const parseError = (error: AxiosError) => error?.response?.data || fakeError
-    const saveMidiFile = async ({ name, midiChannels }: { name: string, midiChannels: TChannel[] }) => {
+    const saveMidiFile = async ({ name, midiChannels, canvasImgBlob }: { name: string, midiChannels: TChannel[], canvasImgBlob?: Blob | undefined | null}) => {
         const body = {name, midiChannels }
-        return axios.post(`${baseUrl}/midiFile`, body)
-        .catch(error=> {throw parseError(error)})
-        
+        try{
+            const { data } =  await axios.post(`${baseUrl}/midiFile`, body)
+            // if(canvasImgBlob){
+            //     await saveCanvasImage(data.id, canvasImgBlob)
+            // }
+            return data
+        }
+        catch(error){
+            console.error(error)
+            throw parseError(error)
+        }
     }
-    const updateMidiFile = async ({ id, name, midiChannels }: { id: string, name: string, midiChannels: TChannel[] }) => {
+    const saveCanvasImage = (id: string, canvasImgBlob: Blob)=> {
+        const formData = new FormData()
+        formData.append('file', canvasImgBlob, 'canvasImage')
+        return axiosFiles.post(`${baseUrl}/midiFile/img/${id}`, formData)
+        .then(res => console.log(res))
+    }
+    const updateMidiFile = async ({ id, name, midiChannels, canvasImgBlob }: { id: string, name: string, midiChannels: TChannel[],canvasImgBlob?: Blob | undefined | null}) => {
         const body = {name, midiChannels }
         return axios.put(`${baseUrl}/midiFile/${id}`, body)
         .catch(error=> {throw parseError(error)})
