@@ -1,6 +1,6 @@
 import React, { ReactElement, useCallback, useContext, useState, MouseEvent, ChangeEvent } from 'react'
 import { Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemIcon, makeStyles, MenuItem, Paper, Select, Slider, Theme } from '@material-ui/core'
-import { AccessTime, SettingsEthernet, Timelapse } from '@material-ui/icons'
+import { AccessTime, FormatColorReset, RefreshTwoTone,SettingsBackupRestoreSharp, Restore, RestoreOutlined, SettingsBackupRestoreOutlined, SettingsEthernet, Timelapse } from '@material-ui/icons'
 import { MidiNumbers } from 'react-piano'
 import { CustomTooltip } from '../shared/loader/CustomTooltip'
 import { AudioStateProviderContext, TNoteRange } from '../../providers/AudioStateProvider/AudioStateProvider'
@@ -117,6 +117,11 @@ export const settingItems = [
         label: "Composition duration",
         value: 'compositionDuration',
         icon: 'compositionDuration'
+    },
+    {
+        label: "Reset grid",
+        value: 'resetGrid',
+        icon: 'resetGrid'
     }
 ]
 const getIcon = (icon: string) => {
@@ -127,6 +132,8 @@ const getIcon = (icon: string) => {
             return <SettingsEthernet />
         case 'compositionDuration':
             return  <AccessTime />
+        case 'resetGrid':
+            return  <SettingsBackupRestoreSharp />
         default:
             return <SettingsEthernet />
     }
@@ -279,16 +286,19 @@ export function renderCompositionDurationPicker({ value, onChange, classes }: TC
 
 function AudioSettingsController({ left = false }): ReactElement {
     const { noteDuration, setNoteDuration,
-        noteRange, setNoteRange, compositionDuration, setCompositionDuration } = useContext(AudioStateProviderContext)
+        noteRange, setNoteRange, compositionDuration, setCompositionDuration, resetGrid } = useContext(AudioStateProviderContext)
     const [itemOpened, setItemOpened] = useState<string>('')
     const [anchorEl, setAnchorEl] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const classes = useStyles()
     const handleClick = useCallback((e: MouseEvent, item: string) => {
         e.stopPropagation()
+        if(item === 'resetGrid'){
+            return resetGrid()
+        }
         const { x, width, y } = e.currentTarget.getBoundingClientRect()
         setAnchorEl({ x: x + width, y: y });
         setItemOpened(itemOpened === item ? '' : item)
-    }, [itemOpened])
+    }, [itemOpened, resetGrid])
 
     return (
         <Drawer

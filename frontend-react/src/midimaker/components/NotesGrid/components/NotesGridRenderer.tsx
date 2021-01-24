@@ -178,7 +178,7 @@ function NotesGridRenderer() {
   const fontSize = useRef<number>(0)
   const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
   // const timers = useRef<Array<number>>([])
-  const { channels, setChannels, noteDuration, channelColor, notes, controllerState,
+  const { channels, noteDuration, channelColor, notes, controllerState,
     currentChannel, compositionDuration } = useContext(AudioStateProviderContext)
   const { loading } = useContext(SoundfontProviderContext)
   const { toggleNote, findNoteInChannel, timer, setTimer, setNotesCoordinates, initCtx } = useContext(NotesGridControllerCtx)
@@ -284,8 +284,7 @@ function NotesGridRenderer() {
       if (!canvasCtx || !notesListCtx) {
         return undefined
       }
-      canvasElement.toBlob((blob)=> 
-      console.log(blob))
+      
       for (let j = 0; j < xLength + 1; j++) {
         const x = Math.floor((j - 1) * (RECT_WIDTH + RECT_SPACE))
         const y = Math.floor((rectangleHeight + RECT_SPACE) * i)
@@ -321,28 +320,7 @@ function NotesGridRenderer() {
     // requestAnimationFrame(renderEmptyCanvas)
     setNotesCoordinates(coordinatesMapLocal)
   }, [canvasElement, canvasBoxElement, notesListElement, renderingDone, canvasSetup, notes, setNotesCoordinates])
-  // updates channel coordinates when duration or note range has changed
-  const updateChannels = useCallback(
-    () => {
-      if (!canvasElement) {
-        return
-      }
-      const rectangleHeight = (canvasElement.height - RECT_SPACE * notes.length) / notes.length
-      const newChannels = channels.map(channel => {
-        const newNotes = channel.notes.map(note => {
-          note.coordX = note.time * (RECT_WIDTH + RECT_SPACE) / noteDuration
-          const noteIdx = notes.findIndex(noteA => Number(noteA.midiNumber) === note.midiNumber)
-          note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
-          return note
-        })
-        channel.notes = newNotes
-        return channel
-      })
-      setChannels(newChannels)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setChannels, noteDuration, notes, canvasElement],
-  )
+
   const renderNotes = useCallback(() => {
     if (!notesCanvasElement) {
       return
@@ -382,20 +360,6 @@ function NotesGridRenderer() {
     updateNote(newNote)
   }, [currentNote, canvasBoxRef, noteDuration, updateNote])
 
-  const getBlobFromCanvas = useCallback((): Promise<Blob> => {
-    return new Promise((resolve, reject)=> {
-        console.log(canvasElement)
-        return canvasElement?.toBlob((blob) => {
-            console.log(blob)
-            if(blob){
-                return resolve(blob)
-            }
-            else{
-                return reject(blob)
-            }
-        })
-    })
-}, [ canvasElement ])
   const handleOnClick = useCallback((event) => {
     event.persist()
     const note = !event.shiftKey && toggleNote(event)
@@ -449,9 +413,7 @@ function NotesGridRenderer() {
   useEffect(() => {
     renderNotes()
   }, [renderNotes])
-  useEffect(() => {
-    updateChannels()
-  }, [updateChannels])
+  
   useEffect(() => {
     renderTimerBar()
   }, [renderTimerBar, timer])

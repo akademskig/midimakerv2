@@ -21,7 +21,6 @@ export class MidiFileService {
       throw new BadRequestException(`Midi with name ${existingMidiFile.name} already exists!`);
     }
     const midiFileDto = new MidiFile({ name, midiChannels, canvasImgBlob, userId });
-    console.log(midiFileDto, 'miditto')
     const qR = getConnection().createQueryRunner();
     if (qR) {
       return qR.manager.save(midiFileDto);
@@ -37,7 +36,6 @@ export class MidiFileService {
     const midiFiles = await getConnection()
       .getRepository(MidiFile)
       .find({ where: { user: userId } })
-      console.log(midiFiles)
     return midiFiles
   }
 
@@ -52,7 +50,6 @@ export class MidiFileService {
       .delete({ id })
   }
   async saveImage(id, file){
-    console.log(file)
     return await getConnection()
       .getRepository(MidiFile)
       .update({ id }, { canvasImgBlob: file.buffer})

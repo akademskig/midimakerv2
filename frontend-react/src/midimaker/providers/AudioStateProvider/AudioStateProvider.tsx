@@ -9,6 +9,7 @@ const initialNoteRange = {
 }
 const initialNoteDuration = 0.125
 const initialChannelColor = '#008080'
+const initialCompositionDuration = 90
 
 interface IControllerState {
     PLAYING?: boolean
@@ -38,7 +39,7 @@ interface IAudioStateProviderContext {
     setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>,
     compositionDuration: number,
     setCompositionDuration: React.Dispatch<React.SetStateAction<number>>,
-
+    resetGrid: () => void
 }
 
 interface IAudioStateProviderProps {
@@ -74,6 +75,7 @@ const initialCtxValue = {
     setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value: TNoteRange) => value),
     compositionDuration: 0,
     setCompositionDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
+    resetGrid: () => {}
 }
 
 
@@ -85,7 +87,7 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [currentChannel, setCurrentChannel] = useState<TChannel | null>(initialChannel)
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
     const [channels, setChannels] = useState<TChannel[]>([])
-    const [compositionDuration, setCompositionDuration] = useState(90)
+    const [compositionDuration, setCompositionDuration] = useState(initialCompositionDuration)
 
     const [notes, setNotes] = useState(
         range(noteRange.first, noteRange.last)
@@ -119,6 +121,12 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         },
         [currentChannel, setCurrentChannel, channels, setChannels, updateColor])
 
+    const resetGrid = useCallback(() => {
+        console.log('reseting')
+        setNoteRange(initialNoteRange)
+        setCompositionDuration(initialCompositionDuration)
+        setNoteDuration(initialNoteDuration)
+    }, [])
     const ctxValue = {
         currentChannel,
         setCurrentChannel,
@@ -135,7 +143,8 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         noteRange,
         setNoteRange,
         compositionDuration,
-        setCompositionDuration
+        setCompositionDuration,
+        resetGrid
     }
 
     return (

@@ -21,6 +21,8 @@ export interface INotesGridController {
   stopPlayRender: ()=> void,
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => void,
   getBlobFromCanvas: () => Promise<Blob | null>,
+  updateChannels: (channels: TChannel[])=> TChannel[]
+
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimerElement: HTMLCanvasElement)=> void
 }
 
@@ -34,6 +36,7 @@ const initialCtxValues = {
   setNotesCoordinates: (coordinates: Array<ICoordinates>) => {},
   pausePlayRender: ()=> {},
   getBlobFromCanvas: async () => null,
+  updateChannels: (channels: TChannel[]) => channels,
   initCtx:(canvasElement: HTMLCanvasElement, canvasBoxElement: HTMLDivElement, notesListElement: HTMLCanvasElement, canvasTimer: HTMLCanvasElement)=> {},
 }
 let canvasElementLocal: HTMLCanvasElement | null = null
@@ -43,7 +46,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
   const { playNote } = useAudioPlayer()
   // const { findNoteByGridCoordinates, getX, getY, rectangleHeight } = useContext(CanvasContext)
   const { handleToggleNote } = useAudioController()
-  const { currentChannel, channels,  setControllerState, noteDuration, notes } = useContext(AudioStateProviderContext)
+  const { currentChannel, channels, setChannels, setControllerState, noteDuration, notes } = useContext(AudioStateProviderContext)
   const [mappedEvents, setMappedEvents ] = useState<TMappedEvent[]>([])
 
   const [timer, setTimer] = useState(0)
@@ -80,6 +83,28 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     return currentChannel?.notes.find(note=> note.noteId === currentNote?.noteId)
   }, [mappedEvents, currentChannel, getX, getY, getRectangleHeight])
 
+    // updates channel coordinates when duration or note range has changed
+    const updateChannels = useCallback(
+      (channels: TChannel[]) => {
+        if (!canvasElement) {
+          return channels
+        }
+        console.log('channels')
+        const rectangleHeight = (canvasElement.height - RECT_SPACE * notes.length) / notes.length
+        const newChannels = channels.map(channel => {
+          const newNotes = channel.notes.map(note => {
+            note.coordX = note.time * (RECT_WIDTH + RECT_SPACE) / noteDuration
+            const noteIdx = notes.findIndex(noteA => Number(noteA.midiNumber) === note.midiNumber)
+            note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
+            return note
+          })
+          channel.notes = newNotes
+          return channel
+        })
+        return newChannels
+      },
+      [canvasElement, notes, noteDuration],
+    )
   const setNotesCoordinates = useCallback((coordinates)=> {
     canvasNotesCoordinates.current=coordinates
   }, [])
@@ -186,11 +211,16 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
               }
           })
       })
-  }, [ canvasElement ])
+  }, [])
 
   useEffect(() => {
     findMappedEvents()
   }, [findMappedEvents])
+  useEffect(() => {
+    setChannels(updateChannels(channels))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ setChannels, updateChannels])
+
   const ctxValue = {
     initCtx,
     toggleNote,
@@ -201,7 +231,8 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
     stopPlayRender,
     setNotesCoordinates,
     pausePlayRender,
-    getBlobFromCanvas
+    getBlobFromCanvas,
+    updateChannels
   }
   return(
     <NotesGridControllerCtx.Provider value={ctxValue}>
