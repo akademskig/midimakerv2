@@ -4,7 +4,9 @@ import MidiCollectionsList from '../midiCollections/MidiCollectionsList'
 const MidiCollections = () => {
    
     return (
-       <MidiCollectionsList/>
+        <div style={{height: 'inherit'}}>
+            <MidiCollectionsList/>
+        </div>
     )
 }
 

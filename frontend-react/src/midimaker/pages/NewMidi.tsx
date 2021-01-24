@@ -14,7 +14,7 @@ const NewMidi = () => {
                 {/* <div style={{height: `${height}-64`, width: `${width-200}px`}}> */}
                 <NotesGridControllerProvider>
                     <AudioPlayerController top/>
-                    <div style={{display: 'flex', flexDirection: 'row', width: '100%', flexGrow: 1}}>
+                    <div style={{display: 'flex', flexDirection: 'row', width: '100%', flexGrow: 1, background: '#5d1c55' }}>
                         <AudioSettingsController left/>
                         <NotesGridRenderer />
                         <ChannelsController/>

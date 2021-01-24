@@ -18,7 +18,12 @@ const useStyles = makeStyles((theme: Theme) =>
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
+        position: 'fixed',
+        right: 0,
+        top: '125px',
+        bottom: '61px',
         overflowX: 'hidden',
+        zIndex:10,
         width: theme.spacing(7) + 1,
         [theme.breakpoints.up('sm')]: {
             width: theme.spacing(7.5) + 1,
@@ -295,7 +300,7 @@ function ChannelsController({ left = false }): ReactElement {
 
     return (
         <Drawer
-            anchor={left ? 'left' : 'right'}
+            anchor={'right'}
             variant="permanent"
             className={classes.drawer}
             classes={{

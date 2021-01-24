@@ -1,4 +1,4 @@
-import {CircularProgress, Collapse, IconButton, List, ListItem, ListItemIcon, ListItemText, makeStyles, Paper } from '@material-ui/core'
+import {CircularProgress, Collapse, IconButton, List, ListItem, ListItemIcon, ListItemText, makeStyles, Paper, Divider } from '@material-ui/core'
 import { Delete,ExpandLess, ExpandMore, MusicNote } from '@material-ui/icons'
 import React, { useState, useCallback, useMemo } from 'react'
 import Loader from '../components/shared/loader/Loader';
@@ -6,13 +6,14 @@ import { getInstrumentLabel } from '../components/AudioSettingsController/utils'
 import { formatDuration } from '../components/NotesGrid/components/utils';
 import { TChannel } from '../providers/SoundfontProvider/SoundFontProvider.types';
 import useMidiCollectionsController from './MidiCollectionsController';
-
+import EmptyListDisplay from './EmptyListDisplay';
 
 type TMidiFile = {
     id: string,
     name: string,
     midiChannels: TChannel[],
-    canvasImgBlob: Buffer
+    canvasImgBlob: Buffer,
+    createdAt: string
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -21,8 +22,11 @@ const useStyles = makeStyles((theme) => ({
       alignItems: 'center',
     },
     paper: {
+        padding: 0,
+        borderRadius: 0,
         position: 'relative',
-        margin: theme.spacing(1)
+        margin: theme.spacing(1), 
+        boxShadow: theme.shadows[11]
     },
     listItem: {
         display: 'flex',
@@ -32,17 +36,25 @@ const useStyles = makeStyles((theme) => ({
         width: '200px',
         height: '200px'
     },
+    list: {
+        padding: 0,
+    },
     nested: {
 
+    },
+    divider: {
+    },
+    expandIcon: {
+        color: theme.palette.secondary.dark
     }
   }));
 
   interface IMidiCollectionsItem {
     key: number,
     midiFile: TMidiFile,
+    onDeleteClick: (midiId: string) => void
 }
-const MidiCollectionsItem = ({midiFile, key }: IMidiCollectionsItem)=> {
-    const { onDeleteClick } = useMidiCollectionsController()
+const MidiCollectionsItem = ({midiFile, key, onDeleteClick }: IMidiCollectionsItem)=> {
     const classes = useStyles()
     const [open, setOpen] = useState(false)
 
@@ -57,26 +69,25 @@ const MidiCollectionsItem = ({midiFile, key }: IMidiCollectionsItem)=> {
         return formatDuration(totalDuration)
         
     }, [])
-
     return (
         <>
         <ListItem key={key} button onClick={handleItemClick}className={classes.listItem}>
             <ListItemText>
             {midiFile?.name}
             </ListItemText>
-            {open ? <ExpandLess /> : <ExpandMore />}
+            {open ? <ExpandLess className={classes.expandIcon} /> : <ExpandMore className={classes.expandIcon}/>}
 
             <IconButton onClick={()=> onDeleteClick(midiFile.id)}>
                 <Delete color={'error'}></Delete>
             </IconButton>
         </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
-                <ListItem>
+                <ListItem >
                     <ListItemText>
                         {`Duration: ${duration} m` }
                     </ListItemText>
                 </ListItem>
-                <ListItem button className={classes.nested}>
+                <ListItem button >
                     <List>
                     {midiFile.midiChannels.map(channel=> 
                     <ListItem>
@@ -98,25 +109,29 @@ const MidiCollectionsItem = ({midiFile, key }: IMidiCollectionsItem)=> {
 
 const MidiCollectionsList = () => {
     const classes = useStyles()
-    const { midiFiles, loading } = useMidiCollectionsController()
+    const { midiFiles, loading, onDeleteClick } = useMidiCollectionsController()
     return (
         <>
             {loading && <Loader/>}
+            {midiFiles.length > 0 ? 
         <Paper className={classes.paper}>
-            {midiFiles.length > 0 && 
-              <List>
+              <List className={classes.list}>
                   {midiFiles.map((midiFile: TMidiFile, key:number)=> {
                     return (
+                        <>
                         <MidiCollectionsItem 
                             midiFile={midiFile} 
                             key={key}
+                            onDeleteClick={onDeleteClick}
                         />
+                        <Divider className={classes.divider}/>
+
+                        </>
                     )
                     })}
-                </List>
+                </List> 
+        </Paper>: <EmptyListDisplay/>
             }
-          
-        </Paper>
         </>
     )
 }

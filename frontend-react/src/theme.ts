@@ -11,6 +11,11 @@ const theme = createMuiTheme({
       main: '#af00cb',
       dark: '#7b0099'
     },
+    error:{
+      light: '#e551ff',
+      main: '#af00cb',
+      dark: '#7b0099'
+    }
   },
   breakpoints: {
     values: {
