@@ -39,7 +39,10 @@ interface IAudioStateProviderContext {
     setNoteRange: React.Dispatch<React.SetStateAction<TNoteRange>>,
     compositionDuration: number,
     setCompositionDuration: React.Dispatch<React.SetStateAction<number>>,
-    resetGrid: () => void
+    resetGrid: () => void,
+    updateGridSetup: (channels: TChannel[]) => void,
+    audioStateLoading: boolean,
+    setAudioStateLoading:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 interface IAudioStateProviderProps {
@@ -61,6 +64,8 @@ const initialControllerState = {
 const initialCtxValue = {
     currentChannel: null,
     setCurrentChannel: ((value: React.SetStateAction<TChannel | null>) => (value: TChannel) => value),
+    audioStateLoading: false,
+    setAudioStateLoading: ((value: React.SetStateAction<boolean>) => (value: boolean) => value),
     channelColor: '#008080',
     setChannelColor: ((value: React.SetStateAction<string>) => (value: string) => value),
     noteDuration: 0.125,
@@ -75,7 +80,8 @@ const initialCtxValue = {
     setNoteRange: ((value: React.SetStateAction<TNoteRange>) => (value: TNoteRange) => value),
     compositionDuration: 0,
     setCompositionDuration: ((value: React.SetStateAction<number>) => (value: number) => value),
-    resetGrid: () => {}
+    resetGrid: () => { },
+    updateGridSetup: (channels: TChannel[]) => {}
 }
 
 
@@ -88,7 +94,29 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
     const [controllerState, setControllerState] = useState<IControllerState>(initialControllerState)
     const [channels, setChannels] = useState<TChannel[]>([])
     const [compositionDuration, setCompositionDuration] = useState(initialCompositionDuration)
+    const [ audioStateLoading, setAudioStateLoading ] = useState<boolean>(false)
+    const updateGridSetup = useCallback(channels => {
+        const compositionDuration = channels.reduce(
+            (acc: number, curr: TChannel) => (curr.duration > acc ? curr.duration : acc),
+            0)
+        const noteRange = channels.map((channel: TChannel) => {
+            return channel.notes.reduce((prev: any, curr: any) => {
+                return {
+                    min: curr.midi < prev.min ? curr.midi : prev.min,
+                    max: curr.midi > prev.max ? curr.midi : prev.max
+                }
 
+            }, { min: 108, max: 0 })
+        })
+        const reduced = noteRange.reduce((prev: any, curr: any) => {
+                return {
+                    min: curr.min < prev.min ? curr.min : prev.min,
+                    max: curr.max > prev.max ? curr.max : prev.max
+                }
+            }, { min: 108, max: 0 })
+        setNoteRange({ first: reduced.min, last: reduced.max})
+        setCompositionDuration(compositionDuration)
+    }, [])
     const [notes, setNotes] = useState(
         range(noteRange.first, noteRange.last)
             .map((idx: number) => MidiNumbers.getAttributes(idx))
@@ -144,7 +172,10 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         setNoteRange,
         compositionDuration,
         setCompositionDuration,
-        resetGrid
+        resetGrid,
+        updateGridSetup,
+        audioStateLoading,
+        setAudioStateLoading
     }
 
     return (

@@ -179,7 +179,7 @@ function NotesGridRenderer() {
   const [hoveredNoteState, setHoveredNoteState] = useState<PlayEvent | null>(hoveredNote)
   // const timers = useRef<Array<number>>([])
   const { channels, noteDuration, channelColor, notes, controllerState,
-    currentChannel, compositionDuration } = useContext(AudioStateProviderContext)
+    currentChannel, compositionDuration, audioStateLoading } = useContext(AudioStateProviderContext)
   const { loading } = useContext(SoundfontProviderContext)
   const { toggleNote, findNoteInChannel, timer, setTimer, setNotesCoordinates, initCtx } = useContext(NotesGridControllerCtx)
   const { updateNote } = useAudioController()
@@ -429,9 +429,10 @@ function NotesGridRenderer() {
       }
     }
   }, [canvasRef, canvasBoxRef, notesListRef, handleKeyDown, notesCanvasElement])
+  console.log(audioStateLoading, loading, renderingDone)
   return (
     <div className={classes.canvasContainer} >
-      {(loading || !renderingDone) && <Loader />}
+      {(loading || !renderingDone || audioStateLoading) && <Loader />}
       <div className={classes.notesListCanvas}>
         <canvas id="notesList-canvas" ref={notesListRef} />
       </div>
