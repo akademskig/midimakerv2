@@ -10,7 +10,6 @@ import { WindowExtended } from '../globals'
 import { AudioStateProviderContext } from '../providers/AudioStateProvider/AudioStateProvider'
 import { NotesGridControllerCtx } from '../components/NotesGrid/components/NotesGridController'
 
-
 interface IAudioNode {
   play: () => unknown,
   stop: () => unknown
@@ -41,36 +40,31 @@ function AudioPlayer(): IAudioPlayer {
 
 
   const startNote = useCallback(
-    (midiNumber, instrumentName?: string) => {
-      return audioContext.resume().then(() => {
+    (event: any, instrumentName?: string) => {
         const audioNode = instrumentName
-          ? cachedInstruments?.[instrumentName]?.play(midiNumber)
-          : currentInstrument?.player?.play(midiNumber)
+          ? cachedInstruments?.[instrumentName]?.start(event.midi.toString(), 0, {duration: event.duration})
+          : currentInstrument?.player?.start(event.midi.toString(), 0,{duration: event.duration})
         if (audioNode) {
           activeAudioNodes.current = {
             ...activeAudioNodes.current,
-            [midiNumber]: audioNode,
+            [event.midi]: audioNode,
           }
         }
-      })
     },
     [cachedInstruments, currentInstrument]
   )
 
   const stopNote = useCallback((midiNumber) => {
     const { current: audioNodes } = activeAudioNodes
-    return audioContext.resume().then(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       audioNodes && audioNodes[midiNumber] && audioNodes[midiNumber].stop()
-      activeAudioNodes.current = { ...audioNodes, [midiNumber]: null }
-    })
+      delete activeAudioNodes.current[midiNumber]
   }, [activeAudioNodes])
 
   const playNote = useCallback((lastEvent: PlayEvent, instrumentName?: string) => {
-    startNote(lastEvent.midiNumber, instrumentName)
+    startNote(lastEvent, instrumentName)
     setTimeout(() => {
-      stopNote(lastEvent.midiNumber)
+      stopNote(lastEvent.midi)
     }, lastEvent.duration * 1000)
   }, [startNote, stopNote])
 

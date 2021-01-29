@@ -10,7 +10,7 @@ import React, {
   createContext
 } from 'react'
 
-import { flatMap, range } from 'lodash'
+import { flatMap, uniqueId } from 'lodash'
 
 import {
   RECT_WIDTH, RECT_SPACE, BAR_COLOR,
@@ -305,7 +305,7 @@ function NotesGridRenderer() {
           canvasCtx.fillStyle = CANVAS_BACKGROUND
           canvasCtx.fillRect(x, y, RECT_SPACE, rectangleHeight) // fill vertical spaces
           canvasCtx.fillRect(x, y - RECT_SPACE, RECT_WIDTH + RECT_SPACE, RECT_SPACE) // fill horizontal spaces
-          coordinatesMapLocal = [...coordinatesMapLocal, { noteId: `${note.midiNumber}`, midiNumber: note.midiNumber, x, y }]
+          coordinatesMapLocal = [...coordinatesMapLocal, { noteId: uniqueId(), midiNumber: note.midiNumber, x, y }]
         }
         if (i === notes.length - 1) {
           canvasCtx.fillRect(0, y + rectangleHeight, (RECT_WIDTH + RECT_SPACE) * xLength, RECT_SPACE)
@@ -330,6 +330,7 @@ function NotesGridRenderer() {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
       channel.notes.map((note: PlayEvent) => ({ ...note, color: channel.color }))
     ) 
+    console.log(joinedEvents)
     // join notes from all channels into a single array, + add a color field
     joinedEvents.forEach((event, i) => {
       if (!notesCanvasCtx) {

@@ -1,6 +1,8 @@
 import { Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, makeStyles, TextField, Theme } from '@material-ui/core'
-import { Pause, PlayArrow, Save, Stop, AttachFile, CreateNewFolderOutlined, CreateNewFolderRounded, LayersClearSharp, FolderOpenOutlined } from '@material-ui/icons'
+import { Pause, PlayArrow, Save, Stop, AttachFile, CreateNewFolderOutlined, CreateNewFolderRounded, LayersClearSharp, FolderOpenOutlined, CloudUpload } from '@material-ui/icons'
 import React, { ReactElement, useContext, useState, useCallback } from 'react'
+import { sample } from 'lodash'
+import { DropzoneArea, DropzoneDialog } from 'material-ui-dropzone'
 import classnames from 'classnames'
 import { useAudioPlayer } from '../../controllers/AudioPlayer'
 import { AudioStateProviderContext } from '../../providers/AudioStateProvider/AudioStateProvider'
@@ -8,6 +10,9 @@ import { NotesGridControllerCtx } from '../NotesGrid/components/NotesGridControl
 import useMidiFileApi from '../../../api/protected/midiFile'
 import useNotify from '../../../components/common/notifications/notifications'
 import { CustomTooltip } from '../shared/loader/CustomTooltip'
+import { defaultColors } from '../NotesGrid/constants'
+import { TChannel } from '../../providers/SoundfontProvider/SoundFontProvider.types'
+import FsController from '../FsController'
 
 type TMidiFile = {
     name: string,
@@ -49,16 +54,10 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 function AudioPlayerController({ top = false }): ReactElement {
     const { playAll, stopPlayAll } = useAudioPlayer()
     // const { renderPlay, stopPlayRender } = useContext(CanvasContext)
-    const { setControllerState, controllerState, channels, setChannels } = useContext(AudioStateProviderContext)
-    const { renderPlay, stopPlayRender, pausePlayRender, updateChannels } = useContext(NotesGridControllerCtx)
-    const { saveMidiFile, getFilenames, getMidiFile, updateMidiFile } = useMidiFileApi()
-    const notify = useNotify()
+    const { setControllerState, controllerState } = useContext(AudioStateProviderContext)
+    const { renderPlay, stopPlayRender, pausePlayRender } = useContext(NotesGridControllerCtx)
     const classes = useStyles()
-    const [open, setOpen] = useState(false)
-    const [selectFileOpen, setSelectFileOpen] = useState(false)
-    const [selectedFile, setSelectedFile] = useState<TMidiFile | null>(null)
-    const [files, setFiles] = useState<TMidiFile[]>([])
-    const [midiName, setMidiName] = useState('test')
+
     const onPlayButtonClick = () => {
         if (controllerState.PLAYING) {
             return
@@ -81,136 +80,28 @@ function AudioPlayerController({ top = false }): ReactElement {
         setControllerState({ 'PLAYING': false, 'PAUSED': true })
     }
 
-
-    const onSaveClick = useCallback(async () => {
-        if (selectedFile) {
-            updateMidiFile({ ...selectedFile, midiChannels: channels })
-                .then(res => notify('success', 'Midi saved.'))
-                .catch(error => notify('error', 'An error occurred.'))
-        }
-        else {
-            setOpen(true)
-        }
-    }, [selectedFile, updateMidiFile, channels, notify])
-
-    const onNameSetClick = useCallback(async () => {
-        saveMidiFile({ name: midiName, midiChannels: channels })
-            .then(({ id, name, midiChannels }) => {
-                setSelectedFile({ id, name })
-                setChannels(midiChannels)
-                notify('success', 'Midi saved.')
-                setOpen(false)
-            })
-            .catch(error => notify('info', error.message))
-    }, [saveMidiFile, midiName, channels, setChannels, notify])
-    const onSelectFileClick = useCallback(
-        async () => {
-            const files = await getFilenames()
-            console.log(files)
-            setFiles(files)
-            setSelectFileOpen(true)
-        },
-        [getFilenames],
-    )
-    const onFileSelectClick = useCallback(
-        async (file) => {
-            const res = await getMidiFile({ id: file.id })
-            if (res) {
-                setChannels(updateChannels(res.midiChannels))
-                setSelectedFile(file)
-            }
-            setSelectFileOpen(false)
-        },
-        [getMidiFile, setChannels],
-    )
-
-    const onNewMidiClick = useCallback(() => {
-        setChannels([])
-        setSelectedFile(null)
-    }, [setChannels])
     return (
-        <>
-            <div className={classes.container}>
-                {
-                    top &&
-                    <>
-                        <div className={classes.audioControlButtons}>
-                            <IconButton onClick={onPlayButtonClick} className={classnames(classes.button, { active: controllerState.PLAYING })}>
-                                <PlayArrow />
-                            </IconButton>
-                            <IconButton onClick={onPauseButtonClick} className={classnames(classes.button, { active: controllerState.PAUSED })}>
-                                <Pause />
-                            </IconButton>
-                            <IconButton onClick={onStopButtonClick} className={classes.button}>
-                                <Stop />
-                            </IconButton>
-                        </div>
-                        <div className={classes.dbControlButtons}>
-                            <Button className={classes.button}>
-                                {selectedFile?.name || ''}
-                            </Button>
-                            <CustomTooltip title={'Save'} placement='top-end' >
-                                <IconButton onClick={onSaveClick} className={classes.button}>
-                                    <Save />
-                                </IconButton>
-                            </CustomTooltip>
-                            <CustomTooltip title={'Load from database'} placement='top-end' >
-                                <IconButton onClick={onSelectFileClick} className={classes.button}>
-                                    <FolderOpenOutlined />
-                                </IconButton>
-                            </CustomTooltip>
-                            <CustomTooltip title={'Clear grid'} placement='top-end' >
-                                <IconButton onClick={onNewMidiClick} className={classes.button}>
-                                    <LayersClearSharp />
-                                </IconButton>
-                            </CustomTooltip>
-                        </div>
-                        <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
-                            <DialogTitle id="form-dialog-title">Save midi</DialogTitle>
-                            <DialogContent>
-                                <TextField
-                                    value={midiName}
-                                    onChange={(e) => setMidiName(e.target.value)}
-                                    autoFocus
-                                    margin="dense"
-                                    id="name"
-                                    label="Midi name"
-                                    type="text"
-                                />
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={() => setOpen(false)} color="primary">
-                                    Cancel
-                    </Button>
-                                <Button onClick={() => onNameSetClick()} color="primary">
-                                    OK
-                    </Button>
-                            </DialogActions>
-                        </Dialog>
-                        <Dialog open={selectFileOpen} onClose={() => setSelectFileOpen(false)} aria-labelledby="form-dialog-title">
-                            <DialogTitle id="form-dialog-title">Select file...</DialogTitle>
-                            <DialogContent>
-                                <List className={classes.fileList}>
-                                    {files.map(file =>
-                                        <ListItem>
-                                            <Button onClick={() => onFileSelectClick(file)} color="secondary">
-                                                {file.name}
-                                            </Button>
-                                        </ListItem>
-
-                                    )}
-                                </List>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={() => setSelectFileOpen(false)} color="primary">
-                                    Cancel
-                    </Button>
-                            </DialogActions>
-                        </Dialog>
-                    </>
-                }
-            </div>
-        </>
+        <div className={classes.container}>
+            {
+                top &&
+                <>
+                    <div className={classes.audioControlButtons}>
+                        <IconButton onClick={onPlayButtonClick} className={classnames(classes.button, { active: controllerState.PLAYING })}>
+                            <PlayArrow />
+                        </IconButton>
+                        <IconButton onClick={onPauseButtonClick} className={classnames(classes.button, { active: controllerState.PAUSED })}>
+                            <Pause />
+                        </IconButton>
+                        <IconButton onClick={onStopButtonClick} className={classes.button}>
+                            <Stop />
+                        </IconButton>
+                    </div>
+                    <div className={classes.dbControlButtons}>
+                        <FsController/>
+                    </div>
+                </>
+            }
+        </div>
 
     )
 }

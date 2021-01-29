@@ -88,7 +88,7 @@ function SoundfontProvider({
       setCurrentInstrument(null)
       if (cachedInstruments?.[instrumentName]) {
         setLoading(false)
-        return setCurrentInstrument({ name: instrumentName, player: cachedInstruments?.[instrumentName] })
+        setCurrentInstrument({ name: instrumentName, player: cachedInstruments?.[instrumentName] })
       }
       const instrument = await fetchInstrument(instrumentName)
       setCurrentInstrument({
@@ -108,7 +108,7 @@ function SoundfontProvider({
 
   useEffect(() => {
     loadInstrument(currentInstrumentName)
-  }, [loadInstrument, currentInstrumentName])
+  }, [currentInstrumentName])
 
   const ctxValue = useMemo(
     () => ({
@@ -119,7 +119,7 @@ function SoundfontProvider({
       currentInstrumentName,
       loading: !currentInstrument || loading,
     }),
-    [currentInstrument, cachedInstruments, loadInstrument, currentInstrumentName]
+    [currentInstrument, cachedInstruments, loadInstrument, currentInstrumentName, loading]
   )
   return (
     <SoundfontProviderContext.Provider value={ctxValue} >

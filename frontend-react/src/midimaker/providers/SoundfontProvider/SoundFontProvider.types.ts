@@ -48,7 +48,7 @@ export interface PlayEvent  {
   noteId: string,
   time: number;
   duration: number;
-  midiNumber: number;
+  midi: number;
   coordX: number;
   coordY: number
 }

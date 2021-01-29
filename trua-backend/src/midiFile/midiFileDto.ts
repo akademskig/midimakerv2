@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import MidiFile from 'src/database/entity/midiFile.entity';
 
 export default class MidiFileDto {
 
@@ -8,7 +9,7 @@ export default class MidiFileDto {
     midiFile?: JSON;
 
     @IsNotEmpty()
-    midiChannels: JSON ;
+    midiChannels: Array<JSON> ;
 
     canvasImgBlob: Blob ;
 

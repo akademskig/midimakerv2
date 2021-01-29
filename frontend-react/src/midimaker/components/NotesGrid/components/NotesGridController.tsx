@@ -5,8 +5,9 @@ import { PlayEvent, TChannel } from '../../../providers/SoundfontProvider/SoundF
 import { useAudioController } from '../../../controllers/AudioController'
 import { AudioStateProviderContext } from '../../../providers/AudioStateProvider/AudioStateProvider'
 import { RECT_SPACE, RECT_WIDTH } from '../constants'
-import { flatMap } from 'lodash'
+import { flatMap, uniqueId } from 'lodash'
 import { TMappedEvent } from './NotesGridRenderer'
+
 export interface INotesGridControllerProps {
   children: ReactElement | ReactElement[]
 }
@@ -82,19 +83,20 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
      (getY(event) >= mappedEvent.y && getY(event)<= mappedEvent.y + getRectangleHeight()))
     return currentChannel?.notes.find(note=> note.noteId === currentNote?.noteId)
   }, [mappedEvents, currentChannel, getX, getY, getRectangleHeight])
-
     // updates channel coordinates when duration or note range has changed
     const updateChannels = useCallback(
       (channels: TChannel[]) => {
         if (!canvasElement) {
           return channels
         }
-        console.log('channels')
         const rectangleHeight = (canvasElement.height - RECT_SPACE * notes.length) / notes.length
         const newChannels = channels.map(channel => {
           const newNotes = channel.notes.map(note => {
+            if(!note.noteId){
+              note.noteId = uniqueId()
+            }
             note.coordX = note.time * (RECT_WIDTH + RECT_SPACE) / noteDuration
-            const noteIdx = notes.findIndex(noteA => Number(noteA.midiNumber) === note.midiNumber)
+            const noteIdx = notes.findIndex(noteA => Number(noteA.midiNumber) === note.midi)
             note.coordY = (rectangleHeight + RECT_SPACE) * noteIdx
             return note
           })
@@ -150,7 +152,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
       const timePoint =  (rectangle.x) / (RECT_WIDTH  + RECT_SPACE) / (1/noteDuration)
       const note = {
         noteId: rectangle.noteId,
-        midiNumber: rectangle.midiNumber,
+        midi: rectangle.midiNumber,
         time: timePoint,
         duration: noteDuration,
         coordX: rectangle.x,

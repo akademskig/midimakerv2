@@ -1,37 +1,38 @@
-import React, { useContext, useMemo } from 'react'
-import Axios, { AxiosError } from 'axios'
+import { useContext, useMemo } from 'react'
+import Axios, { AxiosError, AxiosResponse } from 'axios'
 import { AuthCtx } from '../../providers/auth.provider';
 import { TChannel } from '../../midimaker/providers/SoundfontProvider/SoundFontProvider.types';
 
 const baseUrl = `http://localhost:4000`
 
 export default function useMidiFileApi() {
-    const { accessToken, setAuthData } = useContext(AuthCtx)
+    const { accessToken } = useContext(AuthCtx)
     const axios = useMemo(() => Axios.create({
         headers: {
             'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
         }
     }), [accessToken])
     const axiosFiles = useMemo(() => Axios.create({
         headers: {
             'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'multipart/form-data'
-        }
+        },
+        responseType: 'blob'
     }), [accessToken])
     const fakeError = { 
         statusCode: 400,
         message: 'Unknown error',
         error: 'Unknown'
     }
-    const parseError = (error: AxiosError) => error?.response?.data || fakeError
-    const saveMidiFile = async ({ name, midiChannels, canvasImgBlob }: { name: string, midiChannels: TChannel[], canvasImgBlob?: Blob | undefined | null}) => {
-        const body = {name, midiChannels }
-        try{
-            const { data } =  await axios.post(`${baseUrl}/midiFile`, body)
-            // if(canvasImgBlob){
-            //     await saveCanvasImage(data.id, canvasImgBlob)
-            // }
+    const parseError = (error: AxiosError) => {
+        return error?.response?.data || fakeError}
+    
+    const saveMidiFile = async ({ name, midiChannels }: { name: string, midiChannels: TChannel[], canvasImgBlob?: Blob | undefined | null}) => {
+        const formData = new FormData()
+        formData.append('file', new Blob([JSON.stringify(midiChannels, null, 3)],{type : 'application/json' }))
+        try {
+            const { data } =  await axios.post(`${baseUrl}/midiFile/save/${name}`, formData)
             return data
         }
         catch(error){
@@ -46,8 +47,10 @@ export default function useMidiFileApi() {
         .then(res => console.log(res))
     }
     const updateMidiFile = async ({ id, name, midiChannels, canvasImgBlob }: { id: string, name: string, midiChannels: TChannel[],canvasImgBlob?: Blob | undefined | null}) => {
-        const body = {name, midiChannels }
-        return axios.put(`${baseUrl}/midiFile/${id}`, body)
+        const formData = new FormData()
+        formData.append('file', new Blob([JSON.stringify(midiChannels, null, 3)],{type : 'application/json' }))
+        formData.append('name', name)
+        return axios.put(`${baseUrl}/midiFile/update${name}`, formData)
         .catch(error=> {throw parseError(error)})
         
     }
@@ -71,13 +74,28 @@ export default function useMidiFileApi() {
             .then(res => res.data)
             .catch(error => {throw parseError(error)})
     }
+    const convert = async (id: string, ext: string)=> {
+        return axiosFiles.post(`${baseUrl}/midiFile/convert/${id}/${ext}`)
+            .then((res: AxiosResponse) => {
+                return new Blob([res.data], { type: 'audio/mpeg'})})
+            .catch(error => {throw parseError(error)})
+    }
+    const uploadFile = async (file: File)=> {
+        const formData = new FormData()
+        formData.append('file', file)
+        return axios.post(`${baseUrl}/midiFile/upload`, formData)
+            .then((res: AxiosResponse) => res.data)
+            .catch(error => {throw parseError(error)})
+    }
     return ({
         saveMidiFile,
         getMidiFile,
         getFilenames,
         updateMidiFile,
         getAllByUser,
-        deleteMidiById
+        deleteMidiById,
+        convert,
+        uploadFile
     })
 
 }

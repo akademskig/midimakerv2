@@ -146,12 +146,12 @@ function AudioController(): IAudioController {
     }, [channels, setChannels, switchChannel])
 
     const loadInstruments = useCallback(()=> {
-        channels.map(({instrumentName})=> {
+        channels.map(({instrumentName}) => {
             if(!cachedInstruments[instrumentName]){
-                loadInstrument(instrumentName)
+                return loadInstrument(instrumentName)
             }
         })
-    }, [cachedInstruments, loadInstrument ])
+    }, [cachedInstruments, channels, loadInstrument])
 
     useEffect(() => {
         loadInstruments()
