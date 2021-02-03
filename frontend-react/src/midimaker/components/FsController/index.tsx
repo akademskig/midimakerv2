@@ -114,14 +114,18 @@ function FsController(): ReactElement {
         setUploadOpen(false)
         if (files.length > 0) {
             setAudioStateLoading(true)
-            const data = await uploadFile(files[0])
-            const channels = data.map((d: TChannel) => ({ ...d, color: sample(defaultColors) }))
-            loadInstruments(channels)
-            setChannels(updateChannels(channels))
-            updateGridSetup(channels)
-            setAudioStateLoading(false)
+            uploadFile(files[0]).then(data=> {
+                const channels = data.map((d: TChannel) => ({ ...d, color: sample(defaultColors) }))
+                loadInstruments(channels)
+                setChannels(updateChannels(channels))
+                updateGridSetup(channels)
+            })
+            .catch(error=> notify('error', 'An error occurred. Midi file may not be valid.'))
+            .finally(() => {
+                setAudioStateLoading(false)
+            })
         }
-    }, [loadInstruments, setAudioStateLoading, setChannels, updateChannels, updateGridSetup, uploadFile])
+    }, [loadInstruments, notify, setAudioStateLoading, setChannels, updateChannels, updateGridSetup, uploadFile])
 
     const onNewMidiClick = useCallback(() => {
         setChannels([])

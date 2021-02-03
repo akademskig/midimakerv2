@@ -431,7 +431,6 @@ function NotesGridRenderer() {
       }
     }
   }, [canvasRef, canvasBoxRef, notesListRef, handleKeyDown, notesCanvasElement])
-  console.log(audioStateLoading, loading, renderingDone)
   return (
     <div className={classes.canvasContainer} >
       {(loading || !renderingDone || audioStateLoading) && <Loader />}

@@ -19,15 +19,26 @@ export default function useInstrumentsApi() {
         error: 'Unknown'
     }
     const parseError = (error: AxiosError) => error?.response?.data || fakeError
+    const parseInstrument = ({ name, player}: {name: string, player: any}) => {
+        const playerData = Buffer.from(player)
+        console.log(JSON.parse(playerData.toString('utf-8')))
+        return {
+            name,
+            player: JSON.parse('')
+        }
+
+    }
     const saveInstrument = async ({ name, player }: { name: string, player: Player }) => {
-        const body = {name, player }
-        return axios.post(`${baseUrl}/instruments`, body)
+        const formData = new FormData()
+        formData.append('file', new Blob([JSON.stringify(player, null, 3)],{type : 'application/json' }))
+        formData.append('name', name)
+        return axios.post(`${baseUrl}/instruments/${name}`, formData)
         .catch(error=> {throw parseError(error)})
         
     }
     const getInstrument = async ({ name }: { name: string }) => {
         return axios.get(`${baseUrl}/instruments/${name}`)
-            .then(res => res.data)
+            .then(res => parseInstrument(res.data))
             .catch(error => {throw parseError(error)})
     }
     return ({

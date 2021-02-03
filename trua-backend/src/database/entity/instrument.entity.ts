@@ -12,9 +12,8 @@ export default class Instrument {
     @Column({ length: 500 })
     name: string;
 
-    @IsNotEmpty()
-    @Column()
-    player: BinaryType;
+    @Column({name: 'player',type: 'bytea', nullable: true})
+    player: Buffer;
 
     @CreateDateColumn()
     createdAt: Date;
