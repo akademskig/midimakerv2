@@ -50,7 +50,7 @@ export default function useMidiFileApi() {
         const formData = new FormData()
         formData.append('file', new Blob([JSON.stringify(midiChannels, null, 3)],{type : 'application/json' }))
         formData.append('name', name)
-        return axios.put(`${baseUrl}/midiFile/update${name}`, formData)
+        return axios.put(`${baseUrl}/midiFile/update/${name}`, formData)
         .catch(error=> {throw parseError(error)})
         
     }

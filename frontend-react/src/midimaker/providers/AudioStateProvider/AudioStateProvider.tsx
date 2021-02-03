@@ -1,8 +1,8 @@
 import React, { createContext, ReactElement, useCallback, useEffect, useState } from 'react'
 import { MidiNumbers } from 'react-piano'
+import { v4 as uuid } from 'uuid'
 import { range } from 'lodash'
 import { Note, TChannel } from '../SoundfontProvider/SoundFontProvider.types'
-
 const initialNoteRange = {
     first: 43,
     last: 67,
@@ -49,6 +49,7 @@ interface IAudioStateProviderProps {
     children: ReactElement | ReactElement[]
 }
 const initialChannel = {
+    id: uuid(),
     instrumentName: '',
     notes: [],
     color: initialChannelColor,

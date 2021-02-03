@@ -1,5 +1,5 @@
 import { useCallback, useContext, useRef } from 'react'
-import { uniq, flatMap } from 'lodash'
+import { flatMap } from 'lodash'
 import { SoundfontProviderContext } from '../providers/SoundfontProvider/SoundfontProvider'
 import {
   PlayEvent,
@@ -9,6 +9,7 @@ import {
 import { WindowExtended } from '../globals'
 import { AudioStateProviderContext } from '../providers/AudioStateProvider/AudioStateProvider'
 import { NotesGridControllerCtx } from '../components/NotesGrid/components/NotesGridController'
+import { Player } from 'soundfont-player'
 
 interface IAudioNode {
   play: () => unknown,
@@ -16,19 +17,19 @@ interface IAudioNode {
 }
 
 interface IActiveAudioNodes {
-  [string: string]: IAudioNode | null
+  [string: string]: Player | null
 }
 
 const windowExtended: WindowExtended = window
 const audioContext = new (windowExtended && (windowExtended.AudioContext || windowExtended.webkitAudioContext))()
 
 interface IAudioPlayer {
-  playNote: (event: PlayEvent) => void;
+  playNote: (event: PlayEvent, instrumentName?: string) => void;
   stopNote: (midiNumber: number) => void;
   startNote: (midiNumber: number) => void;
   playAll: () => void
   stopPlayAll: () => void,
-  stopAllNotes: () => void
+  stopAllNotes: () => void,
 }
 const scheduledEvents: Array<number> = []
 function AudioPlayer(): IAudioPlayer {
@@ -41,24 +42,24 @@ function AudioPlayer(): IAudioPlayer {
 
   const startNote = useCallback(
     (event: any, instrumentName?: string) => {
-        const audioNode = instrumentName
-          ? cachedInstruments?.[instrumentName]?.start(event.midi.toString(), 0, {duration: event.duration})
-          : currentInstrument?.player?.start(event.midi.toString(), 0,{duration: event.duration})
-        if (audioNode) {
-          activeAudioNodes.current = {
-            ...activeAudioNodes.current,
-            [event.midi]: audioNode,
-          }
+      const audioNode = instrumentName
+        ? cachedInstruments?.[instrumentName]?.start(event.midi.toString(), 0 , event)
+        : currentInstrument?.player?.start(event.midi.toString(), 0, event)
+      if (audioNode) {
+        activeAudioNodes.current = {
+          ...activeAudioNodes.current,
+          [event.midi]: audioNode,
         }
+      }
     },
     [cachedInstruments, currentInstrument]
   )
 
   const stopNote = useCallback((midiNumber) => {
     const { current: audioNodes } = activeAudioNodes
-      //@ts-ignore
-      audioNodes && audioNodes[midiNumber] && audioNodes[midiNumber].stop()
-      delete activeAudioNodes.current[midiNumber]
+    //@ts-ignore
+    audioNodes && audioNodes[midiNumber.midi] && audioNodes[midiNumber.midi].stop()
+    delete activeAudioNodes.current[midiNumber]
   }, [activeAudioNodes])
 
   const playNote = useCallback((lastEvent: PlayEvent, instrumentName?: string) => {
@@ -81,12 +82,7 @@ function AudioPlayer(): IAudioPlayer {
           })
         }))
       }
-      const startAndEndTimes = uniq(
-        flatMap(joinedEvents, (event) => [
-          event.time -= timer,
-          Math.floor(event.time + event.duration - timer),
-        ]).filter(time => time >= 0)
-      )
+      const startAndEndTimes = joinedEvents.map((event=> event.time -= timer)).filter(t => t>=0)
       startAndEndTimes.forEach((time, i) => {
         scheduledEvents.push(
           setTimeout(() => {
@@ -124,14 +120,6 @@ function AudioPlayer(): IAudioPlayer {
     })
     stopAllNotes()
   }, [stopAllNotes])
-
-  
-
-  // channelsToPlaylist = async (channels) => {
-  //   channels.forEach(async c => {
-  //     this.instruments[c.instrumentName] = await this.loadChannelInstrument(c.instrumentName)
-  //   })
-  // }
 
   return {
     playAll,

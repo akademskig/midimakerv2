@@ -35,7 +35,7 @@ export interface ICoordinates {
 
 export const CanvasContext = createContext<any>(null)
 export type TMappedEvent = {
-  instrumentName: string,
+  channelId: string,
   noteId: string,
   y: number,
   x: number,
@@ -385,11 +385,13 @@ function NotesGridRenderer() {
     if (!event.shiftKey || !currentNote) {
       return
     }
+    
     setHoveredNote(currentNote)
   }, [setHoveredNote, currentNote])
 
   const onMouseMove = useCallback((event) => {
     const note = findNoteInChannel(event)
+    console.log(note)
     if (note) {
       setCurrentNote(note)
     }

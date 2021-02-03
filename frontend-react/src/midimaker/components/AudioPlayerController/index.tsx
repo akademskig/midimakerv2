@@ -1,23 +1,12 @@
-import { Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, makeStyles, TextField, Theme } from '@material-ui/core'
-import { Pause, PlayArrow, Save, Stop, AttachFile, CreateNewFolderOutlined, CreateNewFolderRounded, LayersClearSharp, FolderOpenOutlined, CloudUpload } from '@material-ui/icons'
-import React, { ReactElement, useContext, useState, useCallback } from 'react'
-import { sample } from 'lodash'
-import { DropzoneArea, DropzoneDialog } from 'material-ui-dropzone'
+import { createStyles, IconButton, makeStyles, Theme } from '@material-ui/core'
+import { Pause, PlayArrow, Stop } from '@material-ui/icons'
+import React, { ReactElement, useContext } from 'react'
 import classnames from 'classnames'
 import { useAudioPlayer } from '../../controllers/AudioPlayer'
 import { AudioStateProviderContext } from '../../providers/AudioStateProvider/AudioStateProvider'
 import { NotesGridControllerCtx } from '../NotesGrid/components/NotesGridController'
-import useMidiFileApi from '../../../api/protected/midiFile'
-import useNotify from '../../../components/common/notifications/notifications'
-import { CustomTooltip } from '../shared/loader/CustomTooltip'
-import { defaultColors } from '../NotesGrid/constants'
-import { TChannel } from '../../providers/SoundfontProvider/SoundFontProvider.types'
 import FsController from '../FsController'
 
-type TMidiFile = {
-    name: string,
-    id: string
-}
 const useStyles = makeStyles((theme: Theme) => createStyles({
     container: {
         display: 'flex',

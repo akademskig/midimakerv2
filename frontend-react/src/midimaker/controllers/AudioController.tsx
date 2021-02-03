@@ -1,21 +1,22 @@
-import { useCallback, useContext, useEffect } from 'react'
+import { useCallback, useContext } from 'react'
 import { PlayEvent, TChannel } from '../providers/SoundfontProvider/SoundFontProvider.types'
 import { SoundfontProviderContext } from '../providers/SoundfontProvider/SoundfontProvider'
 import { AudioStateProviderContext } from '../providers/AudioStateProvider/AudioStateProvider'
 import { sample } from 'lodash'
 import { defaultColors } from '../components/NotesGrid/constants'
-
+import { v4 as uuid } from 'uuid'
 class Channel implements TChannel {
+    id: string
     instrumentName: string
     notes: PlayEvent[]
     duration: number
     color: string
-    constructor(instrumentName: string, channelColor: string) {
+    constructor(id: string, instrumentName: string, channelColor: string) {
+        this.id = id
         this.instrumentName = instrumentName
         this.notes = []
         this.duration = 0
         this.color = channelColor
-
     }
 
 }
@@ -26,7 +27,8 @@ interface IAudioController {
     switchChannel: (instrumentName: string) => void
     removeChannel: (InstrumentName: string) => void
     addNewChannel: (InstrumentName: string) => void
-    selectInstrument: (InstrumentName: string) => void
+    selectInstrument: (InstrumentName: string) => void,
+    loadInstruments: (channels: TChannel[]) => void
 }
 
 
@@ -36,10 +38,10 @@ function AudioController(): IAudioController {
    
     
     const addNewChannel = useCallback((instrumentName) => {
-        if(channels.find(channel=> channel.instrumentName === instrumentName)){
-            return
-        }
-        const newChannel = new Channel(instrumentName, sample(defaultColors) || '')
+        // if(channels.find(channel=> channel.instrumentName === instrumentName)){
+        //     return
+        // }
+        const newChannel = new Channel(uuid(), instrumentName, sample(defaultColors) || '')
         setCurrentChannel(newChannel)
         setChannels([...channels, newChannel])
         return newChannel
@@ -51,10 +53,10 @@ function AudioController(): IAudioController {
     }, [addNewChannel, setCurrentInstrumentName])
 
     const updateChannels = useCallback((updatedChannel: TChannel) => {
-        const exists = channels.find(channel => channel.instrumentName === updatedChannel.instrumentName)
+        const exists = channels.find(channel => channel.id === updatedChannel.id)
         let newChannels = []
         if (exists) {
-            newChannels = channels.map(channel => channel.instrumentName === updatedChannel.instrumentName ? updatedChannel : channel)
+            newChannels = channels.map(channel => channel.id === updatedChannel.id ? updatedChannel : channel)
         }
         else {
             newChannels = [...channels, updatedChannel]
@@ -131,31 +133,32 @@ function AudioController(): IAudioController {
         }
 
     }, [addNewChannel, addNoteToCurrentChannel, channels, currentChannel, currentInstrument, removeNoteFromChannel])
-    const switchChannel = useCallback((instrumentName: string) => {
-        const newChannel = channels.find(channel => channel.instrumentName === instrumentName)
+    const switchChannel = useCallback((channelId: string) => {
+        const newChannel = channels.find(channel => channel.id === channelId)
         if(newChannel){
-            setCurrentInstrumentName(instrumentName)
+            setCurrentInstrumentName(newChannel.instrumentName)
             setCurrentChannel(newChannel)
         }
     }, [channels, setCurrentChannel, setCurrentInstrumentName])
 
-    const removeChannel = useCallback((channelInstrumentName: string)=> {
-        const newChannels = channels.filter(channel => channel.instrumentName !== channelInstrumentName)
-        switchChannel(newChannels[newChannels.length-1]?.instrumentName)
+    const removeChannel = useCallback((channelId: string)=> {
+        const newChannels = channels.filter(channel => channel.id !== channelId)
+        switchChannel(newChannels[newChannels.length-1]?.id)
         setChannels(newChannels)
     }, [channels, setChannels, switchChannel])
 
-    const loadInstruments = useCallback(()=> {
-        channels.map(({instrumentName}) => {
-            if(!cachedInstruments[instrumentName]){
-                return loadInstrument(instrumentName)
-            }
+    const loadInstruments = useCallback((channels:TChannel[])=> {
+        channels.map(async ({instrumentName}) => {
+            return loadInstrument(instrumentName)
         })
-    }, [cachedInstruments, channels, loadInstrument])
+        setCurrentChannel(channels[0])
+        return setCurrentInstrumentName(channels[0].instrumentName)
+    }, [loadInstrument, setCurrentChannel, setCurrentInstrumentName])
 
-    useEffect(() => {
-        loadInstruments()
-    }, [loadInstruments])
+    // useEffect(() => {
+    //    loadInstruments()
+    //    console.log('loading')
+    // }, [loadInstruments])
 
     return ({
         handleToggleNote,
@@ -163,7 +166,8 @@ function AudioController(): IAudioController {
         switchChannel,
         removeChannel,
         addNewChannel, 
-        selectInstrument
+        selectInstrument,
+        loadInstruments
     })
 }
 

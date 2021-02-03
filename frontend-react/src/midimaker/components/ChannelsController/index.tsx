@@ -150,13 +150,14 @@ type TChannelListProps = {
     onClick: ((selectedItem: string) => void),
     currentInstrumentName: string,
 }
-const ChannelList = ({ channels, classes, onClick, currentInstrumentName }: TChannelListProps) => {
+const ChannelList = ({ channels, classes, onClick }: TChannelListProps) => {
     const [anchorEl, setAnchorEl] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
     const [opened, setOpened] = useState(-1)
     const theme = useTheme()
     const { removeChannel } = useAudioController()
+    const { currentChannel } = useContext(AudioStateProviderContext)
     const onRemoveClick = useCallback((e, idx) => {
-        removeChannel(channels[idx].instrumentName)
+        removeChannel(channels[idx].id)
     }, [channels, removeChannel])
 
     const closeOnClick = useCallback(() => {
@@ -185,9 +186,9 @@ const ChannelList = ({ channels, classes, onClick, currentInstrumentName }: TCha
                         >
                             <ListItem
                                 disableGutters
-                                className={classnames(classes.listItemChannel, { active: currentInstrumentName === channel.instrumentName })}
-                                onClick={() => onClick(channel.instrumentName)}
-                                value={channel.instrumentName}
+                                className={classnames(classes.listItemChannel, { active: currentChannel?.id === channel.id })}
+                                onClick={() => onClick(channel.id)}
+                                value={channel.id}
                                 onContextMenu={(e) => onChannelRightClick(e, idx)}
                             >
                                 <FiberManualRecord fontSize='large' className={classes.listItemDiv} style={{ color: channel.color }} />
@@ -288,8 +289,8 @@ function ChannelsController({ left = false }): ReactElement {
     const [itemOpened, setItemOpened] = useState<string>('')
     const [anchorEl, setAnchorEl] = useState<{ x: number, y: number }>({ x: 0, y: 0 })
 
-    const handleChannelClick = useCallback((selectedChannelInstrumentName: string) => {
-        switchChannel(selectedChannelInstrumentName)
+    const handleChannelClick = useCallback((channelId: string) => {
+        switchChannel(channelId)
     }, [switchChannel])
     const handleChannelRightClick = useCallback((e: MouseEvent, item: string) => {
         e.stopPropagation()

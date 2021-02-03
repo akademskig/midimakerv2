@@ -31,9 +31,8 @@ const initialCtxValue = {
   currentInstrumentName: '',
   setCurrentInstrumentName: ((value: React.SetStateAction<string>) => (value: string) => value),
 }
-
+let cachedInstrumentsLocal: ICachedInstruments = {}
 export const SoundfontProviderContext = createContext<SoundfontProviderContextValue>(initialCtxValue)
-
 function SoundfontProvider({
   format = SoundfontFormat.mp3,
   soundfont = SoundfontType.MusingKyte,
@@ -52,7 +51,7 @@ function SoundfontProvider({
 
 
   const fetchInstrument = useCallback(async (instrumentName) => {
-   
+
     let instrument = null
     // try {
     //     instrument = await getInstrument({ name: instrumentName })
@@ -83,33 +82,42 @@ function SoundfontProvider({
   }, [format, soundfont])
 
   const loadInstrument = useCallback(
-    async (instrumentName) => {
+    async (instrumentName: string, setCurrent?: boolean) => {
       setLoading(true)
       setCurrentInstrument(null)
       if (cachedInstruments?.[instrumentName]) {
-        setLoading(false)
-        setCurrentInstrument({ name: instrumentName, player: cachedInstruments?.[instrumentName] })
+        setCurrent && setCurrentInstrument({ name: instrumentName, player: cachedInstruments?.[instrumentName] })
+        return setLoading(false)
       }
-      const instrument = await fetchInstrument(instrumentName)
-      setCurrentInstrument({
+      let instrument = null
+      try {
+        instrument = await fetchInstrument(instrumentName)
+
+      }
+      catch (error) {
+        return console.error(`Unable to fetch instrument ${instrumentName}`)
+      }
+      setCurrent && setCurrentInstrument({
         name: instrumentName,
         player: instrument
       })
       if (instrument) {
+        cachedInstrumentsLocal = {
+          ...cachedInstrumentsLocal,
+          [instrumentName]: instrument,
+        }
         setCachedInstruments({
-          ...cachedInstruments,
+          ...cachedInstrumentsLocal,
           [instrumentName]: instrument,
         })
       }
       setLoading(false)
     },
-    [setCurrentInstrument, setCachedInstruments, cachedInstruments, fetchInstrument]
+    [cachedInstruments, fetchInstrument, loading]
   )
-
   useEffect(() => {
-    loadInstrument(currentInstrumentName)
-  }, [currentInstrumentName])
-
+      loadInstrument(currentInstrumentName, true)
+  }, [currentInstrumentName, loadInstrument, setCurrentInstrument])
   const ctxValue = useMemo(
     () => ({
       currentInstrument,

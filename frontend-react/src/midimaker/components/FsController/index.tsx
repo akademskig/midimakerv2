@@ -1,5 +1,5 @@
-import { Button, createStyles, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, LinearProgress, List, ListItem, makeStyles, TextField, Theme } from '@material-ui/core'
-import {Save, LayersClearSharp, FolderOpenOutlined, CloudUpload } from '@material-ui/icons'
+import { Button, createStyles, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, List, ListItem, makeStyles, TextField, Theme } from '@material-ui/core'
+import { Save, LayersClearSharp, FolderOpenOutlined, CloudUpload } from '@material-ui/icons'
 import React, { ReactElement, useContext, useState, useCallback } from 'react'
 import { sample } from 'lodash'
 import { DropzoneDialog } from 'material-ui-dropzone'
@@ -10,6 +10,7 @@ import useNotify from '../../../components/common/notifications/notifications'
 import { CustomTooltip } from '../shared/loader/CustomTooltip'
 import { defaultColors } from '../NotesGrid/constants'
 import { TChannel } from '../../providers/SoundfontProvider/SoundFontProvider.types'
+import { useAudioController } from '../../controllers/AudioController'
 
 type TMidiFile = {
     name: string,
@@ -45,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
 function FsController(): ReactElement {
     // const { renderPlay, stopPlayRender } = useContext(CanvasContext)
     const { channels, setChannels, updateGridSetup, setAudioStateLoading } = useContext(AudioStateProviderContext)
-    const {  updateChannels } = useContext(NotesGridControllerCtx)
+    const { updateChannels } = useContext(NotesGridControllerCtx)
     const { saveMidiFile, getFilenames, getMidiFile, updateMidiFile, uploadFile } = useMidiFileApi()
     const notify = useNotify()
     const classes = useStyles()
@@ -55,6 +56,7 @@ function FsController(): ReactElement {
     const [selectedFile, setSelectedFile] = useState<TMidiFile | null>(null)
     const [files, setFiles] = useState<TMidiFile[]>([])
     const [midiName, setMidiName] = useState('test')
+    const { loadInstruments } = useAudioController()
 
     const onSaveClick = useCallback(async () => {
         if (selectedFile) {
@@ -90,33 +92,36 @@ function FsController(): ReactElement {
         async (file) => {
             setAudioStateLoading(true)
             setSelectFileOpen(false)
-            const res = await getMidiFile({ id: file.id })
-            if (res) {
-                setChannels(updateChannels(res.midiChannels))
-                updateGridSetup(res.midiChannels)
+            const { midiChannels } = await getMidiFile({ id: file.id })
+            if (midiChannels) {
+                const channels = midiChannels.map((d: TChannel) => ({ ...d, color: sample(defaultColors) }))
+                const updatedChannels = updateChannels(channels)
+                loadInstruments(channels)
+                setChannels(updatedChannels)
+                updateGridSetup(channels)
                 setSelectedFile(file)
-                setAudioStateLoading(false)
             }
+            setAudioStateLoading(false)
         },
-        [getMidiFile, setAudioStateLoading, setChannels, updateChannels, updateGridSetup],
+        [getMidiFile, loadInstruments, setAudioStateLoading, setChannels, updateChannels, updateGridSetup],
     )
 
     const onUploadFileClick = useCallback(() => {
         setUploadOpen(true)
     }, [])
 
-    const onUploadFileDone = useCallback(async (files) => {
+    const onUploadFileDone = useCallback(async (files: any[]) => {
         setUploadOpen(false)
-        
         if (files.length > 0) {
             setAudioStateLoading(true)
             const data = await uploadFile(files[0])
-            const channels = data.map((d: TChannel) => ({ ...d, channelColor: sample(defaultColors) }))
+            const channels = data.map((d: TChannel) => ({ ...d, color: sample(defaultColors) }))
+            loadInstruments(channels)
             setChannels(updateChannels(channels))
             updateGridSetup(channels)
             setAudioStateLoading(false)
         }
-    }, [setAudioStateLoading, setChannels, updateChannels, updateGridSetup, uploadFile])
+    }, [loadInstruments, setAudioStateLoading, setChannels, updateChannels, updateGridSetup, uploadFile])
 
     const onNewMidiClick = useCallback(() => {
         setChannels([])
@@ -132,7 +137,7 @@ function FsController(): ReactElement {
                 <CustomTooltip title={'UploadFile'} placement='top-end' >
                     <IconButton onClick={onUploadFileClick} className={classes.button}>
                         <CloudUpload />
-                    </IconButton> 
+                    </IconButton>
                 </CustomTooltip>
                 <CustomTooltip title={'Save'} placement='top-end' >
                     <IconButton onClick={onSaveClick} className={classes.button}>

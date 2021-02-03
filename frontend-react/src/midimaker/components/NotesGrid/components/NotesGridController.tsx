@@ -47,7 +47,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
   const { playNote } = useAudioPlayer()
   // const { findNoteByGridCoordinates, getX, getY, rectangleHeight } = useContext(CanvasContext)
   const { handleToggleNote } = useAudioController()
-  const { currentChannel, channels, setChannels, setControllerState, noteDuration, notes } = useContext(AudioStateProviderContext)
+  const { currentChannel, channels, setCurrentChannel, setChannels, setControllerState, noteDuration, notes } = useContext(AudioStateProviderContext)
   const [mappedEvents, setMappedEvents ] = useState<TMappedEvent[]>([])
 
   const [timer, setTimer] = useState(0)
@@ -78,11 +78,16 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
       }
       return  (canvasElement.height - RECT_SPACE * notes.length) / notes.length
     }, [canvasElement, notes.length])
+    
   const findNoteInChannel = useCallback((event: MouseEvent)=> {
-    const currentNote = mappedEvents.find(mappedEvent => mappedEvent.instrumentName === currentChannel?.instrumentName && (getX(event) < mappedEvent.x + mappedEvent.width && getX(event) >= mappedEvent.x) &&
+    const currentNote = mappedEvents.find(mappedEvent =>  (getX(event) < mappedEvent.x + mappedEvent.width && getX(event) >= mappedEvent.x) &&
      (getY(event) >= mappedEvent.y && getY(event)<= mappedEvent.y + getRectangleHeight()))
+     const currentChannel = channels.find(channel=> channel.id === currentNote?.channelId)
+     currentChannel && setCurrentChannel(currentChannel)
+    //  const joinedEvents = flatMap(channels, (channel: TChannel) =>
+    //  channel.notes.map((note) => ({ ...note, color: channel.color, instrumentName: channel.instrumentName })))
     return currentChannel?.notes.find(note=> note.noteId === currentNote?.noteId)
-  }, [mappedEvents, currentChannel, getX, getY, getRectangleHeight])
+  }, [mappedEvents, channels, setCurrentChannel, getX, getY, getRectangleHeight])
     // updates channel coordinates when duration or note range has changed
     const updateChannels = useCallback(
       (channels: TChannel[]) => {
@@ -120,7 +125,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
  
   const findMappedEvents = useCallback(() => {
     const joinedEvents = flatMap(channels, (channel: TChannel) =>
-      channel.notes.map((note) => ({ ...note, color: channel.color, instrumentName: channel.instrumentName })))
+      channel.notes.map((note) => ({ ...note, color: channel.color, channelId: channel.id})))
 
     const mappedEvents = joinedEvents.map((event, i) => {
       const x = event.coordX
@@ -128,7 +133,7 @@ function NotesGridControllerProvider({ children }: INotesGridControllerProps): J
       const width = Math.floor(
         event.duration * RECT_WIDTH * 1/noteDuration
       )
-      return {x, y, width, noteId: event.noteId, instrumentName: event.instrumentName }
+      return {x, y, width, noteId: event.noteId, channelId: event.channelId }
     })
     setMappedEvents(mappedEvents)
 

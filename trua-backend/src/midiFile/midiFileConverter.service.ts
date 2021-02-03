@@ -3,8 +3,9 @@ import MidiFile from 'src/database/entity/midiFile.entity';
 import { Midi } from "@tonejs/midi"
 import * as fs from 'fs'
 import { instrumentNumbers } from './data/instrument_numbers';
-import { getInstrumentLabel } from './utils';
-
+import { getInstrumentLabel, parseChannelName } from './utils';
+import { uniqBy } from 'lodash'
+import { v4 as uuid } from 'uuid';
 @Injectable()
 export class MidiFileConverterService {
     constructor(
@@ -20,27 +21,36 @@ export class MidiFileConverterService {
         return `${filename}.${ext}`
     }
     async convertToMidi(file: any) {
-        let filenameRaw = `${process.cwd()}/midis/${file.originalname.replace(/\s/g, "")}`
-        const filename = filenameRaw.split('.')[0]
-        const ext = filenameRaw.split('.')[1]
+        let filenameRaw = `${process.cwd()}/midis/${file.originalname}`
+        const splitFilename =  filenameRaw.split('.')
+        const filename = splitFilename[0]
+        const ext = splitFilename[splitFilename.length - 1]
+        console.log(file,ext)
+        if (ext === 'mid') {
+            return await this.decodeMidi(file.buffer)
+        }
         try {
             fs.statSync(`${filename}.${ext}`)
         }
         catch (error) {
             fs.writeFileSync(`${filename}.${ext}`, file.buffer)
         }
-        try {
-            fs.statSync(`${filename}.${'wav'}`)
-        }
-        catch (error) {
-            await this.ffmpegConvertAny(filename, 'mp3', 'wav')
+        if (ext === 'mp3') {
+            try {
+                fs.statSync(`${filename}.${'wav'}`)
+            }
+            catch (error) {
+                await this.ffmpegConvertAny(filename, 'mp3', 'wav')
+            }
         }
         const midiFilename = `${filename}.${'mid'}`
-        try {
-            fs.statSync(midiFilename)
-        }
-        catch (error) {
-            await this.convertWavToMidi(filename)
+        if (ext !== 'mid') {
+            try {
+                fs.statSync(midiFilename)
+            }
+            catch (error) {
+                await this.convertWavToMidi(filename)
+            }
         }
         const midiData = fs.readFileSync(midiFilename)
         return await this.decodeMidi(midiData)
@@ -71,7 +81,7 @@ export class MidiFileConverterService {
             }
             const track = midi.addTrack()
             track.instrument.number = iNum
-            track.name = channel.instrumentName
+            track.name = parseChannelName(channel.instrumentName)
             track.channel = i
 
             channel.notes.forEach((mt: any) => {
@@ -88,10 +98,11 @@ export class MidiFileConverterService {
         const midi = new Midi(midiData)
         const channels = midi.tracks.map(track => {
             return {
-                instrumentName: track.instrument.name.split(' ').join('_'),
+                id: uuid(),
+                instrumentName: parseChannelName(track.instrument.name.split(' ').join('_')),
                 notes: track.notes,
                 //@ts-ignore
-                duration: track.duration
+                duration: track.duration,
             }
         })
         return channels

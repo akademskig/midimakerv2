@@ -28,6 +28,7 @@ export type TCurrentInstrument = {
 }
 
 export type TChannel = {
+  id: string,
   instrumentName: string;
   notes: Array<PlayEvent>;
   color?: string;
