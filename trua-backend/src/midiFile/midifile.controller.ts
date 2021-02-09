@@ -34,7 +34,6 @@ export class MidiFileController {
     }
     @Get('/all')
     async getAll(@Req() req) {
-        console.log('sdsd')
         return this.midiFileService.getAll(req.user.userId);
     }
     @Get(':id')
@@ -42,8 +41,10 @@ export class MidiFileController {
         return await this.midiFileService.findOne({ id });
     }
     @Put('/update/:id')
-    async updateOne(@Param('id') id, @Body() midiFile) {
-        return await this.midiFileService.updateOne({ id, ...midiFile });
+    @UseInterceptors(FileInterceptor('file'))
+    async updateOne(@Param('id') id, @UploadedFile() midiFile) {
+        const data = midiFile.buffer.toString('utf-8')
+        return await this.midiFileService.updateOne({ id, midiChannels: JSON.parse(data) });
     }
     @Delete(':id')
     async deleteById(@Param('id') id) {

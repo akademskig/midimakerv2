@@ -29,20 +29,20 @@ export class MidiFileService {
   async getFilenames(userId) {
     const midiFiles = await getConnection()
       .getRepository(MidiFile)
-      .find({ select: ["name", 'id'], where: { user: userId } })
+      .find({ select: ["name", 'id'], where: { owner: userId } })
     return midiFiles
   }
   async getAll(userId) {
     const midiFiles = await getConnection()
       .getRepository(MidiFile)
-      .find({ where: { user: userId } })
+      .find({ where: { owner: userId } })
     return midiFiles
   }
 
-  async updateOne({id, name, midiChannels}){
+  async updateOne({id, midiChannels}){
     return await getConnection()
       .getRepository(MidiFile)
-      .update({ id }, { name, midiChannels})
+      .update({ id }, { midiChannels})
   }
   async deleteById(id){
     return await getConnection()
