@@ -25,7 +25,6 @@ export class MidiFileConverterService {
         const splitFilename =  filenameRaw.split('.')
         const filename = splitFilename[0]
         const ext = splitFilename[splitFilename.length - 1]
-        console.log(file,ext)
         if (ext === 'mid') {
             return await this.decodeMidi(file.buffer)
         }
@@ -99,7 +98,7 @@ export class MidiFileConverterService {
         const channels = midi.tracks.map(track => {
             return {
                 id: uuid(),
-                instrumentName: parseChannelName(track.instrument.name.split(' ').join('_')),
+                instrumentName: (this.getInstrumentNameFromNumber(track.instrument.number)),
                 notes: track.notes,
                 //@ts-ignore
                 duration: track.duration,
@@ -111,6 +110,11 @@ export class MidiFileConverterService {
         const formatted = getInstrumentLabel(instrument)
         const { instruments } = instrumentNumbers
         return instruments.findIndex(({ instrument }) => instrument.toLowerCase() === formatted.toLocaleLowerCase())
+    }
+    getInstrumentNameFromNumber(instrumentNumber){
+        const { instruments } = instrumentNumbers
+        const originalname = instruments[instrumentNumber].instrument
+        return parseChannelName(originalname)
     }
     async timidityConvertFromMidi(file: string, extOut: string) {
         return new Promise((resolve, reject) => {
