@@ -23,15 +23,20 @@ const useStyles = makeStyles((theme: Theme) =>
         top: '125px',
         bottom: '61px',
         overflowX: 'hidden',
+        overflowY: 'auto',
+        backgroundColor: theme.palette.primary.main,
         zIndex:10,
         width: theme.spacing(7) + 1,
         [theme.breakpoints.up('sm')]: {
             width: theme.spacing(7.5) + 1,
         },
+        '& ::-webkit-scrollbar': {
+           width: '3px',
+           height: '3px',
+        }
     },
     drawerPaper: {
         backgroundColor: theme.palette.primary.main,
-        overflow: 'hidden',
         position: 'relative',
         '& svg': {
             color: theme.palette.primary.contrastText,
@@ -125,7 +130,8 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     },
     channelsList: {
-        padding: `${theme.spacing(0.75)}px 0`
+        padding: `${theme.spacing(0.75)}px 0`,
+        overflowY: 'auto'
     }
 }))
 

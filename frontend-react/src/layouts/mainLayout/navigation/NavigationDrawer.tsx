@@ -16,7 +16,7 @@ import { NavLink } from 'react-router-dom';
 import AppToolbar from '../toolbar';
 import useScreenSize from '../../../providers/screenSize.provider';
 import { RECT_COLOR } from '../../../midimaker/components/NotesGrid/constants';
-import { Collections, InfoOutlined, MusicNote, MusicNoteTwoTone, NoteRounded } from '@material-ui/icons';
+import { Collections, InfoOutlined, MusicNote } from '@material-ui/icons';
 
 const drawerWidth = 200;
 
@@ -101,7 +101,7 @@ const useStyles = (width: number, height: number) => makeStyles((theme: any) =>
                 width: `${width - 56}px`,
             },
             '&.sm': {
-                width: `${width - 60}px`,
+                // width: `${width - 60}px`,
                 marginLeft: '61px'
             },
             [theme.breakpoints.up('xs')]: {
