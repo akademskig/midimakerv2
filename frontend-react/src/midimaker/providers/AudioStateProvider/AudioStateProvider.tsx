@@ -100,7 +100,7 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
         const compositionDuration = channels.reduce(
             (acc: number, curr: TChannel) => (curr.duration > acc ? curr.duration : acc),
             0)
-        const noteRange = channels.map((channel: TChannel) => {
+        const compositionNoteRange = channels.map((channel: TChannel) => {
             return channel.notes.reduce((prev: any, curr: any) => {
                 return {
                     min: curr.midi < prev.min ? curr.midi : prev.min,
@@ -109,14 +109,14 @@ const AudioStateProvider = ({ children }: IAudioStateProviderProps): JSX.Element
 
             }, { min: 108, max: 0 })
         })
-        const reduced = noteRange.reduce((prev: any, curr: any) => {
+        const reduced = compositionNoteRange.reduce((prev: any, curr: any) => {
                 return {
                     min: curr.min < prev.min ? curr.min : prev.min,
                     max: curr.max > prev.max ? curr.max : prev.max
                 }
             }, { min: 108, max: 0 })
-        setNoteRange({ first: reduced.min, last: reduced.max})
-        setCompositionDuration(compositionDuration)
+        setNoteRange({ first: Math.min(reduced.min, initialNoteRange.first), last: Math.max(reduced.max, initialNoteRange.last)})
+        setCompositionDuration(Math.max(compositionDuration, initialCompositionDuration))
     }, [])
     const [notes, setNotes] = useState(
         range(noteRange.first, noteRange.last)
