@@ -85,7 +85,7 @@ function AudioPlayer(): IAudioPlayer {
       const startAndEndTimes = joinedEvents.map((event=> event.time -= timer)).filter(t => t>=0)
       startAndEndTimes.forEach((time, i) => {
         scheduledEvents.push(
-          setTimeout(() => {
+          window.setTimeout(() => {
             const currentEvents = joinedEvents.filter((event: PlayEvent) => {
               return (event.time <= time && event.time + event.duration > time)
             })

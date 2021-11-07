@@ -95,6 +95,7 @@ export default function useMidiFileApi() {
         getAllByUser,
         deleteMidiById,
         convert,
+        saveCanvasImage,
         uploadFile
     })
 

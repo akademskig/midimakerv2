@@ -54,14 +54,14 @@ export default function AuthProvider({ children }: IAuthProvider): JSX.Element {
             setUser(getUser())
         }
         setIsAuth(true)
-    }, [setIsAuth, accessToken])
+    }, [setIsAuth, accessToken, user])
 
     const ctxValue = useMemo(() => ({
         user,
         setAuthData,
         accessToken,
         isAuth,
-    }), [ user, setUser, accessToken, setAccessToken, isAuth ])
+    }), [user, setAuthData, accessToken, isAuth])
 
     return (
         <AuthCtx.Provider value={ctxValue}>

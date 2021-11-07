@@ -18,7 +18,6 @@ class Channel implements TChannel {
         this.duration = 0
         this.color = channelColor
     }
-
 }
 
 interface IAudioController {
@@ -34,13 +33,9 @@ interface IAudioController {
 
 function AudioController(): IAudioController {
     const { currentChannel, setChannels, channels, setCurrentChannel } = useContext(AudioStateProviderContext)
-    const { currentInstrument, setCurrentInstrumentName, cachedInstruments, loadInstrument } = useContext(SoundfontProviderContext)
+    const { currentInstrument, setCurrentInstrumentName, loadInstrument } = useContext(SoundfontProviderContext)
    
-    
     const addNewChannel = useCallback((instrumentName) => {
-        // if(channels.find(channel=> channel.instrumentName === instrumentName)){
-        //     return
-        // }
         const newChannel = new Channel(uuid(), instrumentName, sample(defaultColors) || '')
         setCurrentChannel(newChannel)
         setChannels([...channels, newChannel])
