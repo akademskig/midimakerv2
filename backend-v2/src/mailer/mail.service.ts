@@ -1,5 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SendGridService } from '@anchan828/nest-sendgrid';
+import { get } from 'env-var';
+
+require('dotenv').config()
+
+const HOST_URL = get('HOST_URL').required().asString()
 
 @Injectable()
 export default class MailService {
@@ -15,7 +20,7 @@ export default class MailService {
                 text: 'welcome', // plaintext body
                 html: `<div>
                     <b>Welcome!</b>
-                    <p>Please use this link to verify your email: ${process.env.HOST_URL}/auth/verify_email?email=${emailAddress}&token=${verificationToken}</p>
+                    <p>Please use this link to verify your email: ${HOST_URL}/auth/verify_email?email=${emailAddress}&token=${verificationToken}</p>
                     </div>`, // HTML body content
             })
             .then((res) => {
