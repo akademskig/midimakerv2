@@ -1,5 +1,5 @@
-import { createMuiTheme } from '@material-ui/core/styles';
-const theme = createMuiTheme({
+import { createTheme } from '@material-ui/core/styles';
+const theme = createTheme({
   palette: {
     primary: {
       light: '#4973ac',
@@ -12,9 +12,9 @@ const theme = createMuiTheme({
       dark: '#7b0099'
     },
     error:{
-      light: '#e551ff',
-      main: '#af00cb',
-      dark: '#7b0099'
+      light: '#ff4d4d',
+      main: '#ff0000',
+      dark: '#b30000'
     }
   },
   breakpoints: {
