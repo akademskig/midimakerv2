@@ -1,5 +1,10 @@
-
-import { Injectable, UnauthorizedException, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { AuthUtils } from './auth.utils';
@@ -14,17 +19,29 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly authUtils: AuthUtils,
-  ) { }
+  ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOne({ email });
-    if (user && await this.authUtils.comparePasswords({ password, hashedPassword: user.password })) {
+    if (
+      user &&
+      (await this.authUtils.comparePasswords({
+        password,
+        hashedPassword: user.password,
+      }))
+    ) {
       const { password: pwd, ...result } = user;
       return result;
-    } else if (user && !await this.authUtils.comparePasswords({ password, hashedPassword: user.password })) {
+    } else if (
+      user &&
+      !(await this.authUtils.comparePasswords({
+        password,
+        hashedPassword: user.password,
+      }))
+    ) {
       throw new NotFoundException('Invalid username or password');
     } else if (!user) {
-      throw new NotFoundException('User doesn\'t exist!');
+      throw new NotFoundException("User doesn't exist!");
     }
   }
   async signIn(user: any) {
@@ -47,14 +64,24 @@ export class AuthService {
     try {
       const userCreated = await this.usersService.createNew(user, queryRunner);
       if (userCreated) {
-        const verificationToken = await this.authUtils.createVerificationToken(userCreated.id, queryRunner);
+        const verificationToken = await this.authUtils.createVerificationToken(
+          userCreated.id,
+          queryRunner,
+        );
         const { password, ...userData } = userCreated;
-        await this.mailService.sendMail(userData.email, verificationToken.token);
+        await this.mailService.sendMail(
+          userData.email,
+          verificationToken.token,
+        );
         await queryRunner.commitTransaction();
         return userData;
       }
     } catch (err) {
-      Logger.error('Registration error', JSON.stringify(err), 'AuthService.register');
+      Logger.error(
+        'Registration error',
+        JSON.stringify(err),
+        'AuthService.register',
+      );
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
@@ -62,10 +89,9 @@ export class AuthService {
     }
   }
 
-  async verifyUser({ email, token }: { email: string, token: string }) {
+  async verifyUser({ email, token }: { email: string; token: string }) {
     try {
-      const qB: any = await
-        createQueryBuilder('verification_token', 'vT');
+      const qB: any = await createQueryBuilder('verification_token', 'vT');
       const vT = await qB
         .leftJoinAndSelect('vT.user', 'user')
         .where('user.email = :email', { email })
@@ -80,7 +106,11 @@ export class AuthService {
         const qR = getConnection().createQueryRunner();
         await qR.startTransaction();
         try {
-          await this.usersService.updateOne({ email }, { isVerified: true }, qR);
+          await this.usersService.updateOne(
+            { email },
+            { isVerified: true },
+            qR,
+          );
           await qR.manager.delete('verification_token', { token });
           await qR.commitTransaction();
         } catch (err) {
@@ -92,7 +122,11 @@ export class AuthService {
       }
       return `Email ${email} successfully verified!`;
     } catch (err) {
-      Logger.error('Email verification error', JSON.stringify(err), 'UsersService.verifyUser');
+      Logger.error(
+        'Email verification error',
+        JSON.stringify(err),
+        'UsersService.verifyUser',
+      );
       throw err;
     }
   }

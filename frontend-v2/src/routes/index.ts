@@ -1,0 +1,1 @@
+export { default, MainRoutes } from './routes'

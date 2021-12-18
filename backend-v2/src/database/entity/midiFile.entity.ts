@@ -23,7 +23,7 @@ export default class MidiFile {
     @Column({name: 'imageData',type: 'bytea', nullable: true})
     canvasImgBlob?: Buffer ;
 
-    @ManyToOne(type => User)
+    @ManyToOne(type => User, { onDelete: 'CASCADE'})
     @JoinColumn()
     owner: User;
 

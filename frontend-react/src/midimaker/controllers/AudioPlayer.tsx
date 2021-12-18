@@ -64,9 +64,9 @@ function AudioPlayer(): IAudioPlayer {
 
   const playNote = useCallback((lastEvent: PlayEvent, instrumentName?: string) => {
     startNote(lastEvent, instrumentName)
-    setTimeout(() => {
-      stopNote(lastEvent.midi)
-    }, lastEvent.duration * 1000)
+    // setTimeout(() => {
+    //   stopNote(lastEvent.midi)
+    // }, lastEvent.duration * 1000)
   }, [startNote, stopNote])
 
   const playAll = useCallback(

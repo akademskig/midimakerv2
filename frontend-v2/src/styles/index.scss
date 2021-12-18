@@ -1,0 +1,44 @@
+@import "../assets/fonts/FiraCode.scss";
+
+* {
+  box-sizing: border-box;
+  font-family: "Fira Code", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #1f2236;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #1cd6c7;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #1c6dd6;
+  cursor: pointer;
+}
+.MuiMenu-list {
+  background-color: #283c59;
+}
+.MuiTypography-body1 {
+  font-family: "Fira Code" !important;
+}

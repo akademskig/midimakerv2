@@ -30,15 +30,31 @@ describe('AuthService', () => {
   });
   it('should be defined', async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, SendgridModule, PassportModule, JwtModule, TypeOrmModule.forFeature([VerificationToken])],
-      providers: [Connection, UsersService, QueryBuilderService, AuthUtils, MailService, AuthService, CustomStrategy, JwtStrategy, {
-        provide: getRepositoryToken(User),
-        useValue: 'UserRepository',
-      },
+      imports: [
+        AppModule,
+        SendgridModule,
+        PassportModule,
+        JwtModule,
+        TypeOrmModule.forFeature([VerificationToken]),
+      ],
+      providers: [
+        Connection,
+        UsersService,
+        QueryBuilderService,
+        AuthUtils,
+        MailService,
+        AuthService,
+        CustomStrategy,
+        JwtStrategy,
+        {
+          provide: getRepositoryToken(User),
+          useValue: 'UserRepository',
+        },
         {
           provide: getRepositoryToken(VerificationToken),
           useValue: 'VerificationTokenRepository',
-        }],
+        },
+      ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
@@ -46,16 +62,19 @@ describe('AuthService', () => {
   });
 
   it('should register a user', async () => {
-    const res = await service.register({ username: 'marta', email: 'akademski.gradjanin@gmail.com', password: 'testpassowrd123' });
+    const res = await service.register({
+      username: 'marta',
+      email: 'akademski.gradjanin@gmail.com',
+      password: 'testpassowrd123',
+    });
     userId = res.id;
     expect(typeof res.id === 'string').toBe(true);
   });
   it('should generate verification token', async () => {
-    vT = await
-      createQueryBuilder('verification_token', 'vT')
-        .leftJoinAndSelect('vT.user', 'user')
-        .where('user.id = :id', { id: userId })
-        .getOne();
+    vT = await createQueryBuilder('verification_token', 'vT')
+      .leftJoinAndSelect('vT.user', 'user')
+      .where('user.id = :id', { id: userId })
+      .getOne();
 
     const expected = {
       token: expect.any(String),
@@ -63,9 +82,7 @@ describe('AuthService', () => {
       duration: expect.any(Number),
       createdAt: expect.any(Date),
     };
-    expect(vT).toEqual(
-      expect.objectContaining(expected),
-    );
+    expect(vT).toEqual(expect.objectContaining(expected));
   });
   it('should verifiy email', async () => {
     await service.verifyUser({ email: vT.user.email, token: vT.token });

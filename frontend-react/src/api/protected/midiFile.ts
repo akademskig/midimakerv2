@@ -32,7 +32,7 @@ export default function useMidiFileApi() {
         const formData = new FormData()
         formData.append('file', new Blob([JSON.stringify(midiChannels, null, 3)],{type : 'application/json' }))
         try {
-            const { data } =  await axios.post(`${baseUrl}/midiFile/save/${name}`, formData)
+            const { data } =  await axios.post(`${baseUrl}/midi-file/save/${name}`, formData)
             return data
         }
         catch(error){
@@ -83,7 +83,7 @@ export default function useMidiFileApi() {
     const uploadFile = async (file: File)=> {
         const formData = new FormData()
         formData.append('file', file)
-        return axios.post(`${baseUrl}/midiFile/upload`, formData)
+        return axios.post(`${baseUrl}/midi-file/upload`, formData)
             .then((res: AxiosResponse) => res.data)
             .catch(error => {throw parseError(error)})
     }
